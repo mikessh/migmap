@@ -1,4 +1,5 @@
 out/
-igblast/
+bin/
+data/
 .idea/
 *.iml
