@@ -18,23 +18,22 @@ import java.util.regex.Matcher
  limitations under the License.
  */
 class BlastProcessor {
-    final boolean  hasD
+    final boolean hasD
     final String chain
-    //final igblastwrp.JRefSearcher jRefSearcher
+    final JRefSearcher jRefSearcher
 
-    public BlastProcessor(//igblastwrp.JRefSearcher jRefSearcher,
-                          String chain,
-                          boolean hasD) {
-        //  this.jRefSearcher = jRefSearcher
-        this.hasD = hasD
-        this.chain=chain
+    public BlastProcessor(String species, String gene,
+                          String chain) {
+        this.jRefSearcher = new JRefSearcher(species, gene, chain)
+        this.hasD = chain =~ /[BH]^/
+        this.chain = chain
     }
 
-    public void processChunk(String chunk) {
-        def groomMatch = { Matcher matcher ->
-            matcher.size() > 0 ? matcher[0][1..-1] : null//[]
-        }
+    private static List<String> groomMatch(Matcher matcher) {
+        matcher.size() > 0 ? matcher[0][1..-1] : null//[]
+    }
 
+    public Clonotype processChunk(String chunk) {
         // Query
         // # Query: MIG UMI:TAGTCTGTAGCA:161
         String queryName = (chunk =~ /# Query: (.+)/)[0][1]
@@ -49,12 +48,12 @@ class BlastProcessor {
         segments = groomMatch(chunk =~ /# V-.+\n(.+)${hasD ? "\t(.+)\t" : "\t"}(.+)\tV$chain\t(.+)\t(.+)\t.+\t.+/)
 
 
-        if(segments == null)
+        if (segments == null)
             return // not match for given chain
 
         println segments
 
-        def V_SEGM = segments[0], J_SEGM = segments[1], D_SEGM =hasD ? segments[2]:"N/A"
+        def V_SEGM = segments[0], J_SEGM = segments[1], D_SEGM = hasD ? segments[2] : "N/A"
 
         if (V_SEGM == "N/A" || J_SEGM == "N/A")
             return
@@ -74,8 +73,8 @@ class BlastProcessor {
 
         //# V-(D)-J junction
         // Junction sequence
-        // Combine seuqence inside
-        def junction = (String)(chunk =~ /# V-.+junction.+\n(.+)\n/)[0][0]
+        // Combine sequence inside
+        def junction = (String) (chunk =~ /# V-.+junction.+\n(.+)\n/)[0][0]
         def splitJunction = junction.replaceAll(/(?:N\\/A)|[\(\)]+/, "").trim().split("\t")
         junction = splitJunction[1..<splitJunction.length - 1].join("")
 
@@ -91,5 +90,27 @@ class BlastProcessor {
         println cdrBounds
 
         // Extract CDR3
+        // REMEMBER coordinates in BLAST output are 1-based
+        int cdr1Start = -1, cdr1End = -1,
+            cdr2Start = -1, cdr2End = -1,
+            cdr3Start = -1, cdr3End = -1
+
+        if (cdrBounds[0]) {
+            cdr1Start = Integer.parseInt(cdrBounds[0][0]) - 1
+            cdr1End = Integer.parseInt(cdrBounds[0][1]) - 1
+        }
+
+        if (cdrBounds[1]) {
+            cdr2Start = Integer.parseInt(cdrBounds[1][0]) - 1
+            cdr2End = Integer.parseInt(cdrBounds[1][1]) - 1
+        }
+
+        if (cdrBounds[2]) {
+            cdr3Start = Integer.parseInt(cdrBounds[2][0]) - 4
+            cdr3End = jRefSearcher.getJRefPoint(J_SEGM_UNIQ, Integer.parseInt(hits[2][0]) - 1,
+                    hits[2][1], Integer.parseInt(hits[2][2]) - 1, hits[2][3]) + 4
+        }
+
+        new Clonotype(V_SEGM, J_SEGM, cdr1Start, cdr1End, cdr2Start, cdr2End, cdr3Start, cdr3End)
     }
 }

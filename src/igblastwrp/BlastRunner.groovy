@@ -20,7 +20,7 @@ class BlastRunner {
     final File dir
     final BlastProcessor processor
 
-    public BlastRunner(String species, String gene, String chain, String inputFileName, BlastProcessor processor) {
+    public BlastRunner(String species, String gene, String chain, String inputFileName) {
         def source = new File(getClass().protectionDomain.codeSource.location.path)
         String path = source.parent.replaceAll("%20", " ")
 
@@ -65,7 +65,7 @@ class BlastRunner {
         env = ["IGDATA=\"$IGBLAST_DATA\""]
         dir = new File(IGBLAST_DATA)
 
-        this.processor = processor
+        this.processor = new BlastProcessor(species, gene, chain)
     }
 
     public void runIdle() {

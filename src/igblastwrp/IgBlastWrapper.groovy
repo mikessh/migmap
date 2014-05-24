@@ -32,11 +32,8 @@ if (opt.h || opt == null || opt.arguments().size() < 2 || !opt.C) {
 
 String SPECIES = opt.S ?: "human", GENE = opt.C[0..1], CHAIN = opt.C[2]
 String inputFileName = opt.arguments()[0], outputFileName = opt.arguments()[1]
-boolean hasD = CHAIN =~ /[BH]/
 
-def processor = new BlastProcessor(CHAIN, hasD)
-
-def runner = new BlastRunner(SPECIES, GENE, CHAIN, inputFileName, processor)
+def runner = new BlastRunner(SPECIES, GENE, CHAIN, inputFileName)
 
 runner.runIdle()
 
