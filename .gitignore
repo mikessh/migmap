@@ -1,5 +1,6 @@
 out/
 bin/
 data/
+test/
 .idea/
 *.iml
