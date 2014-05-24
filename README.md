@@ -2,6 +2,9 @@
   IgBlast wrapper  
 =====================================================================
 
+A wrapper for IgBlast immune repertoire analysis tool [http://www.ncbi.nlm.nih.gov/igblast/igblast.cgi]
+To be distributed as a bundle with .jar executable, pre-compiled platform-specific igblast distribution and immune gene segments library
+
 Motivation:
 - IgBlast doesn't extract sequence of CDR3 region directly, neither provide coordinates for CDR3 region in reads. It reports reference Cys residue of Variable segment and Variable segment end in CDR3, but not Phe/Trp residue of J segment that marks the end of CDR3.
 - IgBlast output is not straightforward to parse and summarize, which is important to count clonotype diversity of high-throughput sequencing sample
