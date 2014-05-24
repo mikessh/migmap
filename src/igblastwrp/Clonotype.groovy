@@ -16,37 +16,42 @@ package igblastwrp
  limitations under the License.
  */
 class Clonotype {
-    final String vSegment, jSegment
-    final int cdr1S, cdr1E, cdr2S, cdr2E, cdr3S, cdr3E
+    final String vSegment, dSegment, jSegment
+    final int cdr1start, cdr1end, cdr2start, cdr2end, cdr3start, cdr3end
 
-    Clonotype(String vSegment, String jSegment, int cdr1S, int cdr1E, int cdr2S, int cdr2E, int cdr3S, int cdr3E) {
+    Clonotype(String vSegment, String dSegment, String jSegment,
+              int cdr1start, int cdr1end, int cdr2start, int cdr2end, int cdr3start, int cdr3end) {
         this.vSegment = vSegment
+        this.dSegment = dSegment
         this.jSegment = jSegment
-        this.cdr1S = cdr1S
-        this.cdr1E = cdr1E
-        this.cdr2S = cdr2S
-        this.cdr2E = cdr2E
-        this.cdr3S = cdr3S
-        this.cdr3E = cdr3E
+        this.cdr1start = cdr1start
+        this.cdr1end = cdr1end
+        this.cdr2start = cdr2start
+        this.cdr2end = cdr2end
+        this.cdr3start = cdr3start
+        this.cdr3end = cdr3end
     }
 
     String generateEntry(String seq, String qual) {
-        def cdr1nt = cdr1S >= 0 ? seq.substring(cdr1S, cdr1E) : "N/A",
-            cdr2nt = cdr2S >= 0 ? seq.substring(cdr2S, cdr2E) : "N/A",
-            cdr3nt = cdr3S >= 0 ? seq.substring(cdr3S, cdr3E) : "N/A"
+        def cdr1nt = cdr1start >= 0 ? seq.substring(cdr1start, cdr1end) : "N/A",
+            cdr2nt = cdr2start >= 0 ? seq.substring(cdr2start, cdr2end) : "N/A",
+            cdr3nt = cdr3start >= 0 ? seq.substring(cdr3start, cdr3end) : "N/A"
 
-        def cdr1q = cdr1S >= 0 && qual ? qual.substring(cdr1S, cdr1E) : "N/A",
-            cdr2q = cdr2S >= 0 && qual ? qual.substring(cdr2S, cdr2E) : "N/A",
-            cdr3q = cdr3S >= 0 && qual ? qual.substring(cdr3S, cdr3E) : "N/A"
+        def cdr1q = cdr1start >= 0 && qual ? qual.substring(cdr1start, cdr1end) : "N/A",
+            cdr2q = cdr2start >= 0 && qual ? qual.substring(cdr2start, cdr2end) : "N/A",
+            cdr3q = cdr3start >= 0 && qual ? qual.substring(cdr3start, cdr3end) : "N/A"
 
-        def cdr1aa = cdr1S >= 0 ? translate(cdr1nt) : "N/A",
-            cdr2aa = cdr2S >= 0 ? translate(cdr2nt) : "N/A",
-            cdr3aa = cdr3S >= 0 ? translate(cdr3nt) : "N/A"
+        def cdr1aa = cdr1start >= 0 ? translate(cdr1nt) : "N/A",
+            cdr2aa = cdr2start >= 0 ? translate(cdr2nt) : "N/A",
+            cdr3aa = cdr3start >= 0 ? translate(cdr3nt) : "N/A"
 
-        [vSegment, jSegment, cdr1nt, cdr2nt, cdr3nt, cdr1q, cdr2q, cdr3q, cdr1aa, cdr2aa, cdr3aa].join("\t")
+        [vSegment, dSegment, jSegment, cdr1nt, cdr2nt, cdr3nt, cdr1q, cdr2q, cdr3q, cdr1aa, cdr2aa, cdr3aa].join("\t")
     }
 
-    final static HEADER = "v_segment\tj_segmet\tcdr1nt\tcdr2nt\tcdr3nt\tcdr1q\tcdr2q\tcdr3q\tcdr1aa\tcdr2aa\tcdr3aa"
+
+    final
+    static HEADER = "v_segment\td_segment\tj_segment\tcdr1nt\tcdr2nt\tcdr3nt\tcdr1q\tcdr2q\tcdr3q\tcdr1aa\tcdr2aa\tcdr3aa",
+           HEADER_RAW = "v_segment\td_segment\tj_segment\tcdr1start\tcdr1end\tcdr2start\tcdr2end\tcdr3start\tcdr3end"
 
     static String codon2aa(String codon) {
         String codonUpper = codon.toUpperCase()
@@ -155,5 +160,14 @@ class Clonotype {
         }
 
         return aaSeq + seq.substring(leftEnd, rightEnd).toLowerCase() + aaRight.reverse()
+    }
+
+
+    @Override
+    String toString() {
+        [vSegment, dSegment, jSegment,
+         cdr1start, cdr1end,
+         cdr2start, cdr2end,
+         cdr3start, cdr3end].join("\t")
     }
 }

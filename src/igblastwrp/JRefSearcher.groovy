@@ -18,8 +18,8 @@ class JRefSearcher {
     private static final char GAP = '-'
     private final Map<String, Integer> jRefMap = new HashMap<>()
 
-    public JRefSearcher(String species, String gene, String chain) {
-        def reader = new InputStreamReader(this.class.classLoader.getResourceAsStream("jref.txt"))
+    public JRefSearcher(String species, String gene, String chain, File jRefFile) {
+        def reader = new FileReader(jRefFile)
         def line
         //human	TRA	TRAJ37*01	27	TGGCTCTGGCAACACAGGCAAACTAATCTTTGGGCAAGGGACAACTTTACAAGTAAAACCAG
         while ((line = reader.readLine()) != null) {
@@ -36,13 +36,11 @@ class JRefSearcher {
     }
 
     private static int _getJRefPoint(int jRef, int qstart, String qseq, int sstart, String sseq) {
-        if (sstart > jRef)
+        if (sstart > jRef || jRef >= sseq.replaceAll("-","").length() + sstart)
             return -1
 
         int jRefRel = jRef - sstart, jRefDelta = 0
-        for (
-                int i = 0;
-                i < jRefRel; i++) {
+        for (int i = 0; i < jRefRel; i++) {
             if (qseq[i] == GAP)
                 jRefDelta--
             else if (sseq[i] == GAP) {

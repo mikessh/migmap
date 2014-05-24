@@ -1,5 +1,7 @@
 package igblastwrp
 
+import java.util.concurrent.ConcurrentHashMap
+
 /**
  Copyright 2014 Mikhail Shugay (mikhail.shugay@gmail.com)
 
@@ -33,9 +35,19 @@ if (opt.h || opt == null || opt.arguments().size() < 2 || !opt.C) {
 String SPECIES = opt.S ?: "human", GENE = opt.C[0..1], CHAIN = opt.C[2]
 String inputFileName = opt.arguments()[0], outputFileName = opt.arguments()[1]
 
+// Split input to chunks
+
+def clonotypeMap = new ConcurrentHashMap<String, Clonotype>()
+
 def runner = new BlastRunner(SPECIES, GENE, CHAIN, inputFileName)
 
-runner.runIdle()
+runner.run(clonotypeMap)
+//runner.run()
+
+println "SeqId\t" + Clonotype.HEADER_RAW
+clonotypeMap.each {
+    println it.key + "\t" + it.value
+}
 
 //SPECIES = "human", GENE = "TR", CHAIN = "A",
 //INPUT = "/Users/mikesh/Programming/igblastwrp/test_tra.fa",

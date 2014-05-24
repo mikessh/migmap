@@ -22,10 +22,9 @@ class BlastProcessor {
     final String chain
     final JRefSearcher jRefSearcher
 
-    public BlastProcessor(String species, String gene,
-                          String chain) {
-        this.jRefSearcher = new JRefSearcher(species, gene, chain)
-        this.hasD = chain =~ /[BH]^/
+    public BlastProcessor(String chain, JRefSearcher jRefSearcher) {
+        this.jRefSearcher = jRefSearcher
+        this.hasD = chain =~ /[BH]$/
         this.chain = chain
     }
 
@@ -34,26 +33,21 @@ class BlastProcessor {
     }
 
     public Clonotype processChunk(String chunk) {
-        // Query
-        // # Query: MIG UMI:TAGTCTGTAGCA:161
-        String queryName = (chunk =~ /# Query: (.+)/)[0][1]
-
-        println queryName
-
         def segments
 
         // Rearrangement summary
-        //                                        V               D              J     chain  stop frame prod strand
-        //                                        |               |              |       |      |     |    |   |
-        segments = groomMatch(chunk =~ /# V-.+\n(.+)${hasD ? "\t(.+)\t" : "\t"}(.+)\tV$chain\t(.+)\t(.+)\t.+\t.+/)
+        //                                               V     D     J    chain   stop frame prod strand
+        //                                               |     |     |      |       |     |    |   |
+        segments = hasD ? groomMatch(chunk =~ /# V-.+\n(.+)\t(.+)\t(.+)\tV$chain\t(.+)\t(.+)\t.+\t.+/) :
+                //                             V     J    chain   stop frame prod strand
+                //                             |     |      |       |     |    |   |
+                groomMatch(chunk =~ /# V-.+\n(.+)\t(.+)\tV$chain\t(.+)\t(.+)\t.+\t.+/)
 
 
         if (segments == null)
             return // not match for given chain
 
-        println segments
-
-        def V_SEGM = segments[0], J_SEGM = segments[1], D_SEGM = hasD ? segments[2] : "N/A"
+        def V_SEGM = segments[0], J_SEGM = hasD ? segments[2] : segments[1], D_SEGM = hasD ? segments[1] : "N/A"
 
         if (V_SEGM == "N/A" || J_SEGM == "N/A")
             return
@@ -69,16 +63,16 @@ class BlastProcessor {
                 groomMatch(chunk =~ /# Hit table(?:.+\n)+J\t.+\t([0-9]+)\t([ATGC]+)\t([0-9]+)\t([ATGC]+)\n/)
         ]
 
-        println hits
+        //println hits
 
         //# V-(D)-J junction
         // Junction sequence
         // Combine sequence inside
-        def junction = (String) (chunk =~ /# V-.+junction.+\n(.+)\n/)[0][0]
-        def splitJunction = junction.replaceAll(/(?:N\\/A)|[\(\)]+/, "").trim().split("\t")
-        junction = splitJunction[1..<splitJunction.length - 1].join("")
+        //def junction = (String) (chunk =~ /# V-.+junction.+\n(.+)\n/)[0][0]
+        //def splitJunction = junction.replaceAll(/(?:N\\/A)|[\(\)]+/, "").trim().split("\t")
+        //junction = splitJunction[1..<splitJunction.length - 1].join("")
 
-        println junction
+        //println junction
 
         // CDR coords
         def cdrBounds = [
@@ -87,7 +81,7 @@ class BlastProcessor {
                 groomMatch(chunk =~ /# Alignment summary(?:.+\n)+CDR3-IMGT \(germline\)\t([0-9]+)\t([0-9]+)\t/)
         ]
 
-        println cdrBounds
+        //println cdrBounds
 
         // Extract CDR3
         // REMEMBER coordinates in BLAST output are 1-based
@@ -111,6 +105,6 @@ class BlastProcessor {
                     hits[2][1], Integer.parseInt(hits[2][2]) - 1, hits[2][3]) + 4
         }
 
-        new Clonotype(V_SEGM, J_SEGM, cdr1Start, cdr1End, cdr2Start, cdr2End, cdr3Start, cdr3End)
+        new Clonotype(V_SEGM, D_SEGM, J_SEGM, cdr1Start, cdr1End, cdr2Start, cdr2End, cdr3Start, cdr3End)
     }
 }

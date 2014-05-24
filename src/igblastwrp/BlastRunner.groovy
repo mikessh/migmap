@@ -1,4 +1,7 @@
 package igblastwrp
+
+import java.util.concurrent.ConcurrentHashMap
+
 /**
  Copyright 2014 Mikhail Shugay (mikhail.shugay@gmail.com)
 
@@ -25,12 +28,14 @@ class BlastRunner {
         String path = source.parent.replaceAll("%20", " ")
 
         if (source.absolutePath.endsWith(".groovy")) // trim /src for script
-            path = path.endsWith("/src") ? path.substring(0, path.length() - 4) : path
+            path = path.replaceAll(/(?:src\/){1}.+/, "")
 
         def IGBLAST_EXECUTABLE = "$path/bin/igblastn",
             IGBLAST_DATA = "$path/data",
             IGBLAST_DB_PATH = "$IGBLAST_DATA/database",
             IGBLAST_OPT_PATH = "$IGBLAST_DATA/optional_file"
+
+        //println source.absolutePath
 
         def seqtype = gene == "TR" ? "TCR" : "Ig"
 
@@ -65,10 +70,11 @@ class BlastRunner {
         env = ["IGDATA=\"$IGBLAST_DATA\""]
         dir = new File(IGBLAST_DATA)
 
-        this.processor = new BlastProcessor(species, gene, chain)
+        def jRefSearcher = new JRefSearcher(species, gene, chain, new File("$IGBLAST_DATA/jref.txt"))
+        this.processor = new BlastProcessor(chain, jRefSearcher)
     }
 
-    public void runIdle() {
+    public void run() {
         println "[${new Date()}] Executing ${cmdLine.join(" ")}"
 
         def proc = cmdLine.execute(env, dir)
@@ -85,14 +91,21 @@ class BlastRunner {
         }
     }
 
-    public void run() {
+    public void run(ConcurrentHashMap<String, Clonotype> clonotypeMap) {
         println "[${new Date()}] Executing ${cmdLine.join(" ")}"
 
         def proc = cmdLine.execute(env, dir)
         String chunk = ""
         proc.in.eachLine { line ->
             if (line.startsWith("# IGBLASTN") && chunk.length() > 0) {
-                processor.processChunk(chunk)
+                // # Query: MIG UMI:TAGTCTGTAGCA:161
+                String queryName = (chunk =~ /# Query: (.+)/)[0][1]
+
+                def clonotype = processor.processChunk(chunk)
+
+                if (clonotype)
+                    clonotypeMap.put(queryName, clonotype)
+
                 chunk = ""
             } else chunk += "$line\n"
         }
