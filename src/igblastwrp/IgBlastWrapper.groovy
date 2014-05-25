@@ -71,9 +71,9 @@ while ((read = reader.next()) != null) {
     def seqData = seqRedundMap.get(read.seq)
 
     if (!seqData)
-        seqRedundMap.put(read.seq, seqData = new SeqData(seqRedundMap.size()))
+        seqRedundMap.put(read.seq, seqData = new SeqData(seqRedundMap.size(), read.qual))
 
-    seqData.readIds.add(readId++)
+    seqData.append(readId++, read.qual)
 }
 
 //
@@ -89,6 +89,7 @@ for (int i = 0; i < THREADS; i++) {
             pw.println(it.key)
         }
     }
+    new File(chunkFileName).deleteOnExit()
     fastaChunks.add(chunkFileName)
 }
 
@@ -104,7 +105,9 @@ def processes = (0..(THREADS - 1)).collect { p ->
 processes.each { it.run() }
 processes.each { it.join() }
 
-//runner.run()
+//
+// Re-append read data
+//
 
 println "SeqId\t" + Clonotype.HEADER_RAW
 clonotypeMap.each {

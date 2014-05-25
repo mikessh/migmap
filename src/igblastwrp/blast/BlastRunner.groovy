@@ -17,14 +17,15 @@ import java.util.concurrent.ConcurrentHashMap
  See the License for the specific language governing permissions and
  limitations under the License.
  */
-class BlastRunner implements Runnable{
+class BlastRunner implements Runnable {
     final List cmdLine
     final List env
     final File dir
     final BlastProcessor processor
     final ConcurrentHashMap<String, Clonotype> clonotypeMap
 
-    public BlastRunner(String species, String gene, String chain, String inputFileName, clonotypeMap) {
+    public BlastRunner(String species, String gene, String chain, String inputFileName,
+                       ConcurrentHashMap<String, Clonotype> clonotypeMap) {
         def source = new File(getClass().protectionDomain.codeSource.location.path)
         String path = source.parent.replaceAll("%20", " ")
 
