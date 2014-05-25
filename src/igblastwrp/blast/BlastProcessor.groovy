@@ -97,8 +97,9 @@ class BlastProcessor {
 
         if (cdrBounds[2]) {
             cdr3Start = cdrBounds[2][0].toInteger() - 4
-            cdr3End = jRefSearcher.getJRefPoint(J_SEGM_UNIQ, hits[2][0].toInteger() - 1,
-                    hits[2][1], hits[2][2].toInteger() - 1, hits[2][3]) + 4
+            def jRef = jRefSearcher.getJRefPoint(J_SEGM_UNIQ, hits[2][0].toInteger() - 1,
+                    hits[2][1], hits[2][2].toInteger() - 1, hits[2][3])
+            cdr3End = jRef < 0 ? -1 : jRef + 4
         }
 
         new Clonotype(V_SEGM, D_SEGM, J_SEGM, cdr1Start, cdr1End, cdr2Start, cdr2End, cdr3Start, cdr3End)

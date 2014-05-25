@@ -35,6 +35,50 @@ class Util {
         matcher.size() > 0 ? matcher[0][1..-1] : null//[]
     }
 
+    static final char ntA = 'A', ntT = 'T', ntG = 'G', ntC = 'C', ntN = 'N',
+                      nta = 'a', ntt = 't', ntg = 'g', ntc = 'c', ntn = 'n'
+
+    static revCompl(String seq) {
+        def chars = seq.reverse().toCharArray()
+        for (int i = 0; i < chars.length; i++) {
+            switch (chars[i]) {
+                case ntA:
+                    chars[i] = ntT
+                    break
+                case ntT:
+                    chars[i] = ntA
+                    break
+                case ntG:
+                    chars[i] = ntC
+                    break
+                case ntC:
+                    chars[i] = ntG
+                    break
+                case ntN:
+                    chars[i] = ntN
+                    break
+                case nta:
+                    chars[i] = ntt
+                    break
+                case ntt:
+                    chars[i] = nta
+                    break
+                case ntg:
+                    chars[i] = ntc
+                    break
+                case ntc:
+                    chars[i] = ntg
+                    break
+                case ntn:
+                    chars[i] = ntn
+                    break
+                default:
+                    chars[i] = ntN
+            }
+        }
+        new String(chars)
+    }
+
     static String codon2aa(String codon) {
         String codonUpper = codon.toUpperCase()
         switch (codonUpper) {
@@ -110,7 +154,7 @@ class Util {
         }
     }
 
-    static String translate(String seq) {
+    static String translateCdr(String seq) {
         def aaSeq = ""
         def oof = seq.size() % 3
         if (oof > 0) {
@@ -141,6 +185,17 @@ class Util {
             aaRight += codon2aa(codon)
         }
 
-        return aaSeq + seq.substring(leftEnd, rightEnd).toLowerCase() + aaRight.reverse()
+        aaSeq + seq.substring(leftEnd, rightEnd).toLowerCase() + aaRight.reverse()
+    }
+
+    static String translateLinear(String seq) {
+        def aaSeq = ""
+
+        for (int i = 0; i <= seq.size() - 3; i += 3) {
+            def codon = seq.substring(i, i + 3)
+            aaSeq += codon2aa(codon)
+        }
+
+        aaSeq
     }
 }
