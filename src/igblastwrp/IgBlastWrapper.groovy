@@ -66,27 +66,33 @@ def reader = inputFileName =~ /fastq(?:\.gz)?$/ ? new FastqReader(inputFileName)
         new FastaReader(inputFileName)
 
 Read read
-int readId = 0
 while ((read = reader.next()) != null) {
     def seqData = seqRedundMap.get(read.seq)
 
     if (!seqData)
         seqRedundMap.put(read.seq, seqData = new SeqData(seqRedundMap.size(), read.qual))
 
-    seqData.append(readId++, read.qual)
+    seqData.append(read.qual)
 }
 
 //
 // Create .fa chunks for IgBlast
 //
 def fastaChunks = new ArrayList<String>()
+def seqIter = seqRedundMap.entrySet().iterator()
 for (int i = 0; i < THREADS; i++) {
     def prefix = UUID.randomUUID().toString()
     def chunkFileName = "$outputDir/${prefix}.fa"
+
     new File(chunkFileName).withPrintWriter { pw ->
-        seqRedundMap.each {
-            pw.println(">$it.value.seqId")
-            pw.println(it.key)
+        for (int j = 0; j < seqRedundMap.size() / THREADS; j++) {
+            if (!seqIter.hasNext())
+                break
+
+            def seqEntry = seqIter.next()
+
+            pw.println(">$seqEntry.value.seqId")
+            pw.println(seqEntry.key)
         }
     }
     new File(chunkFileName).deleteOnExit()
@@ -106,14 +112,24 @@ processes.each { it.run() }
 processes.each { it.join() }
 
 //
-// Re-append read data
+// Group clonotypes
 //
+def resultsMap = new HashMap<String, Integer>()
 
-println "SeqId\t" + Clonotype.HEADER_RAW
-clonotypeMap.each {
-    println it.key + "\t" + it.value
+seqRedundMap.each {
+    def clonotype = clonotypeMap[it.value.seqId.toString()]
+    if (clonotype != null) {
+        def clonotypeResult = clonotype.generateEntry(it.key, it.value.computeQual())
+        resultsMap.put(clonotypeResult, (resultsMap[clonotypeResult] ?: 0) + it.value.nReads)
+    }
 }
 
-//SPECIES = "human", GENE = "TR", CHAIN = "A",
-//INPUT = "/Users/mikesh/Programming/igblastwrp/test_tra.fa",
-//OUTPUT = "/Users/mikesh/Programming/igblastwrp/results_a.txt"
+//
+// Write output
+//
+new File(outputFileName).withPrintWriter { pw ->
+    pw.println "Count\t" + Clonotype.HEADER
+    resultsMap.sort { -it.value }.each {
+        pw.println(it.value + "\t" + it.key)
+    }
+}

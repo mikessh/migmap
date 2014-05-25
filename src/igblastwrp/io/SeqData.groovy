@@ -16,7 +16,7 @@ package igblastwrp.io
  limitations under the License.
  */
 class SeqData {
-    final List<Integer> readIds = new LinkedList<>()
+    int nReads =0
     final int[] qual
     final int seqId
 
@@ -25,8 +25,8 @@ class SeqData {
         this.qual = qual ? new int[qual.length()] : null
     }
 
-    void append(int readId, String newQual) {
-        readIds.add(readId)
+    void append(String newQual) {
+        nReads++
         if (this.qual) {
             def qualCharArray = newQual.toCharArray()
             for (int i = 0; i < qualCharArray.length; i++)
@@ -37,7 +37,7 @@ class SeqData {
     String computeQual() {
         if (qual) {
             for (int i = 0; i < qual.length; i++)
-                qual[i] /= readIds.size()
+                qual[i] /= nReads
             def qualCharArray = new char[qual.length]
             for (int i = 0; i < qual.length; i++)
                 qualCharArray[i] = (char) (qual[i] + 33)
