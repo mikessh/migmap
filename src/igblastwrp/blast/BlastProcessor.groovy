@@ -32,12 +32,10 @@ class BlastProcessor {
         def segments
 
         // Rearrangement summary
-        //                                               V     D     J    chain   stop frame prod strand
-        //                                               |     |     |      |       |     |    |   |
-        segments = hasD ? Util.groomMatch(chunk =~ /# V-.+\n(.+)\t(.+)\t(.+)\tV$chain\t(.+)\t(.+)\t.+\t.+/) :
-                //                             V     J    chain   stop frame prod strand
-                //                             |     |      |       |     |    |   |
-                Util.groomMatch(chunk =~ /# V-.+\n(.+)\t(.+)\tV$chain\t(.+)\t(.+)\t.+\t.+/)
+        //                                                    V     D     J  chain stop frame (prod) strand
+        segments = hasD ? Util.groomMatch(chunk =~ /# V-.+\n(.+)\t(.+)\t(.+)\tV$chain\t(.+)\t(.+)\t.+\t(.+)/) :
+                //                                  V     J    chain   stop frame (prod)  strand
+                Util.groomMatch(chunk =~ /# V-.+\n(.+)\t(.+)\tV$chain\t(.+)\t(.+)\t.+\t(.+)/)
 
 
         if (segments == null)
@@ -45,12 +43,13 @@ class BlastProcessor {
 
         def V_SEGM = segments[0], J_SEGM = hasD ? segments[2] : segments[1], D_SEGM = hasD ? segments[1] : "N/A"
 
-        if (V_SEGM == "N/A" || J_SEGM == "N/A")
+        def dFound = D_SEGM != Util.BLAST_NA, vFound = V_SEGM != Util.BLAST_NA, jFound = J_SEGM != Util.BLAST_NA
+
+        if (!vFound)
             return
 
         def J_SEGM_UNIQ = J_SEGM.split(",")[0]
-
-        def dFound = D_SEGM != "N/A"
+        def rc = segments[-1] != "+"
 
         // Hits
         def hits = [
@@ -97,11 +96,11 @@ class BlastProcessor {
 
         if (cdrBounds[2]) {
             cdr3Start = cdrBounds[2][0].toInteger() - 4
-            def jRef = jRefSearcher.getJRefPoint(J_SEGM_UNIQ, hits[2][0].toInteger() - 1,
-                    hits[2][1], hits[2][2].toInteger() - 1, hits[2][3])
+            def jRef = jFound ? jRefSearcher.getJRefPoint(J_SEGM_UNIQ, hits[2][0].toInteger() - 1,
+                    hits[2][1], hits[2][2].toInteger() - 1, hits[2][3]) : -1
             cdr3End = jRef < 0 ? -1 : jRef + 4
         }
 
-        new Clonotype(V_SEGM, D_SEGM, J_SEGM, cdr1Start, cdr1End, cdr2Start, cdr2End, cdr3Start, cdr3End)
+        new Clonotype(V_SEGM, D_SEGM, J_SEGM, cdr1Start, cdr1End, cdr2Start, cdr2End, cdr3Start, cdr3End, rc)
     }
 }
