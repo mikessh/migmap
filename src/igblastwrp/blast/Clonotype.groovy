@@ -51,7 +51,9 @@ class Clonotype {
 
         def cdr1q = cdr1start >= 0 && qual ? qual.substring(cdr1start, cdr1end) : "N/A",
             cdr2q = cdr2start >= 0 && qual ? qual.substring(cdr2start, cdr2end) : "N/A",
-            cdr3q = cdr3start >= 0 && cdr3end >= 0 && qual ? qual.substring(cdr3start, cdr3end) : "N/A"
+            cdr3q = cdr3start >= 0 && qual ?
+                    (cdr3end >= 0 ? qual.substring(cdr3start, cdr3end) : qual.substring(cdr3start))
+                    : "N/A"
 
         def cdr1aa = cdr1start >= 0 ? Util.translateCdr(cdr1nt) : "N/A",
             cdr2aa = cdr2start >= 0 ? Util.translateCdr(cdr2nt) : "N/A",
