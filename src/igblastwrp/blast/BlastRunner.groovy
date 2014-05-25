@@ -1,4 +1,4 @@
-package igblastwrp
+package igblastwrp.blast
 
 import java.util.concurrent.ConcurrentHashMap
 
@@ -17,13 +17,14 @@ import java.util.concurrent.ConcurrentHashMap
  See the License for the specific language governing permissions and
  limitations under the License.
  */
-class BlastRunner {
+class BlastRunner implements Runnable{
     final List cmdLine
     final List env
     final File dir
     final BlastProcessor processor
+    final ConcurrentHashMap<String, Clonotype> clonotypeMap
 
-    public BlastRunner(String species, String gene, String chain, String inputFileName) {
+    public BlastRunner(String species, String gene, String chain, String inputFileName, clonotypeMap) {
         def source = new File(getClass().protectionDomain.codeSource.location.path)
         String path = source.parent.replaceAll("%20", " ")
 
@@ -50,8 +51,8 @@ class BlastRunner {
                     "ORG_OPT"   :
                             "-organism $species -ig_seqtype $seqtype",
 
-                    "THREAD_OPT":
-                            "-num_threads ${Runtime.runtime.availableProcessors()}",
+                    //"THREAD_OPT":
+                    //        "-num_threads ${Runtime.runtime.availableProcessors()}",
 
                     "DOMAIN_OPT":
                             "-domain_system imgt"
@@ -72,9 +73,10 @@ class BlastRunner {
 
         def jRefSearcher = new JRefSearcher(species, gene, chain, new File("$IGBLAST_DATA/jref.txt"))
         this.processor = new BlastProcessor(chain, jRefSearcher)
+        this.clonotypeMap = clonotypeMap
     }
 
-    public void run() {
+    public void runIdle() {
         println "[${new Date()}] Executing ${cmdLine.join(" ")}"
 
         def proc = cmdLine.execute(env, dir)
@@ -91,7 +93,7 @@ class BlastRunner {
         }
     }
 
-    public void run(ConcurrentHashMap<String, Clonotype> clonotypeMap) {
+    public void run() {
         println "[${new Date()}] Executing ${cmdLine.join(" ")}"
 
         def proc = cmdLine.execute(env, dir)

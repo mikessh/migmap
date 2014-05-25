@@ -1,4 +1,4 @@
-package igblastwrp
+package igblastwrp.blast
 /**
  Copyright 2014 Mikhail Shugay (mikhail.shugay@gmail.com)
 

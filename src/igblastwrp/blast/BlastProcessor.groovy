@@ -1,6 +1,6 @@
-package igblastwrp
+package igblastwrp.blast
 
-import java.util.regex.Matcher
+import igblastwrp.Util
 
 /**
  Copyright 2014 Mikhail Shugay (mikhail.shugay@gmail.com)
@@ -28,20 +28,16 @@ class BlastProcessor {
         this.chain = chain
     }
 
-    private static List<String> groomMatch(Matcher matcher) {
-        matcher.size() > 0 ? matcher[0][1..-1] : null//[]
-    }
-
     public Clonotype processChunk(String chunk) {
         def segments
 
         // Rearrangement summary
         //                                               V     D     J    chain   stop frame prod strand
         //                                               |     |     |      |       |     |    |   |
-        segments = hasD ? groomMatch(chunk =~ /# V-.+\n(.+)\t(.+)\t(.+)\tV$chain\t(.+)\t(.+)\t.+\t.+/) :
+        segments = hasD ? Util.groomMatch(chunk =~ /# V-.+\n(.+)\t(.+)\t(.+)\tV$chain\t(.+)\t(.+)\t.+\t.+/) :
                 //                             V     J    chain   stop frame prod strand
                 //                             |     |      |       |     |    |   |
-                groomMatch(chunk =~ /# V-.+\n(.+)\t(.+)\tV$chain\t(.+)\t(.+)\t.+\t.+/)
+                Util.groomMatch(chunk =~ /# V-.+\n(.+)\t(.+)\tV$chain\t(.+)\t(.+)\t.+\t.+/)
 
 
         if (segments == null)
@@ -58,9 +54,9 @@ class BlastProcessor {
 
         // Hits
         def hits = [
-                groomMatch(chunk =~ /# Hit table(?:.+\n)+V\t.+\t([0-9]+)\t([ATGC]+)\t([0-9]+)\t([ATGC]+)\n/),
-                dFound ? groomMatch(chunk =~ /# Hit table(?:.+\n)+D\t.+\t([0-9]+)\t([ATGC]+)\t([0-9]+)\t([ATGC]+)\n/) : null,
-                groomMatch(chunk =~ /# Hit table(?:.+\n)+J\t.+\t([0-9]+)\t([ATGC]+)\t([0-9]+)\t([ATGC]+)\n/)
+                Util.groomMatch(chunk =~ /# Hit table(?:.+\n)+V\t.+\t([0-9]+)\t([ATGC]+)\t([0-9]+)\t([ATGC]+)\n/),
+                dFound ? Util.groomMatch(chunk =~ /# Hit table(?:.+\n)+D\t.+\t([0-9]+)\t([ATGC]+)\t([0-9]+)\t([ATGC]+)\n/) : null,
+                Util.groomMatch(chunk =~ /# Hit table(?:.+\n)+J\t.+\t([0-9]+)\t([ATGC]+)\t([0-9]+)\t([ATGC]+)\n/)
         ]
 
         //println hits
@@ -76,9 +72,9 @@ class BlastProcessor {
 
         // CDR coords
         def cdrBounds = [
-                groomMatch(chunk =~ /# Alignment summary(?:.+\n)+CDR1-IMGT\t([0-9]+)\t([0-9]+)\t/),
-                groomMatch(chunk =~ /# Alignment summary(?:.+\n)+CDR2-IMGT\t([0-9]+)\t([0-9]+)\t/),
-                groomMatch(chunk =~ /# Alignment summary(?:.+\n)+CDR3-IMGT \(germline\)\t([0-9]+)\t([0-9]+)\t/)
+                Util.groomMatch(chunk =~ /# Alignment summary(?:.+\n)+CDR1-IMGT\t([0-9]+)\t([0-9]+)\t/),
+                Util.groomMatch(chunk =~ /# Alignment summary(?:.+\n)+CDR2-IMGT\t([0-9]+)\t([0-9]+)\t/),
+                Util.groomMatch(chunk =~ /# Alignment summary(?:.+\n)+CDR3-IMGT \(germline\)\t([0-9]+)\t([0-9]+)\t/)
         ]
 
         //println cdrBounds
@@ -90,19 +86,19 @@ class BlastProcessor {
             cdr3Start = -1, cdr3End = -1
 
         if (cdrBounds[0]) {
-            cdr1Start = Integer.parseInt(cdrBounds[0][0]) - 1
-            cdr1End = Integer.parseInt(cdrBounds[0][1]) - 1
+            cdr1Start = cdrBounds[0][0].toInteger() - 1
+            cdr1End = cdrBounds[0][1].toInteger() - 1
         }
 
         if (cdrBounds[1]) {
-            cdr2Start = Integer.parseInt(cdrBounds[1][0]) - 1
-            cdr2End = Integer.parseInt(cdrBounds[1][1]) - 1
+            cdr2Start = cdrBounds[1][0].toInteger() - 1
+            cdr2End = cdrBounds[1][1].toInteger() - 1
         }
 
         if (cdrBounds[2]) {
-            cdr3Start = Integer.parseInt(cdrBounds[2][0]) - 4
-            cdr3End = jRefSearcher.getJRefPoint(J_SEGM_UNIQ, Integer.parseInt(hits[2][0]) - 1,
-                    hits[2][1], Integer.parseInt(hits[2][2]) - 1, hits[2][3]) + 4
+            cdr3Start = cdrBounds[2][0].toInteger() - 4
+            cdr3End = jRefSearcher.getJRefPoint(J_SEGM_UNIQ, hits[2][0].toInteger() - 1,
+                    hits[2][1], hits[2][2].toInteger() - 1, hits[2][3]) + 4
         }
 
         new Clonotype(V_SEGM, D_SEGM, J_SEGM, cdr1Start, cdr1End, cdr2Start, cdr2End, cdr3Start, cdr3End)
