@@ -31,7 +31,7 @@ cli.h('usage')
 cli.f('Report clonotypes with functional CDR3s only')
 cli.c('Report clonotypes with complete CDR3s only')
 
-cli.R(args: 1, argName: '\'TRA\', \'TRB\', \'TRG\', \'TRD\',  \'IGL\', \'IGK\' or \'IGH\'', 'Receptor chain [required]')
+cli.R(args: 1, argName: 'TRA|B|G|D and IGH|L|K', 'Receptor gene and chain, e.g. \'TRA\' [required]')
 cli.S(args: 1, argName: '\'human\' or \'mouse\'', 'Species [default=HomoSapiens]')
 cli.p(args: 1, 'number of threads to use [default = all available processors]')
 cli._(longOpt: 'data-dir', args: 1, argName: 'path', 'path to folder that contains IgBlastWrapper bundle: ' +
