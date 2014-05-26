@@ -1,6 +1,5 @@
-=====================================================================
   IgBlast wrapper  
-=====================================================================
+==================
 
 A wrapper for IgBlast immune repertoire analysis tool [http://www.ncbi.nlm.nih.gov/igblast/igblast.cgi]
 To be distributed as a bundle with .jar executable, pre-compiled platform-specific igblast distribution and immune gene segments library
@@ -18,3 +17,7 @@ Goals:
 
 Distant future goals:
 - Reporting of mismatches (alleles/hypermutations) in V gene
+
+NOTE: IgBlastWrapper only aligns to top alleles (marked by ```*01``` in IMGT nomenclature) to speed-up. Mismatches are then extracted from alignment and reported
+ 
+HINT: The most straightforward way to build the scripts is to create an Intellij Project (Groovy), then use "Open Module Settings"->Artifacts(+)Jar->from modules with dependencies followed by Build->Build artifacts  
