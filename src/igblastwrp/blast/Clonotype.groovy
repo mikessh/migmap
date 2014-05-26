@@ -37,7 +37,7 @@ class Clonotype {
         this.rc = rc
         this.inFrame = inFrame
         this.noStop = noStop
-        this.complete=complete
+        this.complete = complete
     }
 
     String generateEntry(String seq, String qual) {
@@ -65,7 +65,11 @@ class Clonotype {
                     (complete ? Util.translateCdr(cdr3nt) : (Util.translateLinear(cdr3nt) + "_"))
                     : Util.MY_NA
 
-        [vSegment, dSegment, jSegment, cdr1nt, cdr2nt, cdr3nt, cdr1q, cdr2q, cdr3q, cdr1aa, cdr2aa, cdr3aa].join("\t")
+        [vSegment, dSegment, jSegment,
+         cdr1nt, cdr2nt, cdr3nt,
+         cdr1q, cdr2q, cdr3q,
+         cdr1aa, cdr2aa, cdr3aa,
+         inFrame, noStop, complete].join("\t")
     }
 
     boolean isFunctional() {
@@ -73,8 +77,16 @@ class Clonotype {
     }
 
     final
-    static HEADER = "v_segment\td_segment\tj_segment\tcdr1nt\tcdr2nt\tcdr3nt\tcdr1q\tcdr2q\tcdr3q\tcdr1aa\tcdr2aa\tcdr3aa",
-           HEADER_RAW = "v_segment\td_segment\tj_segment\tcdr1start\tcdr1end\tcdr2start\tcdr2end\tcdr3start\tcdr3end"
+    static HEADER = "v_segment\td_segment\tj_segment\t" +
+            "cdr1nt\tcdr2nt\tcdr3nt\t" +
+            "cdr1q\tcdr2q\tcdr3q\t" +
+            "cdr1aa\tcdr2aa\tcdr3aa\t" +
+            "inFrame\tnoStop\tcomplete",
+           HEADER_RAW = "v_segment\td_segment\tj_segment\t" +
+                   "cdr1start\tcdr1end\t" +
+                   "cdr2start\tcdr2end\t" +
+                   "cdr3start\tcdr3end\t" +
+                   "inFrame\tnoStop\tcomplete"
 
 
     @Override
@@ -82,6 +94,7 @@ class Clonotype {
         [vSegment, dSegment, jSegment,
          cdr1start, cdr1end,
          cdr2start, cdr2end,
-         cdr3start, cdr3end].join("\t")
+         cdr3start, cdr3end,
+         inFrame, noStop, complete].join("\t")
     }
 }
