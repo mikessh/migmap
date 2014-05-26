@@ -27,7 +27,11 @@ import java.util.concurrent.ConcurrentHashMap
 
 def cli = new CliBuilder(usage: 'igblastwrp [options] input.(fa/fastq)[.gz] output')
 cli.h('usage')
-cli.C(args: 1, argName: '\'TRA\', \'TRB\', \'TRG\', \'TRD\',  \'IGL\', \'IGK\' or \'IGH\'', 'Receptor chain [required]')
+
+cli.f('Report clonotypes with functional CDR3s only')
+cli.c('Report clonotypes with complete CDR3s only')
+
+cli.R(args: 1, argName: '\'TRA\', \'TRB\', \'TRG\', \'TRD\',  \'IGL\', \'IGK\' or \'IGH\'', 'Receptor chain [required]')
 cli.S(args: 1, argName: '\'human\' or \'mouse\'', 'Species [default=HomoSapiens]')
 cli.p(args: 1, 'number of threads to use [default = all available processors]')
 cli._(longOpt: 'data-dir', args: 1, argName: 'path', 'path to folder that contains IgBlastWrapper bundle: ' +
@@ -36,14 +40,19 @@ cli.N(args: 1, 'number of reads to take')
 
 def opt = cli.parse(args)
 
-if (opt.h || opt == null || opt.arguments().size() < 2 || !opt.C) {
+if (opt.h || opt == null || opt.arguments().size() < 2 || !opt.R) {
     cli.usage()
     System.exit(0)
 }
 
 int THREADS = (opt.p ?: "${Runtime.runtime.availableProcessors()}").toInteger()
 int N = (opt.N ?: "-1").toInteger()
-String SPECIES = opt.S ?: "human", GENE = opt.C[0..1], CHAIN = opt.C[2]
+String SPECIES = opt.S ?: "human", GENE = opt.R[0..1], CHAIN = opt.R[2]
+boolean funcOnly = opt.f, completeOnly = opt.c
+
+//
+// DATA BUNDLE
+//
 
 String SCRIPT_PATH = opt.'data-dir' ? new File(opt.'data-dir'.toString()) : null
 
@@ -62,6 +71,10 @@ if (!SCRIPT_PATH) {
     SCRIPT_PATH = scriptParentDir.absolutePath
 }
 
+//
+// IO
+//
+
 String inputFileName = opt.arguments()[0], outputFileName = opt.arguments()[1]
 
 if (!new File(inputFileName).exists()) {
@@ -78,6 +91,12 @@ if (!outputDir.exists()) {
         System.exit(0)
     }
 }
+
+//
+//
+// SCRIPT BODY
+//
+//
 
 //
 // Read input, group reads
@@ -145,7 +164,9 @@ def resultsMap = new HashMap<String, Integer>()
 
 seqRedundMap.each {
     def clonotype = clonotypeMap[it.value.seqId.toString()]
-    if (clonotype != null) {
+    if (clonotype != null &&
+            (!funcOnly || clonotype.functional) &&
+            (!completeOnly || clonotype.complete)) {
         def clonotypeResult = clonotype.generateEntry(it.key, it.value.computeQual())
         resultsMap.put(clonotypeResult, (resultsMap[clonotypeResult] ?: 0) + it.value.nReads)
     }
