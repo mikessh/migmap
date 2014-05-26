@@ -30,6 +30,8 @@ cli.h('usage')
 cli.C(args: 1, argName: '\'TRA\', \'TRB\', \'TRG\', \'TRD\',  \'IGL\', \'IGK\' or \'IGH\'', 'Receptor chain [required]')
 cli.S(args: 1, argName: '\'human\' or \'mouse\'', 'Species [default=HomoSapiens]')
 cli.p(args: 1, 'number of threads to use [default = all available processors]')
+cli._(longOpt: 'data-dir', args: 1, argName: 'path', 'path to folder that contains IgBlastWrapper bundle: ' +
+        'data/ and bin/ folders [default = parent directory of script]')
 cli.N(args: 1, 'number of reads to take')
 
 def opt = cli.parse(args)
@@ -40,7 +42,26 @@ if (opt.h || opt == null || opt.arguments().size() < 2 || !opt.C) {
 }
 
 int THREADS = (opt.p ?: "${Runtime.runtime.availableProcessors()}").toInteger()
+int N = (opt.N ?: "-1").toInteger()
 String SPECIES = opt.S ?: "human", GENE = opt.C[0..1], CHAIN = opt.C[2]
+
+String SCRIPT_PATH = opt.'data-dir' ? new File(opt.'data-dir'.toString()) : null
+
+if (!SCRIPT_PATH) {
+    def SCRIPT_SOURCE = new File(getClass().protectionDomain.codeSource.location.path)
+    SCRIPT_PATH = SCRIPT_SOURCE.parent.replaceAll("%20", " ")
+
+    if (SCRIPT_SOURCE.absolutePath.endsWith(".groovy")) // trim /src for script
+        SCRIPT_PATH = SCRIPT_PATH.replaceAll(/(?:src\/){1}.+/, "")
+} else {
+    def scriptParentDir = new File(SCRIPT_PATH)
+    if (!scriptParentDir.exists()) {
+        println "Bad path to data bundle"
+        System.exit(-1)
+    }
+    SCRIPT_PATH = scriptParentDir.absolutePath
+}
+
 String inputFileName = opt.arguments()[0], outputFileName = opt.arguments()[1]
 
 if (!new File(inputFileName).exists()) {
@@ -48,8 +69,8 @@ if (!new File(inputFileName).exists()) {
     System.exit(-1)
 }
 
-def outputDir = new File(outputFileName).parentFile
-if (!outputDir) {
+def outputDir = new File(outputFileName).absoluteFile.parentFile
+if (!outputDir.exists()) {
     println "Output path doesn't exist.. creating"
     def created = outputDir.mkdirs()
     if (!created) {
@@ -66,6 +87,7 @@ def reader = inputFileName =~ /fastq(?:\.gz)?$/ ? new FastqReader(inputFileName)
         new FastaReader(inputFileName)
 
 Read read
+int n = 0
 while ((read = reader.next()) != null) {
     def seqData = seqRedundMap.get(read.seq)
 
@@ -73,6 +95,11 @@ while ((read = reader.next()) != null) {
         seqRedundMap.put(read.seq, seqData = new SeqData(seqRedundMap.size(), read.qual))
 
     seqData.append(read.qual)
+
+    n++
+
+    if (N > 0 && n == N)
+        break
 }
 
 //
@@ -81,7 +108,7 @@ while ((read = reader.next()) != null) {
 def fastaChunks = new ArrayList<String>()
 def seqIter = seqRedundMap.entrySet().iterator()
 for (int i = 0; i < THREADS; i++) {
-    def prefix = UUID.randomUUID().toString()
+    def prefix = "_igblastwrp-" + UUID.randomUUID().toString()
     def chunkFileName = "$outputDir/${prefix}.fa"
 
     new File(chunkFileName).withPrintWriter { pw ->
@@ -105,7 +132,7 @@ for (int i = 0; i < THREADS; i++) {
 def clonotypeMap = new ConcurrentHashMap<String, Clonotype>()
 
 def processes = (0..(THREADS - 1)).collect { p ->
-    new Thread(new BlastRunner(SPECIES, GENE, CHAIN, fastaChunks[p], clonotypeMap))
+    new Thread(new BlastRunner(SCRIPT_PATH, SPECIES, GENE, CHAIN, fastaChunks[p], clonotypeMap))
 }
 
 processes.each { it.run() }

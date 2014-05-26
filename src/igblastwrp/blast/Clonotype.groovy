@@ -20,11 +20,11 @@ import igblastwrp.Util
 class Clonotype {
     final String vSegment, dSegment, jSegment
     final int cdr1start, cdr1end, cdr2start, cdr2end, cdr3start, cdr3end
-    final boolean rc
+    final boolean rc, inFrame, noStop, complete
 
     Clonotype(String vSegment, String dSegment, String jSegment,
               int cdr1start, int cdr1end, int cdr2start, int cdr2end, int cdr3start, int cdr3end,
-              boolean rc) {
+              boolean rc, boolean inFrame, boolean noStop, boolean complete) {
         this.vSegment = vSegment
         this.dSegment = dSegment == Util.BLAST_NA ? Util.MY_NA : dSegment
         this.jSegment = jSegment
@@ -35,31 +35,34 @@ class Clonotype {
         this.cdr3start = cdr3start
         this.cdr3end = cdr3end
         this.rc = rc
+        this.inFrame = inFrame
+        this.noStop = noStop
+        this.complete=complete
     }
 
     String generateEntry(String seq, String qual) {
-        // todo: rc
         if (rc) {
-            qual = qual.reverse()
+            if (qual)
+                qual = qual.reverse()
             seq = Util.revCompl(seq)
         }
 
         def cdr1nt = cdr1start >= 0 ? seq.substring(cdr1start, cdr1end) : Util.MY_NA,
             cdr2nt = cdr2start >= 0 ? seq.substring(cdr2start, cdr2end) : Util.MY_NA,
             cdr3nt = cdr3start >= 0 ?
-                    (cdr3end >= 0 ? seq.substring(cdr3start, cdr3end) : seq.substring(cdr3start) + "_")
+                    (complete ? seq.substring(cdr3start, cdr3end) : seq.substring(cdr3start) + "_")
                     : Util.MY_NA
 
         def cdr1q = cdr1start >= 0 && qual ? qual.substring(cdr1start, cdr1end) : Util.MY_NA,
             cdr2q = cdr2start >= 0 && qual ? qual.substring(cdr2start, cdr2end) : Util.MY_NA,
             cdr3q = cdr3start >= 0 && qual ?
-                    (cdr3end >= 0 ? qual.substring(cdr3start, cdr3end) : qual.substring(cdr3start))
+                    (complete ? qual.substring(cdr3start, cdr3end) : qual.substring(cdr3start))
                     : Util.MY_NA
 
         def cdr1aa = cdr1start >= 0 ? Util.translateCdr(cdr1nt) : Util.MY_NA,
             cdr2aa = cdr2start >= 0 ? Util.translateCdr(cdr2nt) : Util.MY_NA,
-            cdr3aa = cdr3start >= 0 ? (
-                    cdr3end >= 0 ? Util.translateCdr(cdr3nt) : Util.translateLinear(cdr3nt) + "_")
+            cdr3aa = cdr3start >= 0 ?
+                    (complete ? Util.translateCdr(cdr3nt) : (Util.translateLinear(cdr3nt) + "_"))
                     : Util.MY_NA
 
         [vSegment, dSegment, jSegment, cdr1nt, cdr2nt, cdr3nt, cdr1q, cdr2q, cdr3q, cdr1aa, cdr2aa, cdr3aa].join("\t")

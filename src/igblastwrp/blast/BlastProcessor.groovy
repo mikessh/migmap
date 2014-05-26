@@ -41,6 +41,8 @@ class BlastProcessor {
         if (segments == null)
             return // not match for given chain
 
+        //println segments
+
         def V_SEGM = segments[0], J_SEGM = hasD ? segments[2] : segments[1], D_SEGM = hasD ? segments[1] : "N/A"
 
         def dFound = D_SEGM != Util.BLAST_NA, vFound = V_SEGM != Util.BLAST_NA, jFound = J_SEGM != Util.BLAST_NA
@@ -49,7 +51,8 @@ class BlastProcessor {
             return
 
         def J_SEGM_UNIQ = J_SEGM.split(",")[0]
-        def rc = segments[-1] != "+"
+        def rc = segments[-1] != "+", inFrame = segments[-2] == "In-frame", noStop = segments[-3] == "No"
+
 
         // Hits
         def hits = [
@@ -101,6 +104,10 @@ class BlastProcessor {
             cdr3End = jRef < 0 ? -1 : jRef + 4
         }
 
-        new Clonotype(V_SEGM, D_SEGM, J_SEGM, cdr1Start, cdr1End, cdr2Start, cdr2End, cdr3Start, cdr3End, rc)
+        def complete = cdr3End >= 0
+
+        new Clonotype(V_SEGM, D_SEGM, J_SEGM,
+                cdr1Start, cdr1End, cdr2Start, cdr2End, cdr3Start, cdr3End,
+                rc, inFrame, noStop, complete)
     }
 }

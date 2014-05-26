@@ -19,7 +19,13 @@ class JRefSearcher {
     private final Map<String, Integer> jRefMap = new HashMap<>()
 
     public JRefSearcher(String species, String gene, String chain, File jRefFile) {
-        def reader = new FileReader(jRefFile)
+        def reader
+        try {
+            reader = new FileReader(jRefFile)
+        } catch (FileNotFoundException e) {
+            println "IgBlastWrapper bundle missing. $e"
+            System.exit(-1)
+        }
         def line
         //human	TRA	TRAJ37*01	27	TGGCTCTGGCAACACAGGCAAACTAATCTTTGGGCAAGGGACAACTTTACAAGTAAAACCAG
         while ((line = reader.readLine()) != null) {

@@ -24,14 +24,8 @@ class BlastRunner implements Runnable {
     final BlastProcessor processor
     final ConcurrentHashMap<String, Clonotype> clonotypeMap
 
-    public BlastRunner(String species, String gene, String chain, String inputFileName,
+    public BlastRunner(String path, String species, String gene, String chain, String inputFileName,
                        ConcurrentHashMap<String, Clonotype> clonotypeMap) {
-        def source = new File(getClass().protectionDomain.codeSource.location.path)
-        String path = source.parent.replaceAll("%20", " ")
-
-        if (source.absolutePath.endsWith(".groovy")) // trim /src for script
-            path = path.replaceAll(/(?:src\/){1}.+/, "")
-
         def IGBLAST_EXECUTABLE = "$path/bin/igblastn",
             IGBLAST_DATA = "$path/data",
             IGBLAST_DB_PATH = "$IGBLAST_DATA/database",
