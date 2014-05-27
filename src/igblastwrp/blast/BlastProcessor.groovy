@@ -29,13 +29,16 @@ class BlastProcessor {
     }
 
     public Clonotype processChunk(String chunk) {
-        def segments
+        def segments, hits, cdrBounds
 
         // Rearrangement summary
-        //                                                    V     D     J  chain stop frame (prod) strand
-        segments = hasD ? Util.groomMatch(chunk =~ /# V-.+\n(.+)\t(.+)\t(.+)\tV$chain\t(.+)\t(.+)\t.+\t(.+)/) :
-                //                                  V     J    chain   stop frame (prod)  strand
-                Util.groomMatch(chunk =~ /# V-.+\n(.+)\t(.+)\tV$chain\t(.+)\t(.+)\t.+\t(.+)/)
+        segments = hasD ? Util.groomMatch(chunk =~
+                //         V     D     J  chain stop frame (prod) strand
+                /# V-.+\n(.+)\t(.+)\t(.+)\tV$chain\t(.+)\t(.+)\t.+\t(.+)/) :
+
+                Util.groomMatch(chunk =~
+                        //         V     J    chain   stop frame (prod)  strand
+                        /# V-.+\n(.+)\t(.+)\tV$chain\t(.+)\t(.+)\t.+\t(.+)/)
 
 
         if (segments == null)
@@ -53,12 +56,14 @@ class BlastProcessor {
         def J_SEGM_UNIQ = J_SEGM.split(",")[0]
         def rc = segments[-1] != "+", inFrame = segments[-2] == "In-frame", noStop = segments[-3] == "No"
 
-
         // Hits
-        def hits = [
-                Util.groomMatch(chunk =~ /# Hit table(?:.+\n)+V\t.+\t([0-9]+)\t([ATGC]+)\t([0-9]+)\t([ATGC]+)\n/),
-                dFound ? Util.groomMatch(chunk =~ /# Hit table(?:.+\n)+D\t.+\t([0-9]+)\t([ATGC]+)\t([0-9]+)\t([ATGC]+)\n/) : null,
-                Util.groomMatch(chunk =~ /# Hit table(?:.+\n)+J\t.+\t([0-9]+)\t([ATGC]+)\t([0-9]+)\t([ATGC]+)\n/)
+        hits = [
+                Util.groomMatch(chunk =~
+                        /# Hit table(?:.+\n)+V\t.+\t([0-9]+)\t([ATGC-]+)\t([0-9]+)\t([ATGC-]+)\n/),
+                dFound ? Util.groomMatch(chunk =~
+                        /# Hit table(?:.+\n)+D\t.+\t([0-9]+)\t([ATGC-]+)\t([0-9]+)\t([ATGC-]+)\n/) : null,
+                Util.groomMatch(chunk =~
+                        /# Hit table(?:.+\n)+J\t.+\t([0-9]+)\t([ATGC-]+)\t([0-9]+)\t([ATGC-]+)\n/)
         ]
 
         //println hits
@@ -73,14 +78,18 @@ class BlastProcessor {
         //println junction
 
         // CDR coords
-        def cdrBounds = [
-                Util.groomMatch(chunk =~ /# Alignment summary(?:.+\n)+CDR1-IMGT\t([0-9]+)\t([0-9]+)\t/),
-                Util.groomMatch(chunk =~ /# Alignment summary(?:.+\n)+CDR2-IMGT\t([0-9]+)\t([0-9]+)\t/),
-                Util.groomMatch(chunk =~ /# Alignment summary(?:.+\n)+CDR3-IMGT \(germline\)\t([0-9]+)\t([0-9]+)\t/)
+        cdrBounds = [
+                Util.groomMatch(chunk =~
+                        /# Alignment summary(?:.+\n)+CDR1-IMGT\t([0-9]+)\t([0-9]+)\t/),
+                Util.groomMatch(chunk =~
+                        /# Alignment summary(?:.+\n)+CDR2-IMGT\t([0-9]+)\t([0-9]+)\t/),
+                Util.groomMatch(chunk =~
+                        /# Alignment summary(?:.+\n)+CDR3-IMGT \(germline\)\t([0-9]+)\t([0-9]+)\t/)
         ]
 
         //println cdrBounds
 
+        //try {
         // Extract CDR3
         // REMEMBER coordinates in BLAST output are 1-based
         int cdr1Start = -1, cdr1End = -1,
@@ -89,12 +98,12 @@ class BlastProcessor {
 
         if (cdrBounds[0]) {
             cdr1Start = cdrBounds[0][0].toInteger() - 1
-            cdr1End = cdrBounds[0][1].toInteger() - 1
+            cdr1End = cdrBounds[0][1].toInteger()
         }
 
         if (cdrBounds[1]) {
             cdr2Start = cdrBounds[1][0].toInteger() - 1
-            cdr2End = cdrBounds[1][1].toInteger() - 1
+            cdr2End = cdrBounds[1][1].toInteger()
         }
 
         if (cdrBounds[2]) {
@@ -104,10 +113,22 @@ class BlastProcessor {
             cdr3End = jRef < 0 ? -1 : jRef + 4
         }
 
+        if (cdr1Start < 0 && cdr2Start < 0 && cdr3Start < 0) {
+            return null
+            //println chunk
+        }
+
         def complete = cdr3End >= 0
 
-        new Clonotype(V_SEGM, D_SEGM, J_SEGM,
+        return new Clonotype(V_SEGM, D_SEGM, J_SEGM,
                 cdr1Start, cdr1End, cdr2Start, cdr2End, cdr3Start, cdr3End,
                 rc, inFrame, noStop, complete)
+        //} catch (Exception e) {
+        //    println "Error parsing $chunk"
+        //    println segments
+        //    println hits
+        //    println cdrBounds
+        //}
+        //return null
     }
 }

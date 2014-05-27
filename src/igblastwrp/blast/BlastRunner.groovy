@@ -24,14 +24,12 @@ class BlastRunner implements Runnable {
     final BlastProcessor processor
     final ConcurrentHashMap<String, Clonotype> clonotypeMap
 
-    public BlastRunner(String path, String species, String gene, String chain, String inputFileName,
+    public BlastRunner(int THREADS, String path, String species, String gene, String chain, String inputFileName,
                        ConcurrentHashMap<String, Clonotype> clonotypeMap) {
         def IGBLAST_EXECUTABLE = "$path/bin/igblastn",
             IGBLAST_DATA = "$path/data",
             IGBLAST_DB_PATH = "$IGBLAST_DATA/database",
             IGBLAST_OPT_PATH = "$IGBLAST_DATA/optional_file"
-
-        //println source.absolutePath
 
         def seqtype = gene == "TR" ? "TCR" : "Ig"
 
@@ -46,8 +44,8 @@ class BlastRunner implements Runnable {
                     "ORG_OPT"   :
                             "-organism $species -ig_seqtype $seqtype",
 
-                    //"THREAD_OPT":
-                    //        "-num_threads ${Runtime.runtime.availableProcessors()}",
+                    "THREAD_OPT":
+                            "-num_threads $THREADS",
 
                     "DOMAIN_OPT":
                             "-domain_system imgt"
@@ -72,7 +70,7 @@ class BlastRunner implements Runnable {
     }
 
     public void runIdle() {
-        println "[${new Date()}] Executing ${cmdLine.join(" ")}"
+        //println "[${new Date()}] Executing ${cmdLine.join(" ")}"
 
         def proc = cmdLine.execute(env, dir)
 
@@ -89,16 +87,18 @@ class BlastRunner implements Runnable {
     }
 
     public void run() {
-        println "[${new Date()}] Executing ${cmdLine.join(" ")}"
+        //println "[${new Date()}] Executing ${cmdLine.join(" ")}"
 
         def proc = cmdLine.execute(env, dir)
+        def clonotype
+        String queryName
         String chunk = ""
         proc.in.eachLine { line ->
             if (line.startsWith("# IGBLASTN") && chunk.length() > 0) {
                 // # Query: MIG UMI:TAGTCTGTAGCA:161
-                String queryName = (chunk =~ /# Query: (.+)/)[0][1]
+                queryName = (chunk =~ /# Query: (.+)/)[0][1]
 
-                def clonotype = processor.processChunk(chunk)
+                clonotype = processor.processChunk(chunk)
 
                 if (clonotype)
                     clonotypeMap.put(queryName, clonotype)
@@ -106,7 +106,14 @@ class BlastRunner implements Runnable {
                 chunk = ""
             } else chunk += "$line\n"
         }
-        processor.processChunk(chunk)
+
+        // last chunk
+        clonotype = processor.processChunk(chunk)
+
+        if (clonotype) {
+            queryName = (chunk =~ /# Query: (.+)/)[0][1]
+            clonotypeMap.put(queryName, clonotype)
+        }
 
         proc.out.close()
         proc.waitFor()

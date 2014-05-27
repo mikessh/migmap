@@ -59,8 +59,8 @@ class Clonotype {
                     (complete ? qual.substring(cdr3start, cdr3end) : qual.substring(cdr3start))
                     : Util.MY_NA
 
-        def cdr1aa = cdr1start >= 0 ? Util.translateCdr(cdr1nt) : Util.MY_NA,
-            cdr2aa = cdr2start >= 0 ? Util.translateCdr(cdr2nt) : Util.MY_NA,
+        def cdr1aa = cdr1start >= 0 ? Util.translateLinear(cdr1nt) : Util.MY_NA,
+            cdr2aa = cdr2start >= 0 ? Util.translateLinear(cdr2nt) : Util.MY_NA,
             cdr3aa = cdr3start >= 0 ?
                     (complete ? Util.translateCdr(cdr3nt) : (Util.translateLinear(cdr3nt) + "_"))
                     : Util.MY_NA

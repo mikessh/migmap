@@ -8,6 +8,7 @@ import igblastwrp.io.Read
 import igblastwrp.io.SeqData
 
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.Executors
 
 /**
  Copyright 2014 Mikhail Shugay (mikhail.shugay@gmail.com)
@@ -101,37 +102,43 @@ if (!outputDir.exists()) {
 //
 // Read input, group reads
 //
-def seqRedundMap = new HashMap<String, SeqData>()
+def nonRedundantSequenceMap = new HashMap<String, SeqData>()
 def reader = inputFileName =~ /fastq(?:\.gz)?$/ ? new FastqReader(inputFileName) :
         new FastaReader(inputFileName)
 
+println "[${new Date()}] Reading input.."
 Read read
 int n = 0
 while ((read = reader.next()) != null) {
-    def seqData = seqRedundMap.get(read.seq)
+    def seqData = nonRedundantSequenceMap.get(read.seq)
 
     if (!seqData)
-        seqRedundMap.put(read.seq, seqData = new SeqData(seqRedundMap.size(), read.qual))
+        nonRedundantSequenceMap.put(read.seq, seqData = new SeqData(nonRedundantSequenceMap.size(), read.qual))
 
     seqData.append(read.qual)
 
     n++
 
+    if (n % 50000 == 0)
+        println "[${new Date()}] $n sequences read, ${nonRedundantSequenceMap.size()} non-redundant ones so far.."
+
     if (N > 0 && n == N)
         break
 }
+println "[${new Date()}] Finished reading, $n sequences total, ${nonRedundantSequenceMap.size()} non-redundant ones"
+println "[${new Date()}] Preparing to run IgBlast"
 
 //
 // Create .fa chunks for IgBlast
 //
 def fastaChunks = new ArrayList<String>()
-def seqIter = seqRedundMap.entrySet().iterator()
+def seqIter = nonRedundantSequenceMap.entrySet().iterator()
 for (int i = 0; i < THREADS; i++) {
     def prefix = "_igblastwrp-" + UUID.randomUUID().toString()
     def chunkFileName = "$outputDir/${prefix}.fa"
 
     new File(chunkFileName).withPrintWriter { pw ->
-        for (int j = 0; j < seqRedundMap.size() / THREADS; j++) {
+        for (int j = 0; j < nonRedundantSequenceMap.size() / THREADS; j++) {
             if (!seqIter.hasNext())
                 break
 
@@ -149,20 +156,41 @@ for (int i = 0; i < THREADS; i++) {
 // Run IgBlast in parallel
 //
 def clonotypeMap = new ConcurrentHashMap<String, Clonotype>()
+boolean finished = false
 
-def processes = (0..(THREADS - 1)).collect { p ->
-    new Thread(new BlastRunner(SCRIPT_PATH, SPECIES, GENE, CHAIN, fastaChunks[p], clonotypeMap))
+println "[${new Date()}] Running IgBlast and parsing output"
+
+def listener = Thread.start {
+    while (!finished) {
+        sleep 30000
+        println "[${new Date()}] ${clonotypeMap.size()} non-redundant sequences succesfully " +
+                "aligned and processed so far " +
+                "(${((int) (10000 * clonotypeMap.size() / nonRedundantSequenceMap.size())) / 100}%)"
+    }
 }
 
-processes.each { it.run() }
-processes.each { it.join() }
+def pool = Executors.newFixedThreadPool(THREADS)
+(0..(THREADS - 1)).collect { p ->
+    pool.submit(new BlastRunner(THREADS, SCRIPT_PATH, SPECIES, GENE, CHAIN, fastaChunks[p], clonotypeMap))
+}
+
+pool.shutdown()
+
+while (!pool.terminated) ;
+
+finished = true
+listener.join()
+
+println "[${new Date()}] Finished. ${clonotypeMap.size()} non-redundant sequences succesfully " +
+        "aligned and processed (${((int) (10000 * clonotypeMap.size() / nonRedundantSequenceMap.size())) / 100}%)"
 
 //
 // Group clonotypes
 //
 def resultsMap = new HashMap<String, Integer>()
 
-seqRedundMap.each {
+println "[${new Date()}] Generating clonotypes"
+nonRedundantSequenceMap.each {
     def clonotype = clonotypeMap[it.value.seqId.toString()]
     if (clonotype != null &&
             (!funcOnly || clonotype.functional) &&
@@ -175,9 +203,12 @@ seqRedundMap.each {
 //
 // Write output
 //
+println "[${new Date()}] Writing output"
 new File(outputFileName).withPrintWriter { pw ->
     pw.println "Count\t" + Clonotype.HEADER
     resultsMap.sort { -it.value }.each {
         pw.println(it.value + "\t" + it.key)
     }
 }
+
+println "[${new Date()}] Finished"
