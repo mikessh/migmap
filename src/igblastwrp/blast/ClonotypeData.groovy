@@ -18,7 +18,7 @@ import igblastwrp.Util
  limitations under the License.
  */
 class ClonotypeData {
-    int count = 1
+    int count = 0
     final int[] qual1, qual2, qual3
 
     public ClonotypeData(String qual1, String qual2, String qual3) {
