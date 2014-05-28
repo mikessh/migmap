@@ -152,7 +152,7 @@ for (int i = 0; i < THREADS; i++) {
             pw.println(seqEntry.key)
         }
     }
-    //new File(chunkFileName).deleteOnExit()
+    new File(chunkFileName).deleteOnExit()
     fastaChunks.add(chunkFileName)
 }
 

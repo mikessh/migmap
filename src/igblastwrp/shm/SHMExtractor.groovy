@@ -28,6 +28,9 @@ class SHMExtractor {
         while ((read = reader.next()) != null) {
             def vSegment = read.header.substring(1).trim() //trim >
             vSegmentSeqMap.put(vSegment, new VSegmentData(Util.translateLinear(read.seq), read.seq))
+            println read.header
+            println Util.translateLinear(read.seq)
+            println ""
         }
     }
 
@@ -68,9 +71,9 @@ class SHMExtractor {
                 }
 
 
-                if (cdr1start >= 0 && i >= cdr1start && i < cdr1end)
+                if (cdr1start >= 0 && posInRead >= cdr1start && posInRead < cdr1end)
                     cdr = 1
-                else if (cdr2start >= 0 && i >= cdr2start && i < cdr2end)
+                else if (cdr2start >= 0 && posInRead >= cdr2start && posInRead < cdr2end)
                     cdr = 2
 
                 hypermutations.add(new Hypermutation(pos, posInRead,

@@ -95,7 +95,7 @@ class ClonotypeData {
         if (hypermMap.size() == 0)
             sb.append('.')
         else
-            sb.append(hypermMap.collect { it.value + "," + it.key.toString() }.join("|"))
+            sb.append(hypermMap.sort { it.key.pos }.collect { it.value + "," + it.key.toString() }.join("|"))
         sb.toString()
     }
 

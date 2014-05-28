@@ -55,6 +55,6 @@ class Hypermutation {
     }
 
     String toString() {
-        "$pos:$ntFrom>$ntTo,${(int) (pos / 3)}:$aaFrom>$aaTo,${silent() ? "S" : "R"}${cdr > 0 ? ",CDR${cdr}" : ""}"
+        "$pos:$ntFrom>$ntTo,${(int) (pos / 3)}:$aaFrom>$aaTo${cdr > 0 ? ",CDR${cdr}" : ""}"
     }
 }

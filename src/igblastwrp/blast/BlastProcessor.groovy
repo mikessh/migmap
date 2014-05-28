@@ -131,10 +131,11 @@ class BlastProcessor {
                 hits[0][0].toInteger() - 1, hits[0][1], hits[0][2].toInteger() - 1, hits[0][3],
                 cdr1Start, cdr1End, cdr2Start, cdr2End)
 
-        return new Clonotype(V_SEGM, D_SEGM, J_SEGM,
+        return  new Clonotype(V_SEGM, D_SEGM, J_SEGM,
                 cdr1Start, cdr1End, cdr2Start, cdr2End, cdr3Start, cdr3End,
                 rc, inFrame, noStop, complete,
                 hypermutations)
+
         //} catch (Exception e) {
         //    println "Error parsing $chunk"
         //    println segments
