@@ -82,16 +82,16 @@ if (!SCRIPT_PATH) {
 String inputFileName = opt.arguments()[0], outputFileName = opt.arguments()[1]
 
 if (!new File(inputFileName).exists()) {
-    println "Input file doesn't exist"
+    println "[ERROR] Input file doesn't exist"
     System.exit(-1)
 }
 
 def outputDir = new File(outputFileName).absoluteFile.parentFile
 if (!outputDir.exists()) {
-    println "Output path doesn't exist.. creating"
+    println "[WARNING] Output path doesn't exist.. creating"
     def created = outputDir.mkdirs()
     if (!created) {
-        println "Failed to create output path"
+        println "[ERROR] Failed to create output path"
         System.exit(0)
     }
 }
@@ -109,7 +109,7 @@ def nonRedundantSequenceMap = new HashMap<String, SeqData>()
 def reader = inputFileName =~ /fastq(?:\.gz)?$/ ? new FastqReader(inputFileName) :
         new FastaReader(inputFileName)
 
-println "[${new Date()}] Reading input.."
+println "[${new Date()}] Reading $inputFileName.."
 Read read
 int n = 0
 while ((read = reader.next()) != null) {
@@ -129,7 +129,7 @@ while ((read = reader.next()) != null) {
         break
 }
 println "[${new Date()}] Finished reading, $n sequences total, ${nonRedundantSequenceMap.size()} non-redundant ones"
-println "[${new Date()}] Preparing to run IgBlast"
+println "[${new Date()}] Preparing to run IgBlast (creating .fa chunks)"
 
 //
 // Create .fa chunks for IgBlast
@@ -161,14 +161,14 @@ for (int i = 0; i < THREADS; i++) {
 def clonotypeMap = new ConcurrentHashMap<String, Clonotype>()
 boolean finished = false
 
-println "[${new Date()}] Running IgBlast and parsing output"
+println "[${new Date()}] Running IgBlast for $inputFileName and parsing output"
 
 def listener = Thread.start {
     while (!finished) {
         sleep 30000
         println "[${new Date()}] ${clonotypeMap.size()} non-redundant sequences succesfully " +
                 "aligned and processed so far " +
-                "(${((int) (10000 * clonotypeMap.size() / nonRedundantSequenceMap.size())) / 100}%)"
+                "(${((int) (10000 * (clonotypeMap.size() + 1) / (nonRedundantSequenceMap.size() + 1))) / 100}%)"
     }
 }
 
@@ -213,7 +213,7 @@ nonRedundantSequenceMap.each {
 //
 // Write output
 //
-println "[${new Date()}] Writing output"
+println "[${new Date()}] Writing output to $outputFileName"
 new File(outputFileName).withPrintWriter { pw ->
     pw.println "Count\t" + Clonotype.HEADER + "\t" + ClonotypeData.HEADER
     resultsMap.sort { -it.value.count }.each {

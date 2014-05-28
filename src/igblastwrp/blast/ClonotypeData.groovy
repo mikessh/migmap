@@ -25,6 +25,7 @@ class ClonotypeData {
         this.qual1 = (qual1 != Util.MY_NA) ? new byte[qual1.length()] : null
         this.qual2 = (qual2 != Util.MY_NA) ? new byte[qual2.length()] : null
         this.qual3 = (qual3 != Util.MY_NA) ? new byte[qual3.length()] : null
+        append(qual1, qual2, qual3)
     }
 
     void append(String qual1, String qual2, String qual3) {
