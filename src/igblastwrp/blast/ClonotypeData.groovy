@@ -1,6 +1,7 @@
 package igblastwrp.blast
 
 import igblastwrp.Util
+import igblastwrp.shm.Hypermutation
 
 /**
  Copyright 2014 Mikhail Shugay (mikhail.shugay@gmail.com)
@@ -20,16 +21,23 @@ import igblastwrp.Util
 class ClonotypeData {
     int count = 0
     final int[] qual1, qual2, qual3
+    final Map<Hypermutation, Integer> hypermMap
 
-    public ClonotypeData(String qual1, String qual2, String qual3) {
+    public ClonotypeData(String qual1, String qual2, String qual3, List<Hypermutation> hypermutations) {
         this.qual1 = (qual1 != Util.MY_NA) ? new byte[qual1.length()] : null
         this.qual2 = (qual2 != Util.MY_NA) ? new byte[qual2.length()] : null
         this.qual3 = (qual3 != Util.MY_NA) ? new byte[qual3.length()] : null
-        append(qual1, qual2, qual3)
+        this.hypermMap = new HashMap<>()
+        append(qual1, qual2, qual3, hypermutations)
     }
 
-    void append(String qual1, String qual2, String qual3) {
+    void append(String qual1, String qual2, String qual3, List<Hypermutation> hypermutations) {
         count++
+
+        hypermutations.each {
+            hypermMap.put(it, (hypermMap[it] ?: 0) + 1)
+        }
+
         if (qual1 != Util.MY_NA)
             for (int i = 0; i < qual1.length(); i++)
                 this.qual1[i] = this.qual1[i] + (int) (qual1.charAt(i) - 33)
@@ -66,7 +74,7 @@ class ClonotypeData {
         minQual
     }
 
-    String qualString() {
+    String toString() {
         StringBuilder sb = new StringBuilder()
         if (qual1)
             qual1.each { sb.append((char) (it + 33)) }
@@ -82,8 +90,14 @@ class ClonotypeData {
             qual3.each { sb.append((char) (it + 33)) }
         else
             sb.append('.')
+
+        sb.append('\t')
+        if (hypermMap.size() == 0)
+            sb.append('.')
+        else
+            sb.append(hypermMap.collect { it.value + "|" + it.key.toString() }.join(","))
         sb.toString()
     }
 
-    final static String HEADER = "cdr1q\tcdr2q\tcdr3q\t"
+    final static String HEADER = "cdr1q\tcdr2q\tcdr3q\thypermutations"
 }

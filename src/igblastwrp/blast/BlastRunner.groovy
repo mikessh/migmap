@@ -1,5 +1,7 @@
 package igblastwrp.blast
 
+import igblastwrp.shm.SHMExtractor
+
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -65,7 +67,8 @@ class BlastRunner implements Runnable {
         dir = new File(IGBLAST_DATA)
 
         def jRefSearcher = new JRefSearcher(species, gene, chain, new File("$IGBLAST_DATA/jref.txt"))
-        this.processor = new BlastProcessor(chain, jRefSearcher)
+        this.processor = new BlastProcessor(chain, jRefSearcher,
+                new SHMExtractor("$IGBLAST_DB_PATH/${species}_${gene}_${chain}_V.fa"))
         this.clonotypeMap = clonotypeMap
     }
 

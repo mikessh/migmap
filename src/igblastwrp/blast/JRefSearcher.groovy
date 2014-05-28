@@ -18,7 +18,7 @@ class JRefSearcher {
     private static final char GAP = '-'
     private final Map<String, Integer> jRefMap = new HashMap<>()
 
-    public JRefSearcher(String species, String gene, String chain, File jRefFile) {
+    JRefSearcher(String species, String gene, String chain, File jRefFile) {
         def reader
         try {
             reader = new FileReader(jRefFile)
@@ -36,7 +36,7 @@ class JRefSearcher {
         }
     }
 
-    public int getJRefPoint(String jSegment, int qstart, String qseq, int sstart, String sseq) {
+    int getJRefPoint(String jSegment, int qstart, String qseq, int sstart, String sseq) {
         int jRef = jRefMap[jSegment]
         _getJRefPoint(jRef, qstart, qseq, sstart, sseq)
     }

@@ -1,6 +1,7 @@
 package igblastwrp.blast
 
 import igblastwrp.Util
+import igblastwrp.shm.SHMExtractor
 
 /**
  Copyright 2014 Mikhail Shugay (mikhail.shugay@gmail.com)
@@ -21,9 +22,11 @@ class BlastProcessor {
     final boolean hasD
     final String chain
     final JRefSearcher jRefSearcher
+    final SHMExtractor shmExtractor
 
-    public BlastProcessor(String chain, JRefSearcher jRefSearcher) {
+    public BlastProcessor(String chain, JRefSearcher jRefSearcher, SHMExtractor shmExtractor) {
         this.jRefSearcher = jRefSearcher
+        this.shmExtractor = shmExtractor
         this.hasD = chain =~ /[BH]$/
         this.chain = chain
     }
@@ -59,6 +62,7 @@ class BlastProcessor {
         // Hits
         hits = [
                 Util.groomMatch(chunk =~
+                        //                          qstart     qseq        sstart     sseq
                         /# Hit table(?:.+\n)+V\t.+\t([0-9]+)\t([ATGC-]+)\t([0-9]+)\t([ATGC-]+)\n/),
                 dFound ? Util.groomMatch(chunk =~
                         /# Hit table(?:.+\n)+D\t.+\t([0-9]+)\t([ATGC-]+)\t([0-9]+)\t([ATGC-]+)\n/) : null,
@@ -120,9 +124,13 @@ class BlastProcessor {
 
         def complete = cdr3End >= 0
 
+        def hypermutations = shmExtractor.extract(V_SEGM,
+                hits[0][0].toInteger(), hits[0][1], hits[0][2].toInteger(), hits[0][3],
+                cdr1Start, cdr1End, cdr2Start, cdr2End)
+
         return new Clonotype(V_SEGM, D_SEGM, J_SEGM,
                 cdr1Start, cdr1End, cdr2Start, cdr2End, cdr3Start, cdr3End,
-                rc, inFrame, noStop, complete)
+                rc, inFrame, noStop, complete, hypermutations)
         //} catch (Exception e) {
         //    println "Error parsing $chunk"
         //    println segments

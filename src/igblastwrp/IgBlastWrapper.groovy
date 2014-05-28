@@ -3,6 +3,7 @@ package igblastwrp
 import igblastwrp.blast.BlastRunner
 import igblastwrp.blast.Clonotype
 import igblastwrp.blast.ClonotypeData
+import igblastwrp.blast.ClonotypeEntry
 import igblastwrp.io.FastaReader
 import igblastwrp.io.FastqReader
 import igblastwrp.io.Read
@@ -190,7 +191,7 @@ println "[${new Date()}] Finished. ${clonotypeMap.size()} non-redundant sequence
 //
 // Group clonotypes
 //
-def resultsMap = new HashMap<String, ClonotypeData>()
+def resultsMap = new HashMap<ClonotypeEntry, ClonotypeData>()
 
 println "[${new Date()}] Generating clonotypes"
 nonRedundantSequenceMap.each {
@@ -198,15 +199,16 @@ nonRedundantSequenceMap.each {
     if (clonotype != null &&
             (!funcOnly || clonotype.functional) &&
             (!completeOnly || clonotype.complete)) {
+
         def clonotypeEntry = clonotype.generateEntry(it.key)
         def clonotypeData = resultsMap[clonotypeEntry]
 
         String qual = it.value.computeQual()
 
         if (!clonotypeData)
-            resultsMap.put(clonotypeEntry, clonotype.appendToData(null, qual))  // create new
+            resultsMap.put(clonotypeEntry, clonotype.appendToData(null, qual, qualThreshold))  // create new
         else
-            clonotype.appendToData(clonotypeData, qual)
+            clonotype.appendToData(clonotypeData, qual, qualThreshold)
     }
 }
 
@@ -215,11 +217,11 @@ nonRedundantSequenceMap.each {
 //
 println "[${new Date()}] Writing output to $outputFileName"
 new File(outputFileName).withPrintWriter { pw ->
-    pw.println "Count\t" + Clonotype.HEADER + "\t" + ClonotypeData.HEADER
+    pw.println "Count\t" + ClonotypeEntry.HEADER + "\t" + ClonotypeData.HEADER
     resultsMap.sort { -it.value.count }.each {
         byte minQual = it.value.summarizeQuality()
         if (minQual >= qualThreshold)
-            pw.println(it.value.count + "\t" + it.key + "\t" + it.value.qualString())
+            pw.println(it.value.count + "\t" + it.key.toString() + "\t" + it.value.toString())
     }
 }
 
