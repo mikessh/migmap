@@ -168,7 +168,7 @@ def listener = Thread.start {
         sleep 30000
         println "[${new Date()}] ${clonotypeMap.size()} non-redundant sequences succesfully " +
                 "aligned and processed so far " +
-                "(${((int) (10000 * (clonotypeMap.size() + 1) / (nonRedundantSequenceMap.size() + 1))) / 100}%)"
+                "(${((int) (10000 * clonotypeMap.size() / (nonRedundantSequenceMap.size() + 1))) / 100}%)"
     }
 }
 
@@ -185,7 +185,7 @@ finished = true
 listener.join()
 
 println "[${new Date()}] Finished. ${clonotypeMap.size()} non-redundant sequences succesfully " +
-        "aligned and processed (${((int) (10000 * clonotypeMap.size() / nonRedundantSequenceMap.size())) / 100}%)"
+        "aligned and processed (${((int) (10000 * clonotypeMap.size() / (nonRedundantSequenceMap.size() + 1))) / 100}%)"
 
 //
 // Group clonotypes
