@@ -40,23 +40,14 @@ class Clonotype {
         this.complete = complete
     }
 
-    String generateEntry(String seq, String qual) {
-        if (rc) {
-            if (qual)
-                qual = qual.reverse()
+    String generateEntry(String seq) {
+        if (rc)
             seq = Util.revCompl(seq)
-        }
 
         def cdr1nt = cdr1start >= 0 ? seq.substring(cdr1start, cdr1end) : Util.MY_NA,
             cdr2nt = cdr2start >= 0 ? seq.substring(cdr2start, cdr2end) : Util.MY_NA,
             cdr3nt = cdr3start >= 0 ?
                     (complete ? seq.substring(cdr3start, cdr3end) : seq.substring(cdr3start) + "_")
-                    : Util.MY_NA
-
-        def cdr1q = cdr1start >= 0 && qual ? qual.substring(cdr1start, cdr1end) : Util.MY_NA,
-            cdr2q = cdr2start >= 0 && qual ? qual.substring(cdr2start, cdr2end) : Util.MY_NA,
-            cdr3q = cdr3start >= 0 && qual ?
-                    (complete ? qual.substring(cdr3start, cdr3end) : qual.substring(cdr3start))
                     : Util.MY_NA
 
         def cdr1aa = cdr1start >= 0 ? Util.translateLinear(cdr1nt) : Util.MY_NA,
@@ -67,9 +58,26 @@ class Clonotype {
 
         [vSegment, dSegment, jSegment,
          cdr1nt, cdr2nt, cdr3nt,
-         cdr1q, cdr2q, cdr3q,
          cdr1aa, cdr2aa, cdr3aa,
          inFrame, noStop, complete].join("\t")
+    }
+
+    ClonotypeData appendToData(ClonotypeData clonotypeData, String qual) {
+        if (rc && qual)
+            qual = qual.reverse()
+
+        def cdr1q = cdr1start >= 0 && qual ? qual.substring(cdr1start, cdr1end) : Util.MY_NA,
+            cdr2q = cdr2start >= 0 && qual ? qual.substring(cdr2start, cdr2end) : Util.MY_NA,
+            cdr3q = cdr3start >= 0 && qual ?
+                    (complete ? qual.substring(cdr3start, cdr3end) : qual.substring(cdr3start))
+                    : Util.MY_NA
+
+        if (clonotypeData) {
+            clonotypeData.append(cdr1q, cdr2q, cdr3q)
+            return null
+        }
+
+        return new ClonotypeData(cdr1q, cdr2q, cdr3q)
     }
 
     boolean isFunctional() {
@@ -79,7 +87,6 @@ class Clonotype {
     final
     static HEADER = "v_segment\td_segment\tj_segment\t" +
             "cdr1nt\tcdr2nt\tcdr3nt\t" +
-            "cdr1q\tcdr2q\tcdr3q\t" +
             "cdr1aa\tcdr2aa\tcdr3aa\t" +
             "inFrame\tnoStop\tcomplete",
            HEADER_RAW = "v_segment\td_segment\tj_segment\t" +

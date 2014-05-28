@@ -2,6 +2,7 @@ package igblastwrp
 
 import igblastwrp.blast.BlastRunner
 import igblastwrp.blast.Clonotype
+import igblastwrp.blast.ClonotypeData
 import igblastwrp.io.FastaReader
 import igblastwrp.io.FastqReader
 import igblastwrp.io.Read
@@ -33,7 +34,8 @@ cli.f('Report clonotypes with functional CDR3s only')
 cli.c('Report clonotypes with complete CDR3s only')
 
 cli.R(args: 1, argName: 'TRA|B|G|D and IGH|L|K', 'Receptor gene and chain, e.g. \'TRA\' [required]')
-cli.S(args: 1, argName: '\'human\' or \'mouse\'', 'Species [default=HomoSapiens]')
+cli.S(args: 1, argName: '\'human\' or \'mouse\'', 'Species [default=human]')
+cli.q(args: 1, 'quality threshold, 2..40 [default = 25]')
 cli.p(args: 1, 'number of threads to use [default = all available processors]')
 cli._(longOpt: 'data-dir', args: 1, argName: 'path', 'path to folder that contains IgBlastWrapper bundle: ' +
         'data/ and bin/ folders [default = parent directory of script]')
@@ -49,6 +51,7 @@ if (opt.h || opt == null || opt.arguments().size() < 2 || !opt.R) {
 int THREADS = (opt.p ?: "${Runtime.runtime.availableProcessors()}").toInteger()
 int N = (opt.N ?: "-1").toInteger()
 String SPECIES = opt.S ?: "human", GENE = opt.R[0..1], CHAIN = opt.R[2]
+byte qualThreshold = (opt.q ?: "25").toInteger()
 boolean funcOnly = opt.f, completeOnly = opt.c
 
 //
@@ -176,7 +179,7 @@ def pool = Executors.newFixedThreadPool(THREADS)
 
 pool.shutdown()
 
-while (!pool.terminated) ;
+while (!pool.terminated);
 
 finished = true
 listener.join()
@@ -187,7 +190,7 @@ println "[${new Date()}] Finished. ${clonotypeMap.size()} non-redundant sequence
 //
 // Group clonotypes
 //
-def resultsMap = new HashMap<String, Integer>()
+def resultsMap = new HashMap<String, ClonotypeData>()
 
 println "[${new Date()}] Generating clonotypes"
 nonRedundantSequenceMap.each {
@@ -195,8 +198,15 @@ nonRedundantSequenceMap.each {
     if (clonotype != null &&
             (!funcOnly || clonotype.functional) &&
             (!completeOnly || clonotype.complete)) {
-        def clonotypeResult = clonotype.generateEntry(it.key, it.value.computeQual())
-        resultsMap.put(clonotypeResult, (resultsMap[clonotypeResult] ?: 0) + it.value.nReads)
+        def clonotypeEntry = clonotype.generateEntry(it.key)
+        def clonotypeData = resultsMap[clonotypeEntry]
+
+        String qual = it.value.computeQual()
+
+        if (!clonotypeData)
+            resultsMap.put(clonotypeEntry, clonotype.appendToData(null, qual))  // create new
+        else
+            clonotype.appendToData(clonotypeData, qual)
     }
 }
 
@@ -205,9 +215,11 @@ nonRedundantSequenceMap.each {
 //
 println "[${new Date()}] Writing output"
 new File(outputFileName).withPrintWriter { pw ->
-    pw.println "Count\t" + Clonotype.HEADER
-    resultsMap.sort { -it.value }.each {
-        pw.println(it.value + "\t" + it.key)
+    pw.println "Count\t" + Clonotype.HEADER + "\t" + ClonotypeData.HEADER
+    resultsMap.sort { -it.value.count }.each {
+        byte minQual = it.value.summarizeQuality()
+        if (minQual >= qualThreshold)
+            pw.println(it.value.count + "\t" + it.key + "\t" + it.value.qualString())
     }
 }
 
