@@ -67,8 +67,8 @@ class BlastRunner implements Runnable {
         dir = new File(IGBLAST_DATA)
 
         def jRefSearcher = new JRefSearcher(species, gene, chain, new File("$IGBLAST_DATA/jref.txt"))
-        this.processor = new BlastProcessor(chain, jRefSearcher,
-                new SHMExtractor("$IGBLAST_DB_PATH/${species}_${gene}_${chain}_V.fa"))
+        def shmExtractor = new SHMExtractor("$IGBLAST_DB_PATH/${species}_${gene}_${chain}_V.fa")
+        this.processor = new BlastProcessor(chain, jRefSearcher, shmExtractor)
         this.clonotypeMap = clonotypeMap
     }
 
@@ -107,7 +107,8 @@ class BlastRunner implements Runnable {
                     clonotypeMap.put(queryName, clonotype)
 
                 chunk = ""
-            } else chunk += "$line\n"
+            } else
+                chunk += "$line\n"
         }
 
         // last chunk

@@ -1,6 +1,7 @@
 package igblastwrp.blast
 
 import igblastwrp.Util
+import igblastwrp.shm.Hypermutation
 import igblastwrp.shm.SHMExtractor
 
 /**
@@ -31,7 +32,7 @@ class BlastProcessor {
         this.chain = chain
     }
 
-    public Clonotype processChunk(String chunk) {
+    Clonotype processChunk(String chunk) {
         def segments, hits, cdrBounds
 
         // Rearrangement summary
@@ -53,8 +54,10 @@ class BlastProcessor {
 
         def dFound = D_SEGM != Util.BLAST_NA, vFound = V_SEGM != Util.BLAST_NA, jFound = J_SEGM != Util.BLAST_NA
 
-        if (!vFound)
-            return
+        if (!vFound) {
+            //println chunk todo: verbosity level
+            return null
+        }
 
         def J_SEGM_UNIQ = J_SEGM.split(",")[0]
         def rc = segments[-1] != "+", inFrame = segments[-2] == "In-frame", noStop = segments[-3] == "No"
@@ -118,19 +121,20 @@ class BlastProcessor {
         }
 
         if (cdr1Start < 0 && cdr2Start < 0 && cdr3Start < 0) {
+            // println chunk
             return null
-            //println chunk
         }
 
         def complete = cdr3End >= 0
 
         def hypermutations = shmExtractor.extract(V_SEGM,
-                hits[0][0].toInteger(), hits[0][1], hits[0][2].toInteger(), hits[0][3],
+                hits[0][0].toInteger() - 1, hits[0][1], hits[0][2].toInteger() - 1, hits[0][3],
                 cdr1Start, cdr1End, cdr2Start, cdr2End)
 
         return new Clonotype(V_SEGM, D_SEGM, J_SEGM,
                 cdr1Start, cdr1End, cdr2Start, cdr2End, cdr3Start, cdr3End,
-                rc, inFrame, noStop, complete, hypermutations)
+                rc, inFrame, noStop, complete,
+                hypermutations)
         //} catch (Exception e) {
         //    println "Error parsing $chunk"
         //    println segments

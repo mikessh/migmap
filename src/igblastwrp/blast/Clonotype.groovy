@@ -71,9 +71,9 @@ class Clonotype {
         if (rc && qual)
             qual = qual.reverse()
 
-        def filteredHyperm = hypermutations.findAll {
+        def filteredHyperm = qual ? hypermutations.findAll {
             ((int)qual.charAt(it.posInRead) - 33) >= qualThreshold
-        }
+        } : hypermutations
 
         def cdr1q = cdr1start >= 0 && qual ? qual.substring(cdr1start, cdr1end) : Util.MY_NA,
             cdr2q = cdr2start >= 0 && qual ? qual.substring(cdr2start, cdr2end) : Util.MY_NA,

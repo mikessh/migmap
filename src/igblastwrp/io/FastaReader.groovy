@@ -36,8 +36,9 @@ class FastaReader {
         while (true) {
             def line = reader.readLine()
             if (line == null) {
-                header = null // EOF
-                return new Read(header, seq, null) // return last sequence
+                def _header = header
+                header = null // EOF next read
+                return new Read(_header, seq, null) // return last sequence
             } else if (line.startsWith(">")) {
                 // reset header and return current read
                 def _header = line

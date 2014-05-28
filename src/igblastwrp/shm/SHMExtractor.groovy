@@ -23,12 +23,11 @@ class SHMExtractor {
 
     SHMExtractor(String vSegmentFasta) {
         def reader = new FastaReader(vSegmentFasta)
+
         def read
         while ((read = reader.next()) != null) {
-            if (read.header) {
-                def vSegment = read.header.substring(1).trim() //trim >
-                vSegmentSeqMap.put(vSegment, new VSegmentData(Util.translateLinear(read.seq), read.seq))
-            }
+            def vSegment = read.header.substring(1).trim() //trim >
+            vSegmentSeqMap.put(vSegment, new VSegmentData(Util.translateLinear(read.seq), read.seq))
         }
     }
 
@@ -45,10 +44,10 @@ class SHMExtractor {
             if (q == '-') {
                 qdelta++
             }
-            if (s == '-') {
+            else if (s == '-') {
                 sdelta++
             } else if (s != q) {
-                int cdr = 0, pos = i - sstart - sdelta, posInRead = i - qstart - qdelta,
+                int cdr = 0, pos = i + sstart - sdelta, posInRead = i + qstart - qdelta,
                     codonPos = pos / 3,
                     codonNtStart = codonPos * 3, codonNtPos = codonNtStart + (pos % 3)
 
@@ -58,7 +57,7 @@ class SHMExtractor {
                     aaFrom = vSeq.aaSeq.charAt(codonPos)
 
                     char[] codon = new char[3]
-                    for (int j = codonNtStart; j < codonNtStart + 3; j++) {
+                    for (int j = 0; j < 3; j++) {
                         int jj = codonNtStart + j
                         if (jj == codonNtPos)
                             codon[j] = q

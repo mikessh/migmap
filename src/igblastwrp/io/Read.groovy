@@ -23,4 +23,14 @@ class Read {
         this.seq = seq
         this.qual = qual
     }
+
+    @Override
+    String toString() {
+        def sb = new StringBuilder(header).append('\n').append(seq)
+
+        if (qual)
+            sb.append('\n+\n').append(qual)
+
+        sb.toString()
+    }
 }

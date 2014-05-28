@@ -152,7 +152,7 @@ for (int i = 0; i < THREADS; i++) {
             pw.println(seqEntry.key)
         }
     }
-    new File(chunkFileName).deleteOnExit()
+    //new File(chunkFileName).deleteOnExit()
     fastaChunks.add(chunkFileName)
 }
 
@@ -166,27 +166,37 @@ println "[${new Date()}] Running IgBlast for $inputFileName and parsing output"
 
 def listener = Thread.start {
     while (!finished) {
-        sleep 30000
-        println "[${new Date()}] ${clonotypeMap.size()} non-redundant sequences succesfully " +
+        Thread.sleep(30000)
+
+        int m = clonotypeMap.size(), M = nonRedundantSequenceMap.size()
+        println "[${new Date()}] $m non-redundant sequences succesfully " +
                 "aligned and processed so far " +
-                "(${((int) (10000 * clonotypeMap.size() / (nonRedundantSequenceMap.size() + 1))) / 100}%)"
+                "(${m > 0 ? ((int) (10000 * m / M)) / 100 : 0}%)"
     }
 }
 
-def pool = Executors.newFixedThreadPool(THREADS)
-(0..(THREADS - 1)).collect { p ->
-    pool.submit(new BlastRunner(THREADS, SCRIPT_PATH, SPECIES, GENE, CHAIN, fastaChunks[p], clonotypeMap))
+if (THREADS > 1) {
+    def pool = Executors.newFixedThreadPool(THREADS)
+
+    (0..(THREADS - 1)).collect { p ->
+        pool.submit(new BlastRunner(THREADS, SCRIPT_PATH, SPECIES, GENE, CHAIN, fastaChunks[p], clonotypeMap))
+    }
+    pool.shutdown()
+
+    while (!pool.terminated);
+} else {
+    new BlastRunner(THREADS, SCRIPT_PATH, SPECIES, GENE, CHAIN, fastaChunks[0], clonotypeMap).run()
 }
 
-pool.shutdown()
-
-while (!pool.terminated);
-
+listener.setDefaultUncaughtExceptionHandler({ t, ex ->
+    int m = clonotypeMap.size(), M = nonRedundantSequenceMap.size()
+    println "[${new Date()}] Finished. $m non-redundant sequences succesfully " +
+            "aligned and processed " +
+            "(${m > 0 ? ((int) (10000 * m / M)) / 100 : 0}%)"
+} as Thread.UncaughtExceptionHandler)
 finished = true
+listener.interrupt()
 listener.join()
-
-println "[${new Date()}] Finished. ${clonotypeMap.size()} non-redundant sequences succesfully " +
-        "aligned and processed (${((int) (10000 * clonotypeMap.size() / (nonRedundantSequenceMap.size() + 1))) / 100}%)"
 
 //
 // Group clonotypes
