@@ -150,9 +150,9 @@ class Util {
             case 'GGG': return 'G'
             default:
                 if (codonUpper.contains("N") && codonUpper.length() == 3)
-                    return "#"
+                    return "X" // undefined
                 else
-                    return '?'
+                    return '?' // incomplete
         }
     }
 

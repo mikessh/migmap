@@ -51,7 +51,7 @@ class SHMExtractor {
                     codonPos = pos / 3,
                     codonNtStart = codonPos * 3, codonNtPos = codonNtStart + (pos % 3)
 
-                char aaFrom = 'X', aaTo = 'X'
+                char aaFrom = '?', aaTo = '?'
 
                 if (codonPos < vSeq.aaSeq.length()) {
                     aaFrom = vSeq.aaSeq.charAt(codonPos)
