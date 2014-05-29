@@ -28,9 +28,6 @@ class SHMExtractor {
         while ((read = reader.next()) != null) {
             def vSegment = read.header.substring(1).trim() //trim >
             vSegmentSeqMap.put(vSegment, new VSegmentData(Util.translateLinear(read.seq), read.seq))
-            println read.header
-            println Util.translateLinear(read.seq)
-            println ""
         }
     }
 
