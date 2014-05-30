@@ -1,19 +1,19 @@
-  IgBlast wrapper  
-==================
+#  IgBlast wrapper  
+-------------------
 
-A wrapper for [IgBlast](http://www.ncbi.nlm.nih.gov/igblast/igblast.cgi) immune repertoire analysis tool
+A wrapper for [IgBlast](http://www.ncbi.nlm.nih.gov/igblast/igblast.cgi) immune repertoire analysis tool to facilitate analysis of NGS immune repertoire profiling data
 
 The software is distributed as a bundle with .jar executable, pre-compiled platform-specific IgBlast distribution and immune gene segments library
 
 
-Motivation:
+## Motivation:
 
 - IgBlast doesn't extract sequence of CDR3 region directly, neither provide coordinates for CDR3 region in reads. It reports reference Cys residue of Variable segment and Variable segment end in CDR3, but not Phe/Trp residue of J segment that marks the end of CDR3
 
 - IgBlast output is not straightforward to parse and summarize, which is important to count clonotype diversity of high-throughput sequencing sample
 
 
-Features:
+## Features:
 
 - Run IgBlast on FASTQ data, provide quality filtering for CDRs and alleles/hypermutations
 
@@ -28,7 +28,7 @@ Features:
 - Reporting of mismatches (alleles/hypermutations) in V gene
 
 
-Execution:
+## Execution:
 
 ```
 $> java -jar IgBlastWrapper.jar [options] inputFile outputPrefix
@@ -36,7 +36,7 @@ $> java -jar IgBlastWrapper.jar [options] inputFile outputPrefix
 
 Input file could be either in FASTQ or FASTA format, raw or GZipped.
 
-Options:
+### Options:
 
 * `-R` receptor chain. **Required**. Currently supported: `TRA`, `TRB`, `TRG`, `TRD`, `IGH`, `IGK`, `IGL`
 
@@ -55,8 +55,10 @@ Options:
 * `-p` use `p` cores (uses all cores by default)
 
 
-NOTE
-: IgBlastWrapper only aligns to top alleles (marked by ```*01``` in IMGT nomenclature) to speed-up. Mismatches are then extracted from alignment and reported
+## NOTE
+
+IgBlastWrapper only aligns to top alleles (marked by ```*01``` in IMGT nomenclature) to speed-up. Mismatches are then extracted from alignment and reported
  
-HINT
-: The most straightforward way to build the scripts is to create an Intellij Project (Groovy), then use "Open Module Settings"->Artifacts(+)Jar->from modules with dependencies followed by Build->Build artifacts  
+## HINT
+
+The most straightforward way to build the scripts is to create an Intellij Project (Groovy), then use "Open Module Settings"->Artifacts(+)Jar->from modules with dependencies followed by Build->Build artifacts  
