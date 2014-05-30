@@ -19,15 +19,20 @@ import igblastwrp.shm.Hypermutation
  limitations under the License.
  */
 class ClonotypeData {
+    final int level
     int count = 0
     final int[] qual1, qual2, qual3
     final Map<Hypermutation, Integer> hypermMap
 
-    public ClonotypeData(String qual1, String qual2, String qual3, List<Hypermutation> hypermutations) {
+    public ClonotypeData(String qual1, String qual2, String qual3, List<Hypermutation> hypermutations, int level) {
+        this.level = level
+
         this.qual1 = (qual1 != Util.MY_NA) ? new byte[qual1.length()] : null
         this.qual2 = (qual2 != Util.MY_NA) ? new byte[qual2.length()] : null
         this.qual3 = (qual3 != Util.MY_NA) ? new byte[qual3.length()] : null
+
         this.hypermMap = new HashMap<>()
+
         append(qual1, qual2, qual3, hypermutations)
     }
 
@@ -38,15 +43,18 @@ class ClonotypeData {
             hypermMap.put(it, (hypermMap[it] ?: 0) + 1)
         }
 
-        if (qual1 != Util.MY_NA)
-            for (int i = 0; i < qual1.length(); i++)
-                this.qual1[i] = this.qual1[i] + (int) (qual1.charAt(i) - 33)
-        if (qual2 != Util.MY_NA)
-            for (int i = 0; i < qual2.length(); i++)
-                this.qual2[i] = this.qual2[i] + (int) (qual2.charAt(i) - 33)
-        if (qual3 != Util.MY_NA)
-            for (int i = 0; i < qual3.length(); i++)
-                this.qual3[i] = this.qual3[i] + (int) (qual3.charAt(i) - 33)
+        if (qual1)
+            if (qual1 != Util.MY_NA)
+                for (int i = 0; i < qual1.length(); i++)
+                    this.qual1[i] = this.qual1[i] + (int) (qual1.charAt(i) - 33)
+        if (qual2)
+            if (qual2 != Util.MY_NA)
+                for (int i = 0; i < qual2.length(); i++)
+                    this.qual2[i] = this.qual2[i] + (int) (qual2.charAt(i) - 33)
+        if (qual3)
+            if (qual3 != Util.MY_NA)
+                for (int i = 0; i < qual3.length(); i++)
+                    this.qual3[i] = this.qual3[i] + (int) (qual3.charAt(i) - 33)
     }
 
     byte summarizeQuality() {
@@ -76,28 +84,39 @@ class ClonotypeData {
 
     String toString() {
         StringBuilder sb = new StringBuilder()
-        if (qual1)
-            qual1.each { sb.append((char) (it + 33)) }
-        else
-            sb.append('.')
-        sb.append('\t')
-        if (qual2)
-            qual2.each { sb.append((char) (it + 33)) }
-        else
-            sb.append('.')
-        sb.append('\t')
+
+        if (level > 0) {
+            if (qual1)
+                qual1.each { sb.append((char) (it + 33)) }
+            else
+                sb.append('.')
+            sb.append('\t')
+        }
+
+        if (level > 0) {
+            if (qual2)
+                qual2.each { sb.append((char) (it + 33)) }
+            else if (level > 0)
+                sb.append('.')
+            sb.append('\t')
+        }
+
         if (qual3)
             qual3.each { sb.append((char) (it + 33)) }
         else
             sb.append('.')
 
         sb.append('\t')
+
         if (hypermMap.size() == 0)
             sb.append('.')
         else
             sb.append(hypermMap.sort { it.key.pos }.collect { it.value + "," + it.key.toString() }.join("|"))
+
         sb.toString()
     }
 
-    final static String HEADER = "cdr1q\tcdr2q\tcdr3q\thypermutations"
+    final static List<String> HEADER = ["cdr3q\tmutations",
+                                        "cdr1q\tcdr2q\tcdr3q\tmutations",
+                                        "cdr1q\tcdr2q\tcdr3q\tmutations"]
 }

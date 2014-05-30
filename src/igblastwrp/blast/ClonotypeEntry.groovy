@@ -1,5 +1,7 @@
 package igblastwrp.blast
 
+import igblastwrp.shm.Hypermutation
+
 /**
  Copyright 2014 Mikhail Shugay (mikhail.shugay@gmail.com)
 
@@ -19,12 +21,15 @@ class ClonotypeEntry {
     final String vSegment, dSegment, jSegment,
                  cdr1nt, cdr2nt, cdr3nt,
                  cdr1aa, cdr2aa, cdr3aa
+    final List<Hypermutation> hypermutations
     final boolean inFrame, noStop, complete
 
     ClonotypeEntry(String vSegment, String dSegment, String jSegment,
                    String cdr1nt, String cdr2nt, String cdr3nt,
                    String cdr1aa, String cdr2aa, String cdr3aa,
-                   boolean inFrame, boolean noStop, boolean complete) {
+                   boolean inFrame, boolean noStop, boolean complete,
+                   List<Hypermutation> hypermutations,
+                   int level) {
         this.vSegment = vSegment
         this.dSegment = dSegment
         this.jSegment = jSegment
@@ -37,6 +42,7 @@ class ClonotypeEntry {
         this.inFrame = inFrame
         this.noStop = noStop
         this.complete = complete
+        this.hypermutations = hypermutations
     }
 
     final static String HEADER = "v_segment\td_segment\tj_segment\t" +

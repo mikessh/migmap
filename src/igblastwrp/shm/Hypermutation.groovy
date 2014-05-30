@@ -31,10 +31,6 @@ class Hypermutation {
         this.cdr = cdr
     }
 
-    boolean silent() {
-        aaFrom == aaTo
-    }
-
     boolean equals(o) {
         if (this.is(o)) return true
 

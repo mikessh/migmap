@@ -44,7 +44,7 @@ class Clonotype {
         this.hypermutations = hypermutations
     }
 
-    ClonotypeEntry generateEntry(String seq) {
+    String generateKey(String seq, int level) {
         if (rc)
             seq = Util.revCompl(seq)
 
@@ -60,23 +60,36 @@ class Clonotype {
                     (complete ? Util.translateCdr(cdr3nt) : (Util.translateLinear(cdr3nt) + "_"))
                     : Util.MY_NA
 
-        new ClonotypeEntry(vSegment, dSegment, jSegment,
-                cdr1nt, cdr2nt, cdr3nt,
-                cdr1aa, cdr2aa, cdr3aa,
-                inFrame, noStop, complete
-        )
+        switch (level) {
+            case 2:
+                return [vSegment, dSegment, jSegment,
+                        cdr1nt, cdr2nt, cdr3nt,
+                        cdr1aa, cdr2aa, cdr3aa,
+                        inFrame, noStop, complete,
+                        hypermutations.join('|')].join('\t')
+            case 1:
+                return [vSegment, dSegment, jSegment,
+                        cdr1nt, cdr2nt, cdr3nt,
+                        cdr1aa, cdr2aa, cdr3aa,
+                        inFrame, noStop, complete].join('\t')
+            default:
+                [vSegment, dSegment, jSegment,
+                 cdr3nt,
+                 cdr3aa,
+                 inFrame, noStop, complete].join('\t')
+        }
     }
 
-    ClonotypeData appendToData(ClonotypeData clonotypeData, String qual, byte qualThreshold) {
+    ClonotypeData appendToData(ClonotypeData clonotypeData, String qual, byte qualThreshold, int level) {
         if (rc && qual)
             qual = qual.reverse()
 
         def filteredHyperm = qual ? hypermutations.findAll {
-            ((int)qual.charAt(it.posInRead) - 33) >= qualThreshold
+            ((int) qual.charAt(it.posInRead) - 33) >= qualThreshold
         } : hypermutations
 
-        def cdr1q = cdr1start >= 0 && qual ? qual.substring(cdr1start, cdr1end) : Util.MY_NA,
-            cdr2q = cdr2start >= 0 && qual ? qual.substring(cdr2start, cdr2end) : Util.MY_NA,
+        def cdr1q = level > 0 && cdr1start >= 0 && qual ? qual.substring(cdr1start, cdr1end) : Util.MY_NA,
+            cdr2q = level > 0 && cdr2start >= 0 && qual ? qual.substring(cdr2start, cdr2end) : Util.MY_NA,
             cdr3q = cdr3start >= 0 && qual ?
                     (complete ? qual.substring(cdr3start, cdr3end) : qual.substring(cdr3start))
                     : Util.MY_NA
@@ -86,19 +99,33 @@ class Clonotype {
             return null
         }
 
-        return new ClonotypeData(cdr1q, cdr2q, cdr3q, filteredHyperm)
+        return new ClonotypeData(cdr1q, cdr2q, cdr3q, filteredHyperm, level)
     }
 
     boolean isFunctional() {
         inFrame && noStop
     }
 
+    final static List<String> KEY_HEADER = [
+            "v_segment\td_segment\tj_segment\t" +
+                    "cdr3nt\t" +
+                    "cdr3aa\t" +
+                    "inFrame\tnoStop\tcomplete",
+            "v_segment\td_segment\tj_segment\t" +
+                    "cdr1nt\tcdr2nt\tcdr3nt\t" +
+                    "cdr1aa\tcdr2aa\tcdr3aa\t" +
+                    "inFrame\tnoStop\tcomplete",
+            "v_segment\td_segment\tj_segment\t" +
+                    "cdr1nt\tcdr2nt\tcdr3nt\t" +
+                    "cdr1aa\tcdr2aa\tcdr3aa\t" +
+                    "inFrame\tnoStop\tcomplete\tmutations"
+    ]
+
     final static String HEADER = "v_segment\td_segment\tj_segment\t" +
             "cdr1start\tcdr1end\t" +
             "cdr2start\tcdr2end\t" +
             "cdr3start\tcdr3end\t" +
             "inFrame\tnoStop\tcomplete"
-
 
     @Override
     String toString() {
