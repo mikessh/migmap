@@ -1,5 +1,4 @@
 #  IgBlast wrapper  
--------------------
 
 A wrapper for [IgBlast](http://www.ncbi.nlm.nih.gov/igblast/igblast.cgi) immune repertoire analysis tool to facilitate analysis of NGS immune repertoire profiling data
 
