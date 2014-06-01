@@ -33,16 +33,19 @@ cli.h('usage')
 
 cli.f('Report clonotypes with functional CDR3s only')
 cli.c('Report clonotypes with complete CDR3s only')
+
 cli.l(args: 1, argName: '0, 1 or 2',
         'Level of clonotype detalization: 0 - CDR3, 1 - CDR1,2,3, 2 - CDR1,2,3+V-mutations. ' +
                 'Several levels could be specified as comma-separated string [default = 0]')
 
 cli.R(args: 1, argName: 'TRA|B|G|D and IGH|L|K', 'Receptor gene and chain, e.g. \'TRA\' [required]')
+cli.a('[migec-compatibility] Assume MIG-assembled data. Header should contain UMI:NNNNN:count')
 cli.S(args: 1, argName: '\'human\' or \'mouse\'', 'Species [default=human]')
 cli.q(args: 1, 'quality threshold, 2..40 [default = 25]')
 cli.p(args: 1, 'number of threads to use [default = all available processors]')
 cli._(longOpt: 'data-dir', args: 1, argName: 'path', 'path to folder that contains IgBlastWrapper bundle: ' +
         'data/ and bin/ folders [default = parent directory of script]')
+
 cli.N(args: 1, 'number of reads to take')
 
 def opt = cli.parse(args)
@@ -63,7 +66,7 @@ int THREADS = (opt.p ?: "${Runtime.runtime.availableProcessors()}").toInteger()
 int N = (opt.N ?: "-1").toInteger()
 String SPECIES = opt.S ?: "human", GENE = opt.R[0..1], CHAIN = opt.R[2]
 byte qualThreshold = (opt.q ?: "25").toInteger()
-boolean funcOnly = opt.f, completeOnly = opt.c
+boolean funcOnly = opt.f, completeOnly = opt.c, assembled = opt.a
 
 //
 // DATA BUNDLE
@@ -129,7 +132,17 @@ while ((read = reader.next()) != null) {
     if (!seqData)
         nonRedundantSequenceMap.put(read.seq, seqData = new SeqData(nonRedundantSequenceMap.size(), read.qual))
 
-    seqData.append(read.qual)
+    int count = 1
+    if (assembled) {
+        def umiFieldMatcher = read.header =~ /UMI:(?:[ATGC]+):([0-9]+)/
+        if (umiFieldMatcher.size() > 0)
+            count = (umiFieldMatcher[0][0].toString()).toInteger()
+        else {
+            println "[ERROR] Read header misses UMI field in assembly mode"
+            System.exit(-1)
+        }
+    }
+    seqData.append(read.qual, count)
 
     n++
 
@@ -181,7 +194,7 @@ def listener = Thread.start {
         int m = clonotypeMap.size(), M = nonRedundantSequenceMap.size()
         println "[${new Date()}] $m non-redundant sequences succesfully " +
                 "aligned and processed so far " +
-                "(${m > 0 ? ((int) (10000 * m / M)) / 100 : 0}%)"
+                "(${m > 0 ? ((int) (10000 * (double) m / (double) M)) / 100 : 0}%)"
     }
 }
 
@@ -202,7 +215,7 @@ listener.setDefaultUncaughtExceptionHandler({ t, ex ->
     int m = clonotypeMap.size(), M = nonRedundantSequenceMap.size()
     println "[${new Date()}] Finished. $m non-redundant sequences succesfully " +
             "aligned and processed " +
-            "(${m > 0 ? ((int) (10000 * m / M)) / 100 : 0}%)"
+            "(${m > 0 ? ((int) (10000 * (double) m / (double) M)) / 100 : 0}%)"
 } as Thread.UncaughtExceptionHandler)
 finished = true
 listener.interrupt()
