@@ -45,6 +45,7 @@ cli.q(args: 1, 'quality threshold, 2..40 [default = 25]')
 cli.p(args: 1, 'number of threads to use [default = all available processors]')
 cli._(longOpt: 'data-dir', args: 1, argName: 'path', 'path to folder that contains IgBlastWrapper bundle: ' +
         'data/ and bin/ folders [default = parent directory of script]')
+cli.h('display help message')
 
 cli.N(args: 1, 'number of reads to take')
 

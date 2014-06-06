@@ -28,8 +28,7 @@ class ClonotypeEntry {
                    String cdr1nt, String cdr2nt, String cdr3nt,
                    String cdr1aa, String cdr2aa, String cdr3aa,
                    boolean inFrame, boolean noStop, boolean complete,
-                   List<Hypermutation> hypermutations,
-                   int level) {
+                   List<Hypermutation> hypermutations) {
         this.vSegment = vSegment
         this.dSegment = dSegment
         this.jSegment = jSegment
