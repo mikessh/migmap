@@ -3,7 +3,6 @@ package igblastwrp
 import igblastwrp.blast.BlastRunner
 import igblastwrp.blast.Clonotype
 import igblastwrp.blast.ClonotypeData
-import igblastwrp.blast.ClonotypeEntry
 import igblastwrp.io.FastaReader
 import igblastwrp.io.FastqReader
 import igblastwrp.io.Read
@@ -226,7 +225,7 @@ listener.join()
 // Group clonotypes
 //
 levels.each { level ->
-    def resultsMap = new HashMap<ClonotypeEntry, ClonotypeData>()
+    def resultsMap = new HashMap<String, ClonotypeData>()// new HashMap<ClonotypeEntry, ClonotypeData>()
     def outputFileName = outputFilePrefix + ".L${level}.txt"
 
     println "[${new Date()}] Generating clonotypes for level $level"
@@ -253,12 +252,11 @@ levels.each { level ->
 //
     println "[${new Date()}] Writing output to $outputFileName"
     new File(outputFileName).withPrintWriter { pw ->
-        pw.println "Count\t" + Clonotype.KEY_HEADER[level] + "\t" + ClonotypeData.HEADER[level]
+        pw.println "Count\t" + Clonotype.KEY_HEADER + "\t" + ClonotypeData.VALUE_HEADER
         resultsMap.sort { -it.value.count }.each {
             byte minQual = it.value.summarizeQuality()
             def key = it.key
-            if (level == 2)
-                key = key.substring(0, key.lastIndexOf("\t")) // trim hypermutations from reporting for level 2
+            key = key.substring(0, key.lastIndexOf("\t")) // trim hypermutations, they will be reported from value
             if (minQual >= qualThreshold) {
                 pw.println(it.value.count + "\t" + key + "\t" + it.value.toString())
             }

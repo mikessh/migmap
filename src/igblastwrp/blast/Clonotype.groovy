@@ -62,21 +62,26 @@ class Clonotype {
 
         switch (level) {
             case 2:
-                return [vSegment, dSegment, jSegment,
+                return [//vSegment, dSegment, jSegment,
                         cdr1nt, cdr2nt, cdr3nt,
                         cdr1aa, cdr2aa, cdr3aa,
-                        inFrame, noStop, complete,
-                        hypermutations.join('|')].join('\t')
+                        hypermutations.join('|')
+                        //inFrame, noStop, complete
+                ].join('\t')
             case 1:
-                return [vSegment, dSegment, jSegment,
+                return [//vSegment, dSegment,jSegment,
                         cdr1nt, cdr2nt, cdr3nt,
                         cdr1aa, cdr2aa, cdr3aa,
-                        inFrame, noStop, complete].join('\t')
+                        Util.MY_NA
+                        //inFrame, noStop, complete
+                ].join('\t')
             default:
-                [vSegment, dSegment, jSegment,
-                 cdr3nt,
-                 cdr3aa,
-                 inFrame, noStop, complete].join('\t')
+                [//vSegment, dSegment,jSegment,
+                 cdr3nt, Util.MY_NA, Util.MY_NA,
+                 cdr3aa, Util.MY_NA, Util.MY_NA,
+                 Util.MY_NA
+                 //inFrame, noStop, complete
+                ].join('\t')
         }
     }
 
@@ -95,31 +100,20 @@ class Clonotype {
                     : Util.MY_NA
 
         if (clonotypeData) {
-            clonotypeData.append(cdr1q, cdr2q, cdr3q, filteredHyperm)
+            clonotypeData.append(cdr1q, cdr2q, cdr3q, filteredHyperm, vSegment, dSegment, jSegment)
             return null
         }
 
-        return new ClonotypeData(cdr1q, cdr2q, cdr3q, filteredHyperm, level)
+        return new ClonotypeData(cdr1q, cdr2q, cdr3q, filteredHyperm, vSegment, dSegment, jSegment, level)
     }
 
     boolean isFunctional() {
         inFrame && noStop
     }
 
-    final static List<String> KEY_HEADER = [
-            "v_segment\td_segment\tj_segment\t" +
-                    "cdr3nt\t" +
-                    "cdr3aa\t" +
-                    "inFrame\tnoStop\tcomplete",
-            "v_segment\td_segment\tj_segment\t" +
-                    "cdr1nt\tcdr2nt\tcdr3nt\t" +
-                    "cdr1aa\tcdr2aa\tcdr3aa\t" +
-                    "inFrame\tnoStop\tcomplete",
-            "v_segment\td_segment\tj_segment\t" +
-                    "cdr1nt\tcdr2nt\tcdr3nt\t" +
-                    "cdr1aa\tcdr2aa\tcdr3aa\t" +
-                    "inFrame\tnoStop\tcomplete\tmutations"
-    ]
+    final static String KEY_HEADER = "cdr1nt\tcdr2nt\tcdr3nt\t" +
+            "cdr1aa\tcdr2aa\tcdr3aa\t" +
+            "mutations"
 
     final static String HEADER = "v_segment\td_segment\tj_segment\t" +
             "cdr1start\tcdr1end\t" +

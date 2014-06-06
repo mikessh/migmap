@@ -23,8 +23,10 @@ class ClonotypeData {
     int count = 0
     final int[] qual1, qual2, qual3
     final Map<Hypermutation, Integer> hypermMap
+    final Map<String, Integer> dSegmentVoter, vSegmentVoter, jSegmentVoter
 
-    public ClonotypeData(String qual1, String qual2, String qual3, List<Hypermutation> hypermutations, int level) {
+    public ClonotypeData(String qual1, String qual2, String qual3, List<Hypermutation> hypermutations,
+                         String vSegment, String dSegment, String jSegment, int level) {
         this.level = level
 
         this.qual1 = (qual1 != Util.MY_NA) ? new byte[qual1.length()] : null
@@ -32,16 +34,24 @@ class ClonotypeData {
         this.qual3 = (qual3 != Util.MY_NA) ? new byte[qual3.length()] : null
 
         this.hypermMap = new HashMap<>()
+        this.vSegmentVoter = new HashMap<>()
+        this.dSegmentVoter = new HashMap<>()
+        this.jSegmentVoter = new HashMap<>()
 
-        append(qual1, qual2, qual3, hypermutations)
+        append(qual1, qual2, qual3, hypermutations, vSegment, dSegment, jSegment)
     }
 
-    void append(String qual1, String qual2, String qual3, List<Hypermutation> hypermutations) {
+    void append(String qual1, String qual2, String qual3, List<Hypermutation> hypermutations,
+                String vSegment, String dSegment, String jSegment) {
         count++
 
         hypermutations.each {
             hypermMap.put(it, (hypermMap[it] ?: 0) + 1)
         }
+
+        vSegmentVoter.put(vSegment, (vSegmentVoter[vSegment] ?: 0) + 1)
+        dSegmentVoter.put(dSegment, (dSegmentVoter[dSegment] ?: 0) + 1)
+        jSegmentVoter.put(jSegment, (jSegmentVoter[jSegment] ?: 0) + 1)
 
         if (qual1)
             if (qual1 != Util.MY_NA)
@@ -85,38 +95,35 @@ class ClonotypeData {
     String toString() {
         StringBuilder sb = new StringBuilder()
 
-        if (level > 0) {
-            if (qual1)
-                qual1.each { sb.append((char) (it + 33)) }
-            else
-                sb.append('.')
-            sb.append('\t')
-        }
+        sb.append(vSegmentVoter.max { it.value }.key).append('\t')
+        sb.append(dSegmentVoter.max { it.value }.key).append('\t')
+        sb.append(jSegmentVoter.max { it.value }.key).append('\t')
 
-        if (level > 0) {
-            if (qual2)
-                qual2.each { sb.append((char) (it + 33)) }
-            else if (level > 0)
-                sb.append('.')
-            sb.append('\t')
-        }
+        if (qual1 && level > 0)
+            qual1.each { sb.append((char) (it + 33)) }
+        else
+            sb.append(Util.MY_NA)
+        sb.append('\t')
+
+        if (qual2 && level > 0)
+            qual2.each { sb.append((char) (it + 33)) }
+        else
+            sb.append(Util.MY_NA)
+        sb.append('\t')
 
         if (qual3)
             qual3.each { sb.append((char) (it + 33)) }
         else
-            sb.append('.')
-
+            sb.append(Util.MY_NA)
         sb.append('\t')
 
         if (hypermMap.size() == 0)
-            sb.append('.')
+            sb.append(Util.MY_NA)
         else
             sb.append(hypermMap.sort { it.key.pos }.collect { it.value + "," + it.key.toString() }.join("|"))
 
         sb.toString()
     }
 
-    final static List<String> HEADER = ["cdr3q\tmutations",
-                                        "cdr1q\tcdr2q\tcdr3q\tmutations",
-                                        "cdr1q\tcdr2q\tcdr3q\tmutations"]
+    final static String VALUE_HEADER = "vSegment\tdSegment\tjSegment\tcdr1q\tcdr2q\tcdr3q\tmutations"
 }
