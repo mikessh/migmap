@@ -60,4 +60,4 @@ IgBlastWrapper only aligns to top alleles (marked by ```*01``` in IMGT nomenclat
  
 ## HINT
 
-The most straightforward way to build the scripts is to create an Intellij Project (Groovy), then use "Open Module Settings"->Artifacts(+)Jar->from modules with dependencies followed by Build->Build artifacts  
+The most straightforward way to build the scripts is to create an Intellij Project (Groovy), then use "Open Module Settings"->Artifacts(+)Jar->from modules with dependencies followed by Build->Build artifacts. Module architecture will be changed to Maven soon..  
