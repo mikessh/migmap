@@ -11,6 +11,8 @@ The software is distributed as a bundle with .jar executable, pre-compiled platf
 
 - IgBlast output is not straightforward to parse and summarize, which is important to count clonotype diversity of high-throughput sequencing sample
 
+- IgBlast doesn't account for sequence quality
+
 
 ## Features:
 
@@ -45,7 +47,7 @@ Input file could be either in FASTQ or FASTA format, raw or GZipped.
 
 * `-c` filter clonotypes with incomplete CDR3 sequence
 
-* `-q` quality threshold. Lowest quality for CDR sequence should be higher for a clonotype to pass filter. Mutations having quality lower than the threshold are also filtered
+* `-q` quality threshold. Lowest quality for CDR sequences should be higher than the threshold for a clonotype to pass filter. Mutations having quality lower than the threshold are also filtered
 
 * `-l` clonotype detalizaiton level. Possible values: `0`, `1`, `2` and `0,1`, `0,1,2`, etc. At detalization level `0` clonotypes are grouped by CDR3 sequence, all mutaitons are then assembled and enumerated within clonotype. For detalization level `1` CDR1,2 and 3 sequences are used. For level `2` CDR3 sequence and all sequence mutations are used in clonotype grouping. Output will be generated for all specified levels and `outputPrefix` will be appended with `L$level.txt`
 
