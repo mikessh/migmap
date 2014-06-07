@@ -19,6 +19,7 @@ class SeqData {
     int nReads = 0
     final int[] qual
     final int seqId
+    String computedQual = null
 
     SeqData(int seqId, String qual) {
         this.seqId = seqId
@@ -36,12 +37,16 @@ class SeqData {
 
     String computeQual() {
         if (qual) {
-            for (int i = 0; i < qual.length; i++)
-                qual[i] /= nReads
-            def qualCharArray = new char[qual.length]
-            for (int i = 0; i < qual.length; i++)
-                qualCharArray[i] = (char) (qual[i] + 33)
-            return new String(qualCharArray)
+            if(computedQual)
+                return computedQual
+            else {
+                for (int i = 0; i < qual.length; i++)
+                    qual[i] /= nReads
+                def qualCharArray = new char[qual.length]
+                for (int i = 0; i < qual.length; i++)
+                    qualCharArray[i] = (char) (qual[i] + 33)
+                return computedQual = new String(qualCharArray)
+            }
         }
         return null
     }

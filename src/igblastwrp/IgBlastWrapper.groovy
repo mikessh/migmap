@@ -136,7 +136,7 @@ while ((read = reader.next()) != null) {
     if (assembled) {
         def umiFieldMatcher = read.header =~ /UMI:(?:[ATGC]+):([0-9]+)/
         if (umiFieldMatcher.size() > 0)
-            count = (umiFieldMatcher[0][0].toString()).toInteger()
+            count = (umiFieldMatcher[0][1].toString()).toInteger()
         else {
             println "[ERROR] Read header misses UMI field in assembly mode"
             System.exit(-1)
@@ -262,6 +262,6 @@ levels.each { level ->
             }
         }
     }
-
-    println "[${new Date()}] Finished"
 }
+
+println "[${new Date()}] Finished"

@@ -77,8 +77,8 @@ class Clonotype {
                 ].join('\t')
             default:
                 [//vSegment, dSegment,jSegment,
-                 cdr3nt, Util.MY_NA, Util.MY_NA,
-                 cdr3aa, Util.MY_NA, Util.MY_NA,
+                 Util.MY_NA, Util.MY_NA, cdr3nt,
+                 Util.MY_NA, Util.MY_NA, cdr3aa,
                  Util.MY_NA
                  //inFrame, noStop, complete
                 ].join('\t')
@@ -112,8 +112,7 @@ class Clonotype {
     }
 
     final static String KEY_HEADER = "cdr1nt\tcdr2nt\tcdr3nt\t" +
-            "cdr1aa\tcdr2aa\tcdr3aa\t" +
-            "mutations"
+            "cdr1aa\tcdr2aa\tcdr3aa"
 
     final static String HEADER = "v_segment\td_segment\tj_segment\t" +
             "cdr1start\tcdr1end\t" +
