@@ -124,7 +124,7 @@ class BlastProcessor {
         //    return null
         //}
 
-        def complete = cdr3End >= 0, hasCdr3 =  cdr3Start >= 0
+        def hasCdr3 =  cdr3Start >= 0, complete = cdr3End >= 0 && hasCdr3
 
         def hypermutations = shmExtractor.extract(V_SEGM,
                 hits[0][0].toInteger() - 1, hits[0][1], hits[0][2].toInteger() - 1, hits[0][3],

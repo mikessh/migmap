@@ -226,6 +226,7 @@ listener.join()
 // Group clonotypes
 //
 levels.each { level ->
+    def nReads = 0, nEvents = 0
     def resultsMap = new HashMap<String, ClonotypeData>()
     def outputFileName = outputFilePrefix + ".L${level}.txt"
 
@@ -234,15 +235,19 @@ levels.each { level ->
         def clonotype = clonotypeMap[it.value.seqId.toString()]
         if (clonotype != null) {
             def clonotypeKey = clonotype.generateKey(it.key, level, funcOnly, completeOnly, reportNoCdr3)
-            if(clonotypeKey!=null) {
+            if (clonotypeKey != null) {
                 def clonotypeData = resultsMap[clonotypeKey]
 
                 def qual = it.value.computeQual()
 
                 if (!clonotypeData)
-                    resultsMap.put(clonotypeKey, clonotype.appendToData(null, qual, qualThreshold, level))  // create new
+                    resultsMap.put(clonotypeKey, clonotype.appendToData(null, qual, qualThreshold,
+                            it.value.nReads, it.value.nEvents, level))  // create new
                 else
-                    clonotype.appendToData(clonotypeData, qual, qualThreshold, level)
+                    clonotype.appendToData(clonotypeData, qual, qualThreshold,
+                            it.value.nReads, it.value.nEvents, level)
+                nReads += it.value.nReads
+                nEvents += it.value.nEvents
             }
         }
     }
@@ -252,13 +257,16 @@ levels.each { level ->
 //
     println "[${new Date()}] Writing output to $outputFileName"
     new File(outputFileName).withPrintWriter { pw ->
-        pw.println "#count\t" + Clonotype.KEY_HEADER + "\t" + ClonotypeData.VALUE_HEADER
-        resultsMap.sort { -it.value.count }.each {
+        pw.println "#reads_count\treads_percent\tevents_count\tevents_percent" +
+                Clonotype.KEY_HEADER + "\t" + ClonotypeData.VALUE_HEADER
+        resultsMap.sort { -it.value.nReads }.each {
             byte minQual = it.value.summarizeQuality()
             def key = it.key
             key = key.substring(0, key.lastIndexOf("\t")) // trim hypermutations, they will be reported from value
             if (minQual >= qualThreshold) {
-                pw.println(it.value.count + "\t" + key + "\t" + it.value.toString())
+                pw.println(it.value.nReads + "\t" + (it.value.nReads / nReads) + "\t" +
+                        it.value.nEvents + "\t" + (it.value.nEvents / nEvents) + "\t" +
+                        key + "\t" + it.value.toString())
             }
         }
     }

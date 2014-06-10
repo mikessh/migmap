@@ -20,13 +20,13 @@ import igblastwrp.shm.Hypermutation
  */
 class ClonotypeData {
     final int level
-    int count = 0
+    int nReads = 0, nEvents = 0
     final int[] qual1, qual2, qual3
     final Map<Hypermutation, Integer> hypermMap
     final Map<String, Integer> dSegmentVoter, vSegmentVoter, jSegmentVoter
 
     public ClonotypeData(String qual1, String qual2, String qual3, List<Hypermutation> hypermutations,
-                         String vSegment, String dSegment, String jSegment, int level) {
+                         String vSegment, String dSegment, String jSegment, int nReads, int nEvents, int level) {
         this.level = level
 
         this.qual1 = (qual1 != Util.MY_NA) ? new byte[qual1.length()] : null
@@ -38,12 +38,13 @@ class ClonotypeData {
         this.dSegmentVoter = new HashMap<>()
         this.jSegmentVoter = new HashMap<>()
 
-        append(qual1, qual2, qual3, hypermutations, vSegment, dSegment, jSegment)
+        append(qual1, qual2, qual3, hypermutations, vSegment, dSegment, jSegment, nReads, nEvents)
     }
 
     void append(String qual1, String qual2, String qual3, List<Hypermutation> hypermutations,
-                String vSegment, String dSegment, String jSegment) {
-        count++
+                String vSegment, String dSegment, String jSegment, int nReads, int nEvents) {
+        this.nEvents += nEvents
+        this.nReads += nReads
 
         hypermutations.each {
             hypermMap.put(it, (hypermMap[it] ?: 0) + 1)
@@ -56,15 +57,15 @@ class ClonotypeData {
         if (qual1)
             if (qual1 != Util.MY_NA)
                 for (int i = 0; i < qual1.length(); i++)
-                    this.qual1[i] = this.qual1[i] + (int) (qual1.charAt(i) - 33)
+                    this.qual1[i] = this.qual1[i] + (int) (qual1.charAt(i) - 33) * nReads
         if (qual2)
             if (qual2 != Util.MY_NA)
                 for (int i = 0; i < qual2.length(); i++)
-                    this.qual2[i] = this.qual2[i] + (int) (qual2.charAt(i) - 33)
+                    this.qual2[i] = this.qual2[i] + (int) (qual2.charAt(i) - 33) * nReads
         if (qual3)
             if (qual3 != Util.MY_NA)
                 for (int i = 0; i < qual3.length(); i++)
-                    this.qual3[i] = this.qual3[i] + (int) (qual3.charAt(i) - 33)
+                    this.qual3[i] = this.qual3[i] + (int) (qual3.charAt(i) - 33) * nReads
     }
 
     byte summarizeQuality() {
@@ -72,19 +73,19 @@ class ClonotypeData {
 
         if (qual1)
             for (int i = 0; i < qual1.length; i++) {
-                byte q = qual1[i] / count
+                byte q = qual1[i] / nReads
                 qual1[i] = q
                 minQual = minQual > q ? q : minQual
             }
         if (qual2)
             for (int i = 0; i < qual2.length; i++) {
-                byte q = qual2[i] / count
+                byte q = qual2[i] / nReads
                 qual2[i] = q
                 minQual = minQual > q ? q : minQual
             }
         if (qual3)
             for (int i = 0; i < qual3.length; i++) {
-                byte q = qual3[i] / count
+                byte q = qual3[i] / nReads
                 qual3[i] = q
                 minQual = minQual > q ? q : minQual
             }

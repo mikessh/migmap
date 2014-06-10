@@ -93,7 +93,7 @@ class Clonotype {
         }
     }
 
-    ClonotypeData appendToData(ClonotypeData clonotypeData, String qual, byte qualThreshold, int level) {
+    ClonotypeData appendToData(ClonotypeData clonotypeData, String qual, byte qualThreshold, int nReads, int nEvents, int level) {
         if (rc && qual)
             qual = qual.reverse()
 
@@ -108,11 +108,11 @@ class Clonotype {
                     : Util.MY_NA
 
         if (clonotypeData) {
-            clonotypeData.append(cdr1q, cdr2q, cdr3q, filteredHyperm, vSegment, dSegment, jSegment)
+            clonotypeData.append(cdr1q, cdr2q, cdr3q, filteredHyperm, vSegment, dSegment, jSegment, nReads, nEvents)
             return null
         }
 
-        return new ClonotypeData(cdr1q, cdr2q, cdr3q, filteredHyperm, vSegment, dSegment, jSegment, level)
+        return new ClonotypeData(cdr1q, cdr2q, cdr3q, filteredHyperm, vSegment, dSegment, jSegment, nReads, nEvents, level)
     }
 
     final static String KEY_HEADER = "cdr1nt\tcdr2nt\tcdr3nt\t" +
