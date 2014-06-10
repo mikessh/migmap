@@ -43,11 +43,10 @@ class SHMExtractor {
 
             if (q == '-') {
                 qdelta++
-            }
-            else if (s == '-') {
+            } else if (s == '-') {
                 sdelta++
             } else if (s != q) {
-                int cdr = 0, pos = i + sstart - sdelta, posInRead = i + qstart - qdelta,
+                int pos = i + sstart - sdelta, posInRead = i + qstart - qdelta,
                     codonPos = pos / 3,
                     codonNtStart = codonPos * 3, codonNtPos = codonNtStart + (pos % 3)
 
@@ -67,15 +66,21 @@ class SHMExtractor {
                     aaTo = Util.codon2aa(new String(codon))
                 }
 
-
+                def region = "FW1"
                 if (cdr1start >= 0 && posInRead >= cdr1start && posInRead < cdr1end)
-                    cdr = 1
-                else if (cdr2start >= 0 && posInRead >= cdr2start && posInRead < cdr2end)
-                    cdr = 2
+                    region = "CDR1"
+                else if (cdr2start >= 0) {
+                    if (posInRead < cdr2start)
+                        region = "FW2"
+                    else if (posInRead < cdr2end)
+                        region = "CDR2"
+                    else
+                        region = "FW3"
+                }
 
                 hypermutations.add(new Hypermutation(pos, posInRead,
                         s, q, aaFrom, aaTo,
-                        cdr))
+                        region))
             }
         }
 

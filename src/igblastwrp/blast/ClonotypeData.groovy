@@ -3,6 +3,8 @@ package igblastwrp.blast
 import igblastwrp.Util
 import igblastwrp.shm.Hypermutation
 
+import java.text.DecimalFormat
+
 /**
  Copyright 2014 Mikhail Shugay (mikhail.shugay@gmail.com)
 
@@ -22,7 +24,7 @@ class ClonotypeData {
     final int level
     int nReads = 0, nEvents = 0
     final int[] qual1, qual2, qual3
-    final Map<Hypermutation, Integer> hypermMap
+    final Map<Hypermutation, int[]> hypermMap
     final Map<String, Integer> dSegmentVoter, vSegmentVoter, jSegmentVoter
 
     public ClonotypeData(String qual1, String qual2, String qual3, List<Hypermutation> hypermutations,
@@ -47,7 +49,11 @@ class ClonotypeData {
         this.nReads += nReads
 
         hypermutations.each {
-            hypermMap.put(it, (hypermMap[it] ?: 0) + 1)
+            int[] counters = hypermMap[it]
+            if (!counters)
+                hypermMap.put(it, counters = new int[2])
+            counters[1] = counters[1] + nEvents
+            counters[0] = counters[0] + nReads
         }
 
         vSegmentVoter.put(vSegment, (vSegmentVoter[vSegment] ?: 0) + 1)
@@ -93,6 +99,8 @@ class ClonotypeData {
         minQual
     }
 
+    def static final formatter = new DecimalFormat("0.#E0");
+
     String toString() {
         StringBuilder sb = new StringBuilder()
 
@@ -121,7 +129,11 @@ class ClonotypeData {
         if (hypermMap.size() == 0)
             sb.append(Util.MY_NA)
         else
-            sb.append(hypermMap.sort { it.key.pos }.collect { it.value + "," + it.key.toString() }.join("|"))
+            sb.append(hypermMap.sort { it.key.pos }.collect {
+                it.value[0] + ":" + formatter.format(it.value[0] / nReads) + ":" +
+                        it.value[1] + ":" + formatter.format(it.value[1] / nEvents) + "," +
+                        it.key.toString()
+            }.join("|"))
 
         sb.toString()
     }

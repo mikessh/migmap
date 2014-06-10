@@ -17,18 +17,18 @@ package igblastwrp.shm
 class Hypermutation {
     final int pos, posInRead
     final char ntFrom, ntTo, aaFrom, aaTo
-    final int cdr
+    final String region
 
     Hypermutation(int pos, int posInRead,
                   char ntFrom, char ntTo, char aaFrom, char aaTo,
-                  int cdr) {
+                  String region) {
         this.pos = pos
         this.posInRead = posInRead
         this.ntFrom = ntFrom
         this.ntTo = ntTo
         this.aaFrom = aaFrom
         this.aaTo = aaTo
-        this.cdr = cdr
+        this.region = region
     }
 
     boolean equals(o) {
@@ -51,6 +51,6 @@ class Hypermutation {
     }
 
     String toString() {
-        "$pos:$ntFrom>$ntTo,${(int) (pos / 3)}:$aaFrom>$aaTo${cdr > 0 ? ",CDR${cdr}" : ""}"
+        "$pos:$ntFrom>$ntTo,${(int) (pos / 3)}:$aaFrom>$aaTo,$region"
     }
 }
