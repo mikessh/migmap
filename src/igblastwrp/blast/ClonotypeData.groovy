@@ -4,6 +4,7 @@ import igblastwrp.Util
 import igblastwrp.shm.Hypermutation
 
 import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
 
 /**
  Copyright 2014 Mikhail Shugay (mikhail.shugay@gmail.com)
@@ -99,7 +100,8 @@ class ClonotypeData {
         minQual
     }
 
-    def static final formatter = new DecimalFormat("0.#E0");
+    def static final formatter = new DecimalFormat("0.#E0",
+            DecimalFormatSymbols.getInstance(Locale.ENGLISH));
 
     String toString() {
         StringBuilder sb = new StringBuilder()
