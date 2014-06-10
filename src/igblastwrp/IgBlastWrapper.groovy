@@ -32,6 +32,7 @@ cli.h('usage')
 
 cli.f('Report clonotypes with functional CDR3s only')
 cli.c('Report clonotypes with complete CDR3s only')
+cli._(longOpt: 'no-cdr3', 'Report clonotypes for which no CDR3 was identified')
 
 cli.l(args: 1, argName: '0, 1 or 2',
         'Level of clonotype detalization: 0 - CDR3, 1 - CDR1,2,3, 2 - CDR1,2,3+V-mutations. ' +
@@ -66,7 +67,7 @@ int THREADS = (opt.p ?: "${Runtime.runtime.availableProcessors()}").toInteger()
 int N = (opt.N ?: "-1").toInteger()
 String SPECIES = opt.S ?: "human", GENE = opt.R[0..1], CHAIN = opt.R[2]
 byte qualThreshold = (opt.q ?: "25").toInteger()
-boolean funcOnly = opt.f, completeOnly = opt.c, assembled = opt.a
+boolean funcOnly = opt.f, completeOnly = opt.c, assembled = opt.a, reportNoCdr3 = opt.'no-cdr3'
 
 //
 // DATA BUNDLE
@@ -225,25 +226,24 @@ listener.join()
 // Group clonotypes
 //
 levels.each { level ->
-    def resultsMap = new HashMap<String, ClonotypeData>()// new HashMap<ClonotypeEntry, ClonotypeData>()
+    def resultsMap = new HashMap<String, ClonotypeData>()
     def outputFileName = outputFilePrefix + ".L${level}.txt"
 
     println "[${new Date()}] Generating clonotypes for level $level"
     nonRedundantSequenceMap.each {
         def clonotype = clonotypeMap[it.value.seqId.toString()]
-        if (clonotype != null &&
-                (!funcOnly || clonotype.functional) &&
-                (!completeOnly || clonotype.complete)) {
+        if (clonotype != null) {
+            def clonotypeKey = clonotype.generateKey(it.key, level, funcOnly, completeOnly, reportNoCdr3)
+            if(clonotypeKey!=null) {
+                def clonotypeData = resultsMap[clonotypeKey]
 
-            def clonotypeKey = clonotype.generateKey(it.key, level)
-            def clonotypeData = resultsMap[clonotypeKey]
+                def qual = it.value.computeQual()
 
-            def qual = it.value.computeQual()
-
-            if (!clonotypeData)
-                resultsMap.put(clonotypeKey, clonotype.appendToData(null, qual, qualThreshold, level))  // create new
-            else
-                clonotype.appendToData(clonotypeData, qual, qualThreshold, level)
+                if (!clonotypeData)
+                    resultsMap.put(clonotypeKey, clonotype.appendToData(null, qual, qualThreshold, level))  // create new
+                else
+                    clonotype.appendToData(clonotypeData, qual, qualThreshold, level)
+            }
         }
     }
 
@@ -252,7 +252,7 @@ levels.each { level ->
 //
     println "[${new Date()}] Writing output to $outputFileName"
     new File(outputFileName).withPrintWriter { pw ->
-        pw.println "Count\t" + Clonotype.KEY_HEADER + "\t" + ClonotypeData.VALUE_HEADER
+        pw.println "#count\t" + Clonotype.KEY_HEADER + "\t" + ClonotypeData.VALUE_HEADER
         resultsMap.sort { -it.value.count }.each {
             byte minQual = it.value.summarizeQuality()
             def key = it.key

@@ -21,12 +21,12 @@ import igblastwrp.shm.Hypermutation
 class Clonotype {
     final String vSegment, dSegment, jSegment
     final int cdr1start, cdr1end, cdr2start, cdr2end, cdr3start, cdr3end
-    final boolean rc, inFrame, noStop, complete
+    final boolean rc, complete, hasCdr3
     final List<Hypermutation> hypermutations
 
     Clonotype(String vSegment, String dSegment, String jSegment,
               int cdr1start, int cdr1end, int cdr2start, int cdr2end, int cdr3start, int cdr3end,
-              boolean rc, boolean inFrame, boolean noStop, boolean complete,
+              boolean rc, boolean complete, boolean hasCdr3,
               List<Hypermutation> hypermutations) {
         this.vSegment = vSegment
         this.dSegment = dSegment == Util.BLAST_NA ? Util.MY_NA : dSegment
@@ -38,13 +38,15 @@ class Clonotype {
         this.cdr3start = cdr3start
         this.cdr3end = cdr3end
         this.rc = rc
-        this.inFrame = inFrame
-        this.noStop = noStop
         this.complete = complete
+        this.hasCdr3 = hasCdr3
         this.hypermutations = hypermutations
     }
 
-    String generateKey(String seq, int level) {
+    String generateKey(String seq, int level, boolean funcOnly, boolean completeOnly, boolean reportNoCdr3) {
+        if ((!reportNoCdr3 && !hasCdr3) || (completeOnly && !complete))
+            return null
+
         if (rc)
             seq = Util.revCompl(seq)
 
@@ -60,27 +62,33 @@ class Clonotype {
                     (complete ? Util.translateCdr(cdr3nt) : (Util.translateLinear(cdr3nt) + "_"))
                     : Util.MY_NA
 
+        boolean inFrame = !cdr3aa.contains("?"), noStop = !cdr3aa.contains("*"),
+                complete = !cdr3aa.contains("_")
+
+        if (funcOnly && (!inFrame || !noStop))
+            return null
+
         switch (level) {
             case 2:
                 return [//vSegment, dSegment, jSegment,
                         cdr1nt, cdr2nt, cdr3nt,
                         cdr1aa, cdr2aa, cdr3aa,
+                        inFrame, noStop, complete,
                         hypermutations.join('|')
-                        //inFrame, noStop, complete
                 ].join('\t')
             case 1:
                 return [//vSegment, dSegment,jSegment,
                         cdr1nt, cdr2nt, cdr3nt,
                         cdr1aa, cdr2aa, cdr3aa,
+                        inFrame, noStop, complete,
                         Util.MY_NA
-                        //inFrame, noStop, complete
                 ].join('\t')
             default:
-                [//vSegment, dSegment,jSegment,
-                 Util.MY_NA, Util.MY_NA, cdr3nt,
-                 Util.MY_NA, Util.MY_NA, cdr3aa,
-                 Util.MY_NA
-                 //inFrame, noStop, complete
+                return [//vSegment, dSegment,jSegment,
+                        Util.MY_NA, Util.MY_NA, cdr3nt,
+                        Util.MY_NA, Util.MY_NA, cdr3aa,
+                        inFrame, noStop, complete,
+                        Util.MY_NA
                 ].join('\t')
         }
     }
@@ -107,12 +115,8 @@ class Clonotype {
         return new ClonotypeData(cdr1q, cdr2q, cdr3q, filteredHyperm, vSegment, dSegment, jSegment, level)
     }
 
-    boolean isFunctional() {
-        inFrame && noStop
-    }
-
     final static String KEY_HEADER = "cdr1nt\tcdr2nt\tcdr3nt\t" +
-            "cdr1aa\tcdr2aa\tcdr3aa"
+            "cdr1aa\tcdr2aa\tcdr3aa\tinFrame\tnoStop\tcomplete"
 
     final static String HEADER = "v_segment\td_segment\tj_segment\t" +
             "cdr1start\tcdr1end\t" +
@@ -126,6 +130,6 @@ class Clonotype {
          cdr1start, cdr1end,
          cdr2start, cdr2end,
          cdr3start, cdr3end,
-         inFrame, noStop, complete].join("\t")
+         complete].join("\t")
     }
 }
