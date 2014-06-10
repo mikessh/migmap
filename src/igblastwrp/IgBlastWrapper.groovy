@@ -103,7 +103,7 @@ if (!new File(inputFileName).exists()) {
 
 def outputDir = new File(outputFilePrefix).absoluteFile.parentFile
 if (!outputDir.exists()) {
-    println "[WARNING] Output path doesn't exist.. creating"
+    println "[INFO] Output path doesn't exist.. creating"
     def created = outputDir.mkdirs()
     if (!created) {
         println "[ERROR] Failed to create output path"
@@ -162,7 +162,7 @@ println "[${new Date()}] Preparing to run IgBlast (creating .fa chunks)"
 def fastaChunks = new ArrayList<String>()
 def seqIter = nonRedundantSequenceMap.entrySet().iterator()
 for (int i = 0; i < THREADS; i++) {
-    def prefix = "_igblastwrp-" + UUID.randomUUID().toString()
+    def prefix = "_igblastwrp-" + UUID.randomUUID().toString() + "_" + i
     def chunkFileName = "$outputDir/${prefix}.fa"
 
     new File(chunkFileName).withPrintWriter { pw ->
