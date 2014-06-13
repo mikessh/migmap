@@ -62,11 +62,15 @@ cdr2q        | quality string for CDR2 region
 cdr3q        | quality string for CDR3 region
 mutations    | mutations string
 
-Mutation string is a list of mutation entries separated by `|`, i.e. `entry1``|``entry2``|``...`. 
+Mutation string is a list of mutation entries separated by "|", i.e. `entry1``|``entry2``|``...`. 
 
-Each mutation entry is encoded in the following format:
-`reads_count:reads_freq:mig_count:mig_freq``,``nt_pos:nt_from>nt_to``,``aa_pos:aa_from>aa_to``,``region``
+Each mutation entry is encoded in the following comma-separated format:
 
+`reads_count:reads_freq:mig_count:mig_freq``,``nt_pos:nt_from>nt_to``,``aa_pos:aa_from>aa_to``,``region`
+
+Here is an example:
+
+> 3454:1E0:100:1E0,67:C>G,22:T>S,FW2|3454:1E0:100:1E0,76:G>T,25:G>V,CDR1
 
 ### Options:
 
