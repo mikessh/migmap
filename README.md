@@ -70,7 +70,7 @@ Each mutation entry is encoded in the following comma-separated format:
 
 Here is an example:
 
-> 3454:1E0:100:1E0,67:C>G,22:T>S,FW2|3454:1E0:100:1E0,76:G>T,25:G>V,CDR1
+> 3505:1E0:107:1E0,67:C>G,22:T>S,FW2|4:1,1E-3:1:9,3E-3,87:A>T,29:S>C,CDR1
 
 ### Options:
 
