@@ -40,7 +40,7 @@ Input file could be either in FASTQ or FASTA format, raw or GZipped.
 Output table format:
 
 Column       | Definition
--------------|-----------
+-------------|--------------------------------------------------------------------------------------------------------
 reads_count  | number of reads
 reads_freq   | share of reads
 mig_count    | number of MIGs (read groups with distinct UMIs), only applies when using `-a` optional
@@ -60,7 +60,12 @@ jSegment     | Joining segment (major allele only)
 cdr1q        | quality string for CDR1 region
 cdr2q        | quality string for CDR2 region
 cdr3q        | quality string for CDR3 region
-mutations    | mutations string, where each mutation entry is separated by `|`. Mutation entry is provided in the following format: `reads_count:reads_freq:mig_count:mig_freq``,``nt_pos:nt_from>nt_to``,``aa_pos:aa_from>aa_to``,``region``
+mutations    | mutations string
+
+Mutation string is a list of mutation entries separated by `|`, i.e. `entry1``|``entry2``|``...`. 
+
+Each mutation entry is encoded in the following format:
+`reads_count:reads_freq:mig_count:mig_freq``,``nt_pos:nt_from>nt_to``,``aa_pos:aa_from>aa_to``,``region``
 
 
 ### Options:
