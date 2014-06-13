@@ -59,7 +59,7 @@ class BlastProcessor {
         }
 
         def J_SEGM_UNIQ = J_SEGM.split(",")[0]
-        def rc = segments[-1] != "+"//, inFrame = segments[-2] == "In-frame", noStop = segments[-3] == "No"
+        def rc = segments[-1] != "+", inFrame = segments[-2] == "In-frame", noStop = segments[-3] == "No"
 
         // Hits
         hits = [
@@ -132,7 +132,7 @@ class BlastProcessor {
 
         return new Clonotype(V_SEGM, D_SEGM, J_SEGM,
                 cdr1Start, cdr1End, cdr2Start, cdr2End, cdr3Start, cdr3End,
-                rc, complete, hasCdr3, hypermutations)
+                rc, complete, hasCdr3, inFrame, noStop, hypermutations)
 
         //} catch (Exception e) {
         //    println "Error parsing $chunk"

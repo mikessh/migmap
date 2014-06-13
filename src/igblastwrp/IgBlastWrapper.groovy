@@ -30,13 +30,14 @@ import java.util.concurrent.Executors
 def cli = new CliBuilder(usage: 'igblastwrp [options] input.(fa/fastq)[.gz] outputPrefix')
 cli.h('usage')
 
-cli.f('Report clonotypes with functional CDR3s only')
+cli.f('Report functional (no stop codons and frameshifts) clonotypes only')
 cli.c('Report clonotypes with complete CDR3s only')
 cli._(longOpt: 'no-cdr3', 'Report clonotypes for which no CDR3 was identified')
 
 cli.l(args: 1, argName: '0, 1 or 2',
         'Level of clonotype detalization: 0 - CDR3, 1 - CDR1,2,3, 2 - CDR1,2,3+V-mutations. ' +
-                'Several levels could be specified as comma-separated string [default = 0]')
+                'Several levels could be specified as comma-separated string [default = 0]. ' +
+                'Also specifies stop/functional filtering scope.')
 
 cli.R(args: 1, argName: 'TRA|B|G|D and IGH|L|K', 'Receptor gene and chain, e.g. \'TRA\' [required]')
 cli.a('[migec-compatibility] Assume MIG-assembled data. Header should contain UMI:NNNNN:count')
@@ -257,7 +258,7 @@ levels.each { level ->
 //
     println "[${new Date()}] Writing output to $outputFileName"
     new File(outputFileName).withPrintWriter { pw ->
-        pw.println "#reads_count\treads_percent\tevents_count\tevents_percent" +
+        pw.println "#reads_count\treads_freq\tmig_count\tmig_freq\t" +
                 Clonotype.KEY_HEADER + "\t" + ClonotypeData.VALUE_HEADER
         resultsMap.sort { -it.value.nReads }.each {
             byte minQual = it.value.summarizeQuality()

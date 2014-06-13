@@ -21,12 +21,12 @@ import igblastwrp.shm.Hypermutation
 class Clonotype {
     final String vSegment, dSegment, jSegment
     final int cdr1start, cdr1end, cdr2start, cdr2end, cdr3start, cdr3end
-    final boolean rc, complete, hasCdr3
+    final boolean rc, complete, hasCdr3, inFrame,noStop
     final List<Hypermutation> hypermutations
 
     Clonotype(String vSegment, String dSegment, String jSegment,
               int cdr1start, int cdr1end, int cdr2start, int cdr2end, int cdr3start, int cdr3end,
-              boolean rc, boolean complete, boolean hasCdr3,
+              boolean rc, boolean complete, boolean hasCdr3, boolean inFrame, boolean noStop,
               List<Hypermutation> hypermutations) {
         this.vSegment = vSegment
         this.dSegment = dSegment == Util.BLAST_NA ? Util.MY_NA : dSegment
@@ -40,6 +40,8 @@ class Clonotype {
         this.rc = rc
         this.complete = complete
         this.hasCdr3 = hasCdr3
+        this.inFrame = inFrame
+        this.noStop = noStop
         this.hypermutations = hypermutations
     }
 
@@ -62,9 +64,6 @@ class Clonotype {
                     (complete ? Util.translateCdr(cdr3nt) : (Util.translateLinear(cdr3nt) + "_"))
                     : Util.MY_NA
 
-        boolean inFrame = !cdr3aa.contains("?"), noStop = !cdr3aa.contains("*"),
-                complete = !cdr3aa.contains("_")
-
         if (funcOnly && (!inFrame || !noStop))
             return null
 
@@ -77,6 +76,11 @@ class Clonotype {
                         hypermutations.join('|')
                 ].join('\t')
             case 1:
+                boolean inFrame = ![cdr1aa, cdr2aa, cdr3aa].any { it.contains("?") },
+                        noStop = ![cdr1aa, cdr2aa, cdr3aa].any { it.contains("*") },
+                        complete = ![cdr1aa, cdr2aa, cdr3aa].any { it == Util.MY_NA} &&
+                                !cdr3aa.contains("_")
+
                 return [//vSegment, dSegment,jSegment,
                         cdr1nt, cdr2nt, cdr3nt,
                         cdr1aa, cdr2aa, cdr3aa,
@@ -84,6 +88,9 @@ class Clonotype {
                         Util.MY_NA
                 ].join('\t')
             default:
+                boolean inFrame = !cdr3aa.contains("?"), noStop = !cdr3aa.contains("*"),
+                        complete = !cdr3aa.contains("_")
+
                 return [//vSegment, dSegment,jSegment,
                         Util.MY_NA, Util.MY_NA, cdr3nt,
                         Util.MY_NA, Util.MY_NA, cdr3aa,
