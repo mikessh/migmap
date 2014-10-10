@@ -2,3 +2,7 @@ out/
 bin/
 test/
 .idea/
+old_data/
+data/
+dataprep/database
+dataprep/jref.txt

@@ -41,7 +41,7 @@ cli.l(args: 1, argName: '0, 1 or 2',
 
 cli.R(args: 1, argName: 'TRA|B|G|D and IGH|L|K', 'Receptor gene and chain, e.g. \'TRA\' [required]')
 cli.a('[migec-compatibility] Assume MIG-assembled data. Header should contain UMI:NNNNN:count')
-cli.S(args: 1, argName: '\'human\' or \'mouse\'', 'Species [default=human]')
+cli.S(args: 1, argName: 'species name', 'human, mouse, rat, rabbit or rhesus_monkey [default=human]')
 cli.q(args: 1, 'quality threshold, 2..40 [default = 25]')
 cli.p(args: 1, 'number of threads to use [default = all available processors]')
 cli._(longOpt: 'data-dir', args: 1, argName: 'path', 'path to folder that contains IgBlastWrapper bundle: ' +
