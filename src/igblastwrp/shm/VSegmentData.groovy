@@ -1,7 +1,4 @@
 package igblastwrp.shm
-
-import java.util.concurrent.atomic.AtomicInteger
-
 /**
  Copyright 2014 Mikhail Shugay (mikhail.shugay@gmail.com)
 
@@ -19,9 +16,33 @@ import java.util.concurrent.atomic.AtomicInteger
  */
 class VSegmentData {
     final String aaSeq, ntSeq
+    List<Range> regionMarkup
 
     VSegmentData(String aaSeq, String ntSeq) {
         this.aaSeq = aaSeq
         this.ntSeq = ntSeq
+    }
+
+    int deduceRegion(int pos) {
+        regionId2Name(regionMarkup.findIndexOf { it.contains(pos) })
+    }
+
+    private static String regionId2Name(int regionId) {
+        switch (regionId) {
+            case 0:
+                return "FW1"
+            case 1:
+                return "CDR1"
+            case 2:
+                return "FW2"
+            case 3:
+                return "CDR2"
+            case 4:
+                return "FW3"
+            case 5:
+                return "CDR3"
+            default:
+                return "NA"
+        }
     }
 }

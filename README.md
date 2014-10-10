@@ -78,7 +78,7 @@ Here is an example:
 
 * `-R` receptor chain. **Required**. Currently supported: `TRA`, `TRB`, `TRG`, `TRD`, `IGH`, `IGK`, `IGL`
 
-* `-S` species. Currently supported: `human` and `mouse`
+* `-S` species. Currently supported: `human`, `mouse`, `rat`, `rabbit` and `rhesus_monkey`
 
 * `-f` filter clonotypes with non-functional CDR3 region (contains stop or is out-of-frame)
 
@@ -98,6 +98,7 @@ Here is an example:
 ## NOTE
 
 IgBlastWrapper only aligns to top alleles (marked by ```*01``` in IMGT nomenclature) to speed-up. Mismatches are then extracted from alignment and reported
+Not all receptor & species combinations are supported for species other than human and mouse.
  
 ## HINT
 

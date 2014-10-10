@@ -21,13 +21,24 @@ import igblastwrp.io.FastaReader
 class SHMExtractor {
     def vSegmentSeqMap = new HashMap<String, VSegmentData>()
 
-    SHMExtractor(String vSegmentFasta) {
+    SHMExtractor(String vSegmentFasta, String regionsFile) {
         def reader = new FastaReader(vSegmentFasta)
 
         def read
         while ((read = reader.next()) != null) {
             def vSegment = read.header.substring(1).trim() //trim >
             vSegmentSeqMap.put(vSegment, new VSegmentData(Util.translateLinear(read.seq), read.seq))
+        }
+
+        new File(regionsFile).splitEachLine("\t") { List<String> splitLine ->
+            def regionMarkup = new IntRange(1, 10).step(2).collect { int i ->
+                new Range(splitLine[i].toInteger() - 1, // 1-based
+                        splitLine[i + 1].toInteger()    // non-inclusive
+                )
+            }
+            def vSegmentData = vSegmentSeqMap[splitLine[0]]
+            if (vSegmentData != null)
+                vSegmentData.regionMarkup = regionMarkup
         }
     }
 
@@ -66,17 +77,27 @@ class SHMExtractor {
                     aaTo = Util.codon2aa(new String(codon))
                 }
 
-                def region = "FW1"
-                if (cdr1start >= 0 && posInRead >= cdr1start && posInRead < cdr1end)
-                    region = "CDR1"
-                else if (cdr2start >= 0) {
-                    if (posInRead < cdr2start)
-                        region = "FW2"
-                    else if (posInRead < cdr2end)
-                        region = "CDR2"
-                    else
-                        region = "FW3"
+                def region = null
+
+                if (cdr1start >= 0) {
+                    if (posInRead < cdr1start)
+                        region = "FW1"
+                    else if (posInRead < cdr1end)
+                        region = "CDR1"
+
+
+                    if (cdr2start >= 0) {
+                        if (posInRead < cdr2start)
+                            region = "FW2"
+                        else if (posInRead < cdr2end)
+                            region = "CDR2"
+                        else
+                            region = "FW3"
+                    }
                 }
+
+                if (!region)
+                    region = vSeq.deduceRegion(pos)
 
                 hypermutations.add(new Hypermutation(pos, posInRead,
                         s, q, aaFrom, aaTo,
