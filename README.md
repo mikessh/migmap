@@ -103,3 +103,4 @@ Not all receptor & species combinations are supported for species other than hum
 ## HINT
 
 The most straightforward way to build the scripts is to create an Intellij Project (Groovy), then use "Open Module Settings"->Artifacts(+)Jar->from modules with dependencies followed by Build->Build artifacts. Module architecture will be changed to Maven soon..  
+As for now you are recommended to use platform-specific binaries from [Latest release](https://github.com/mikessh/igblastwrp/releases/latest)
