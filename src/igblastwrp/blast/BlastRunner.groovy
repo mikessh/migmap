@@ -20,6 +20,7 @@ import java.util.concurrent.ConcurrentHashMap
  limitations under the License.
  */
 class BlastRunner implements Runnable {
+    final static boolean WIN = System.properties['os.name'].toLowerCase().contains('windows')
     final List cmdLine
     final List env
     final File dir
@@ -32,6 +33,9 @@ class BlastRunner implements Runnable {
             IGBLAST_DATA = "$path/data",
             IGBLAST_DB_PATH = "$IGBLAST_DATA/database",
             IGBLAST_OPT_PATH = "$IGBLAST_DATA/optional_file"
+
+        if (WIN)
+            IGBLAST_EXECUTABLE += ".exe"
 
         def seqtype = gene == "TR" ? "TCR" : "Ig"
 
