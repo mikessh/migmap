@@ -30,7 +30,7 @@ class SHMExtractor {
             vSegmentSeqMap.put(vSegment, new VSegmentData(Util.translateLinear(read.seq), read.seq))
         }
 
-        new File(regionsFile).splitEachLine("\t") { List<String> splitLine ->
+        new File(regionsFile).splitEachLine("[ \t]+") { List<String> splitLine ->
             def regionMarkup = new IntRange(1, 10).step(2).collect { int i ->
                 new Range(splitLine[i].toInteger() - 1, // 1-based
                         splitLine[i + 1].toInteger()    // non-inclusive
