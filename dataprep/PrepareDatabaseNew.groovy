@@ -1,5 +1,3 @@
-import java.nio.file.Files
-
 /**
  Copyright 2014 Mikhail Shugay (mikhail.shugay@gmail.com)
 
@@ -24,6 +22,8 @@ new File("jref.txt").delete()
 new File(inputFileName).splitEachLine("\t") {
     def (species, geneFull, segment, segmentFull, refPoint, seq) = it
 
+    segmentFull = segmentFull.replaceAll("/", "_")
+
     new File("$outputPath/${species}_${geneFull[0..1]}_${geneFull[2]}_${segment}.fa").withWriterAppend { writer ->
         writer.println(">$segmentFull\n$seq")
     }
@@ -36,5 +36,5 @@ new File(inputFileName).splitEachLine("\t") {
 }
 
 new File(outputPath).listFiles().each {
-    "makeblastdb -parse_seqids -dbtype nucl -in $outputPath/$it.name".execute()
+    "makeblastdb -parse_seqids -dbtype nucl -in $outputPath/$it.name -out $outputPath/${it.name[0..-4]}".execute()
 }
