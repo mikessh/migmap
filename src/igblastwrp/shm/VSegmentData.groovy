@@ -23,7 +23,7 @@ class VSegmentData {
         this.ntSeq = ntSeq
     }
 
-    int deduceRegion(int pos) {
+    String deduceRegion(int pos) {
         regionId2Name(regionMarkup.findIndexOf { it.contains(pos) })
     }
 
