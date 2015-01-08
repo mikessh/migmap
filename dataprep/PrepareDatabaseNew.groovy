@@ -39,6 +39,11 @@ new File(inputFileName).splitEachLine("\t") {
     }
 }
 
+/*
+Add dummy references. 
+This is absolutely necessary as IgBlast requires D segment references 
+and is not aware whether a certain chain has D segment or not
+ */
 speciesGeneHash.each {
     def fileName = it + "_D.fa"
     def file = new File(fileName)
