@@ -26,31 +26,20 @@ def speciesAliasMap = ["HomoSapiens"         : "human",
                        "OryctolagusCuniculus": "rabbit",
                        "MacacaMulatta"       : "rhesus_monkey"]
 
-def allowedVSegmentBySpecies = new HashMap<String, Set<String>>()
-
-// Not all segments have domain markup
-// make sure we use only marked segments
-speciesAliasMap.values().each { alias ->
-    def allowedSet = new HashSet<String>()
-    allowedVSegmentBySpecies.put(alias, allowedSet)
-    new File(alias + ".ndm.imgt").splitEachLine("\t") {
-        allowedSet.add(it[0])
-    }
-}
-
 new File(inputFileName).splitEachLine("\t") {
     def (species, geneFull, segment, segmentFull, refPoint, seq) = it
 
-    // Change names to IgBlast semantics
-    species = speciesAliasMap[species]
-    segment = segment[0]
-    segmentFull = segmentFull.replaceAll("/", "_") // otherwise makeblastdb will crash
-    def _prefix = "$outputPath/${species}_${geneFull[0..1]}_${geneFull[2]}"
+    if (!seq.contains("N")) {
+        // Change names to IgBlast semantics
+        species = speciesAliasMap[species]
+        segment = segment[0]
+        segmentFull = segmentFull.replaceAll("/", "_") // otherwise makeblastdb will crash
+        def _prefix = "$outputPath/${species}_${geneFull[0..1]}_${geneFull[2]}"
 
-    if (species) {
-        boolean majorAllele = segmentFull.endsWith("*01")
+        if (species) {
+            boolean majorAllele = segmentFull.endsWith("*01")
 
-        if (segment != "V" || allowedVSegmentBySpecies[species].contains(segmentFull)) {
+
             (majorAllele ? [_prefix, "${_prefix}_all"] : ["${_prefix}_all"]).each { prefix ->
                 speciesGeneHash.add(prefix)
 
@@ -64,9 +53,9 @@ new File(inputFileName).splitEachLine("\t") {
                     }
                 }
             }
+        } else {
+            // Ignore those species, we won't be able to use them without framework markup anyway
         }
-    } else {
-        // Ignore those species, we won't be able to use them without framework markup anyway
     }
 }
 
