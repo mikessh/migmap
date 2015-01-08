@@ -19,10 +19,14 @@ new File(outputPath).deleteDir()
 new File(outputPath).mkdir()
 new File("jref.txt").delete()
 
+def speciesGeneHash = new HashSet<String>()
+
 new File(inputFileName).splitEachLine("\t") {
     def (species, geneFull, segment, segmentFull, refPoint, seq) = it
 
     segmentFull = segmentFull.replaceAll("/", "_")
+
+    speciesGeneHash.add("$outputPath/${species}_${geneFull[0..1]}_${geneFull[2]}")
 
     new File("$outputPath/${species}_${geneFull[0..1]}_${geneFull[2]}_${segment}.fa").withWriterAppend { writer ->
         writer.println(">$segmentFull\n$seq")
@@ -31,6 +35,16 @@ new File(inputFileName).splitEachLine("\t") {
     if (segment == "J") {
         new File("jref.txt").withWriterAppend { writer ->
             writer.println([species, geneFull, segmentFull, refPoint, seq].join("\t"))
+        }
+    }
+}
+
+speciesGeneHash.each {
+    def fileName = it + "_D.fa"
+    def file = new File(fileName)
+    if (!file.exists()) {
+        file.withPrintWriter { pw ->
+            pw.println(">.\nAAAAAAAAAAAAAAAA")
         }
     }
 }

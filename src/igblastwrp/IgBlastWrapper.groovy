@@ -36,7 +36,7 @@ cli._(longOpt: 'no-cdr3', 'Report clonotypes for which no CDR3 was identified')
 
 cli.l(args: 1, argName: '0, 1 or 2',
         'Level of clonotype detalization: 0 - CDR3, 1 - CDR1,2,3, 2 - CDR1,2,3+V-mutations. ' +
-                'Several levels could be specified as comma-separated string [default = 0]. ' +
+                'Several levels could be specified as comma-separated string [default = 2]. ' +
                 'Also specifies stop/functional filtering scope.')
 
 cli.R(args: 1, argName: 'TRA|B|G|D and IGH|L|K', 'Receptor gene and chain, e.g. \'TRA\' [required]')
@@ -57,7 +57,7 @@ if (opt.h || opt == null || opt.arguments().size() < 2 || !opt.R) {
     System.exit(0)
 }
 
-def levels = (opt.l ?: "0").split(",").collect { it.toInteger() }.unique()
+def levels = (opt.l ?: "2").split(",").collect { it.toInteger() }.unique()
 levels.each { level ->
     if (level < 0 || level > 2) {
         println "ERROR Illegal clonotype detalization level $level"
