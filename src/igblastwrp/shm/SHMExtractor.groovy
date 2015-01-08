@@ -21,24 +21,13 @@ import igblastwrp.io.FastaReader
 class SHMExtractor {
     def vSegmentSeqMap = new HashMap<String, VSegmentData>()
 
-    SHMExtractor(String vSegmentFasta, String regionsFile) {
+    SHMExtractor(String vSegmentFasta) {
         def reader = new FastaReader(vSegmentFasta)
 
         def read
         while ((read = reader.next()) != null) {
             def vSegment = read.header.substring(1).trim() //trim >
             vSegmentSeqMap.put(vSegment, new VSegmentData(Util.translateLinear(read.seq), read.seq))
-        }
-
-        new File(regionsFile).splitEachLine("[ \t]+") { List<String> splitLine ->
-            def regionMarkup = new IntRange(1, 10).step(2).collect { int i ->
-                new Range(splitLine[i].toInteger() - 1, // 1-based
-                        splitLine[i + 1].toInteger()    // non-inclusive
-                )
-            }
-            def vSegmentData = vSegmentSeqMap[splitLine[0]]
-            if (vSegmentData != null)
-                vSegmentData.regionMarkup = regionMarkup
         }
     }
 
@@ -97,7 +86,7 @@ class SHMExtractor {
                 }
 
                 if (!region)
-                    region = vSeq.deduceRegion(pos)
+                    region = "NA"
 
                 hypermutations.add(new Hypermutation(pos, posInRead,
                         s, q, aaFrom, aaTo,
