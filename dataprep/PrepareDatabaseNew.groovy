@@ -14,28 +14,59 @@
  limitations under the License.
  */
 
-def inputFileName = "./formatted_vdjtools_refs.txt", outputPath = "./database/"
+def inputFileName = "./segments.all.minor.txt", outputPath = "./database/"
 new File(outputPath).deleteDir()
 new File(outputPath).mkdir()
 new File("jref.txt").delete()
 
 def speciesGeneHash = new HashSet<String>()
+def speciesAliasMap = ["HomoSapiens"         : "human",
+                       "MusMusculus"         : "mouse",
+                       "RattusNorvegicus"    : "rat",
+                       "OryctolagusCuniculus": "rabbit",
+                       "MacacaMulatta"       : "rhesus_monkey"]
+
+def allowedVSegmentBySpecies = new HashMap<String, Set<String>>()
+
+// Not all segments have domain markup
+// make sure we use only marked segments
+speciesAliasMap.values().each { alias ->
+    def allowedSet = new HashSet<String>()
+    allowedVSegmentBySpecies.put(alias, allowedSet)
+    new File(alias + ".ndm.imgt").splitEachLine("\t") {
+        allowedSet.add(it[0])
+    }
+}
 
 new File(inputFileName).splitEachLine("\t") {
     def (species, geneFull, segment, segmentFull, refPoint, seq) = it
 
-    segmentFull = segmentFull.replaceAll("/", "_")
+    // Change names to IgBlast semantics
+    species = speciesAliasMap[species]
+    segment = segment[0]
+    segmentFull = segmentFull.replaceAll("/", "_") // otherwise makeblastdb will crash
+    def _prefix = "$outputPath/${species}_${geneFull[0..1]}_${geneFull[2]}"
 
-    speciesGeneHash.add("$outputPath/${species}_${geneFull[0..1]}_${geneFull[2]}")
+    if (species) {
+        boolean majorAllele = segmentFull.endsWith("*01")
 
-    new File("$outputPath/${species}_${geneFull[0..1]}_${geneFull[2]}_${segment}.fa").withWriterAppend { writer ->
-        writer.println(">$segmentFull\n$seq")
-    }
+        if (segment != "V" || allowedVSegmentBySpecies[species].contains(segmentFull)) {
+            (majorAllele ? [_prefix, "${_prefix}_all"] : ["${_prefix}_all"]).each { prefix ->
+                speciesGeneHash.add(prefix)
 
-    if (segment == "J") {
-        new File("jref.txt").withWriterAppend { writer ->
-            writer.println([species, geneFull, segmentFull, refPoint, seq].join("\t"))
+                new File("${prefix}_${segment}.fa").withWriterAppend { writer ->
+                    writer.println(">$segmentFull\n$seq")
+                }
+
+                if (segment == "J") {
+                    new File("jref.txt").withWriterAppend { writer ->
+                        writer.println([species, geneFull, segmentFull, refPoint, seq].join("\t"))
+                    }
+                }
+            }
         }
+    } else {
+        // Ignore those species, we won't be able to use them without framework markup anyway
     }
 }
 
@@ -49,7 +80,7 @@ speciesGeneHash.each {
     def file = new File(fileName)
     if (!file.exists()) {
         file.withPrintWriter { pw ->
-            pw.println(">.\nAAAAAAAAAAAAAAAA")
+            pw.println(">.\nGGGGGGGGGGGGGGGG")
         }
     }
 }
