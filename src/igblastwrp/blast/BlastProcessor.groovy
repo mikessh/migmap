@@ -65,11 +65,11 @@ class BlastProcessor {
         hits = [
                 Util.groomMatch(chunk =~
                         //                          qstart     qseq        sstart     sseq
-                        /# Hit table(?:.+\n)+V\t.+\t([0-9]+)\t([ATGC-]+)\t([0-9]+)\t([ATGC-]+)\n/),
+                        /# Hit table(?:.+\n)+V\t.+\t([0-9]+)\t([ATGCN-]+)\t([0-9]+)\t([ATGCN-]+)\n/),
                 dFound ? Util.groomMatch(chunk =~
-                        /# Hit table(?:.+\n)+D\t.+\t([0-9]+)\t([ATGC-]+)\t([0-9]+)\t([ATGC-]+)\n/) : null,
+                        /# Hit table(?:.+\n)+D\t.+\t([0-9]+)\t([ATGCN-]+)\t([0-9]+)\t([ATGCN-]+)\n/) : null,
                 Util.groomMatch(chunk =~
-                        /# Hit table(?:.+\n)+J\t.+\t([0-9]+)\t([ATGC-]+)\t([0-9]+)\t([ATGC-]+)\n/)
+                        /# Hit table(?:.+\n)+J\t.+\t([0-9]+)\t([ATGCN-]+)\t([0-9]+)\t([ATGCN-]+)\n/)
         ]
 
         //println hits
@@ -124,10 +124,13 @@ class BlastProcessor {
         //    return null
         //}
 
-        def hasCdr3 =  cdr3Start >= 0, complete = cdr3End >= 0 && hasCdr3
+        def hasCdr3 = cdr3Start >= 0, complete = cdr3End >= 0 && hasCdr3
 
         def hypermutations = shmExtractor.extract(V_SEGM,
-                hits[0][0].toInteger() - 1, hits[0][1], hits[0][2].toInteger() - 1, hits[0][3],
+                hits[0][0].toInteger() - 1,
+                hits[0][1],
+                hits[0][2].toInteger() - 1,
+                hits[0][3],
                 cdr1Start, cdr1End, cdr2Start, cdr2End)
 
         return new Clonotype(V_SEGM, D_SEGM, J_SEGM,
