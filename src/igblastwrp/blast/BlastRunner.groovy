@@ -27,7 +27,8 @@ class BlastRunner implements Runnable {
     final BlastProcessor processor
     final ConcurrentHashMap<String, Clonotype> clonotypeMap
 
-    public BlastRunner(int THREADS, String path, String species, String gene, String chain, String inputFileName,
+    public BlastRunner(int THREADS, String path, String species, String gene, String chain,
+                       boolean allAlleles, String inputFileName,
                        ConcurrentHashMap<String, Clonotype> clonotypeMap) {
         def IGBLAST_EXECUTABLE = "$path/bin/igblastn",
             IGBLAST_DATA = "$path/data",
@@ -41,7 +42,7 @@ class BlastRunner implements Runnable {
 
         def OPTS = ["SEGM_OPT"  :
                             ["V", "J", "D"].collect { segment ->
-                                "-germline_db_${segment} $IGBLAST_DB_PATH/${species}_${gene}_${chain}_${segment}"
+                                "-germline_db_${segment} $IGBLAST_DB_PATH/${species}_${gene}_${chain}${allAlleles ? "_all" : ""}_${segment}"
                             },
 
                     "AUX_OPT"   :
@@ -71,8 +72,10 @@ class BlastRunner implements Runnable {
         dir = new File(IGBLAST_DATA)
 
         def jRefSearcher = new JRefSearcher(species, gene, chain, new File("$IGBLAST_DATA/jref.txt"))
-        def shmExtractor = new SHMExtractor("$IGBLAST_DB_PATH/${species}_${gene}_${chain}_V.fa",
-                "$IGBLAST_DATA/internal_data/$species/${species}.ndm.imgt")
+        def shmExtractor = new SHMExtractor(
+                "$IGBLAST_DB_PATH/${species}_${gene}_${chain}${allAlleles ? "_all" : ""}_V.fa",
+                "$IGBLAST_DATA/internal_data/$species/${species}.ndm.imgt"
+        )
         this.processor = new BlastProcessor(chain, jRefSearcher, shmExtractor)
         this.clonotypeMap = clonotypeMap
     }

@@ -40,12 +40,15 @@ cli.l(args: 1, argName: '0, 1 or 2',
                 'Also specifies stop/functional filtering scope.')
 
 cli.R(args: 1, argName: 'TRA|B|G|D and IGH|L|K', 'Receptor gene and chain, e.g. \'TRA\' [required]')
+cli._(longOpt: 'all-alleles', 'Use all alleles during alignment (this is going to be slower). ' +
+        'Will use only major (*01) alleles if option is not set.')
 cli.a('[migec-compatibility] Assume MIG-assembled data. Header should contain UMI:NNNNN:count')
 cli.S(args: 1, argName: 'species name', 'human, mouse, rat, rabbit or rhesus_monkey [default=human]')
 cli.q(args: 1, 'quality threshold, 2..40 [default = 25]')
 cli.p(args: 1, 'number of threads to use [default = all available processors]')
 cli._(longOpt: 'data-dir', args: 1, argName: 'path', 'path to folder that contains IgBlastWrapper bundle: ' +
         'data/ and bin/ folders [default = parent directory of script]')
+cli._(longOpt: "debug", "Debug mode.")
 cli.h('display help message')
 
 cli.N(args: 1, 'number of reads to take')
@@ -64,11 +67,12 @@ levels.each { level ->
         System.exit(-1)
     }
 }
-int THREADS = (opt.p ?: "${Runtime.runtime.availableProcessors()}").toInteger()
 int N = (opt.N ?: "-1").toInteger()
 String SPECIES = opt.S ?: "human", GENE = opt.R[0..1], CHAIN = opt.R[2]
 byte qualThreshold = (opt.q ?: "25").toInteger()
-boolean funcOnly = opt.f, completeOnly = opt.c, assembled = opt.a, reportNoCdr3 = opt.'no-cdr3'
+boolean funcOnly = opt.f, completeOnly = opt.c, assembled = opt.a, reportNoCdr3 = opt.'no-cdr3',
+        allAlleles = opt.'all-alleles', debug = opt.'debug'
+int THREADS = debug ? 1 : ((opt.p ?: "${Runtime.runtime.availableProcessors()}").toInteger())
 
 //
 // DATA BUNDLE
@@ -200,17 +204,22 @@ def listener = Thread.start {
     }
 }
 
-if (THREADS > 1) {
-    def pool = Executors.newFixedThreadPool(THREADS)
-
-    (0..(THREADS - 1)).collect { p ->
-        pool.submit(new BlastRunner(THREADS, SCRIPT_PATH, SPECIES, GENE, CHAIN, fastaChunks[p], clonotypeMap))
-    }
-    pool.shutdown()
-
-    while (!pool.terminated);
+if (debug) {
+    new BlastRunner(THREADS, SCRIPT_PATH, SPECIES, GENE, CHAIN, allAlleles, fastaChunks[0], clonotypeMap).runIdle()
+    System.exit(0)
 } else {
-    new BlastRunner(THREADS, SCRIPT_PATH, SPECIES, GENE, CHAIN, fastaChunks[0], clonotypeMap).run()
+    if (THREADS > 1) {
+        def pool = Executors.newFixedThreadPool(THREADS)
+
+        (0..(THREADS - 1)).collect { p ->
+            pool.submit(new BlastRunner(THREADS, SCRIPT_PATH, SPECIES, GENE, CHAIN, allAlleles, fastaChunks[p], clonotypeMap))
+        }
+        pool.shutdown()
+
+        while (!pool.terminated);
+    } else {
+        new BlastRunner(THREADS, SCRIPT_PATH, SPECIES, GENE, CHAIN, allAlleles, fastaChunks[0], clonotypeMap).run()
+    }
 }
 
 listener.setDefaultUncaughtExceptionHandler({ t, ex ->
