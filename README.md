@@ -37,7 +37,7 @@ java -jar path/to/igblastwrp.jar [options] inputFile outputPrefix
 
 For example
 ```bash
-java -Xmx40G -jar igblastwrp.jar -c -R IGH input.fastq.gz output.txt
+java -Xmx40G -jar igblastwrp.jar -cf -R IGH --all-alleles input.fastq.gz output.txt
 ```
 
 Input file could be either in FASTQ or FASTA format, raw or GZipped.
