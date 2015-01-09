@@ -31,13 +31,46 @@ The software is distributed as a bundle with .jar executable, pre-compiled platf
 
 ## Execution:
 
+```bash
+java -jar path/to/igblastwrp.jar [options] inputFile outputPrefix
 ```
-$> java -jar IgBlastWrapper.jar [options] inputFile outputPrefix
+
+For example
+```bash
+java -Xmx40G -jar igblastwrp.jar -c -R IGH input.fastq.gz output.txt
 ```
 
 Input file could be either in FASTQ or FASTA format, raw or GZipped.
 
-Output table format:
+### Options:
+
+* `-R chain` Sets the receptor chain. **Required**. Currently supported: `TRA`, `TRB`, `TRG`, `TRD`, `IGH`, `IGK`, `IGL`
+
+* `--all-alleles` Use all alleles during alignment (this is going to be slower). Will use only major (*01) alleles if option is not set.
+
+* `-S species` Sets the species. Currently supported: `human`, `mouse`, `rat`, `rabbit` and `rhesus_monkey`
+
+* `-f` filter clonotypes with non-functional CDR3 region (contains stop or is out-of-frame)
+
+* `-c` filter clonotypes with incomplete CDR3 sequence
+
+* `--no-cdr3` report clonotypes, for which not even a portion of CDR3 is identified
+
+* `-q x` quality threshold. Lowest quality for CDR sequences should be higher than the threshold for a clonotype to pass filter. Mutations having quality lower than the threshold are also filtered
+
+* `-l x` clonotype detalizaiton level. Possible values: `0`, `1`, `2` and `0,1`, `0,1,2`, etc. At detalization level `0` clonotypes are grouped by CDR3 sequence, all mutations are then assembled and enumerated within clonotype. For detalization level `1` CDR1,2 and 3 sequences are used. For level `2` CDR3 sequence and all sequence mutations are used in clonotype grouping. Output will be generated for all specified levels and `outputPrefix` will be appended with `L$level.txt`. Note that out-of-frame and stop codon presence is calculated corresponding to detalization level, i.e. stop codons in FW1 don't *noStop* field in level `2` output.
+
+* `-N x` take `x` first reads for analysis (useful for down-sampling)
+
+* `-p x` use `x` cores (uses all cores by default)
+
+* `-a` [MIGEC](https://github.com/mikessh/migec) compatibility mode. Assumes FASTQ headers contain a *UMI:NNNNN:READ_COUNT* entry and performs separate read and UMI (event) counting
+
+* `--debug` Debug mode. Will run in a single thread and pring IgBlast output to stdout. Should be used as `java -jar igblastwrp.jar --debug input_file - > results.txt`
+
+* `-h` display help message
+
+### Output table format:
 
 Column       | Definition
 -------------|--------------------------------------------------------------------------------------------------------
@@ -71,35 +104,6 @@ Each mutation entry is encoded in the following comma-separated format:
 Here is an example:
 
 > 3505:1E0:107:1E0,67:C>G,22:T>S,FW2|4:1,1E-3:1:9,3E-3,87:A>T,29:S>C,CDR1
-
-### Options:
-
-* `-R chain` Sets the receptor chain. **Required**. Currently supported: `TRA`, `TRB`, `TRG`, `TRD`, `IGH`, `IGK`, `IGL`
-
-* `--all-alleles` Use all alleles during alignment (this is going to be slower). Will use only major (*01) alleles if option is not set.
-
-* `-S species` Sets the species. Currently supported: `human`, `mouse`, `rat`, `rabbit` and `rhesus_monkey`
-
-* `-f` filter clonotypes with non-functional CDR3 region (contains stop or is out-of-frame)
-
-* `-c` filter clonotypes with incomplete CDR3 sequence
-
-* `--no-cdr3` report clonotypes, for which not even a portion of CDR3 is identified
-
-* `-q x` quality threshold. Lowest quality for CDR sequences should be higher than the threshold for a clonotype to pass filter. Mutations having quality lower than the threshold are also filtered
-
-* `-l x` clonotype detalizaiton level. Possible values: `0`, `1`, `2` and `0,1`, `0,1,2`, etc. At detalization level `0` clonotypes are grouped by CDR3 sequence, all mutations are then assembled and enumerated within clonotype. For detalization level `1` CDR1,2 and 3 sequences are used. For level `2` CDR3 sequence and all sequence mutations are used in clonotype grouping. Output will be generated for all specified levels and `outputPrefix` will be appended with `L$level.txt`. Note that out-of-frame and stop codon presence is calculated corresponding to detalization level, i.e. stop codons in FW1 don't *noStop* field in level `2` output.
-
-* `-N x` take `x` first reads for analysis (useful for down-sampling)
-
-* `-p x` use `x` cores (uses all cores by default)
-
-* `-a` [MIGEC](https://github.com/mikessh/migec) compatibility mode. Assumes FASTQ headers contain a *UMI:NNNNN:READ_COUNT* entry and performs separate read and UMI (event) counting
-
-* `--debug` Debug mode. Will run in a single thread and pring IgBlast output to stdout.
-
-* `-h` display help message
-
 
 ## NOTE
 
