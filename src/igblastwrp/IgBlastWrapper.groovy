@@ -236,7 +236,6 @@ listener.join()
 // Group clonotypes
 //
 levels.each { level ->
-    def nReads = 0, nEvents = 0
     def resultsMap = new HashMap<String, ClonotypeData>()
     def outputFileName = outputFilePrefix + ".L${level}.txt"
 
@@ -256,8 +255,6 @@ levels.each { level ->
                 else
                     clonotype.appendToData(clonotypeData, qual, qualThreshold,
                             it.value.nReads, it.value.nEvents, level)
-                nReads += it.value.nReads
-                nEvents += it.value.nEvents
             }
         }
     }
@@ -266,18 +263,31 @@ levels.each { level ->
 // Write output
 //
     println "[${new Date()}] Writing output to $outputFileName"
+    def nReads = 0, nEvents = 0
     new File(outputFileName).withPrintWriter { pw ->
         pw.println "#reads_count\treads_freq\tmig_count\tmig_freq\t" +
                 Clonotype.KEY_HEADER + "\t" + ClonotypeData.VALUE_HEADER
-        resultsMap.sort { -it.value.nReads }.each {
+
+        // quality filter (CDR3)
+        resultsMap = resultsMap.findAll {
             byte minQual = it.value.summarizeQuality()
+            minQual >= qualThreshold
+        }
+
+        // count totals
+        resultsMap.each {
+            nReads += it.value.nReads
+            nEvents += it.value.nEvents
+        }
+
+        // store clonotype table
+        resultsMap.sort { -it.value.nReads }.each {
             def key = it.key
-            key = key.substring(0, key.lastIndexOf("\t")) // trim hypermutations, they will be reported from value
-            if (minQual >= qualThreshold) {
-                pw.println(it.value.nReads + "\t" + (it.value.nReads / nReads) + "\t" +
-                        it.value.nEvents + "\t" + (it.value.nEvents / nEvents) + "\t" +
-                        key + "\t" + it.value.toString())
-            }
+            key = key.substring(0, key.lastIndexOf("\t")) // trim hypermutations, they will be taken from 'value'
+
+            pw.println(it.value.nReads + "\t" + (it.value.nReads / nReads) + "\t" +
+                    it.value.nEvents + "\t" + (it.value.nEvents / nEvents) + "\t" +
+                    key + "\t" + it.value.toString())
         }
     }
 }
