@@ -46,7 +46,7 @@ Input file could be either in FASTQ or FASTA format, raw or GZipped.
 
 * `-R chain` Sets the receptor chain. **Required**. Currently supported: `TRA`, `TRB`, `TRG`, `TRD`, `IGH`, `IGK`, `IGL`
 
-* `--all-alleles` Use all alleles during alignment (this is going to be slower). Will use only major (*01) alleles if option is not set.
+* `--all-alleles` Use all alleles during alignment (this is going to be slower). **NOTE** By default only major (*01) alleles are used for alignment.
 
 * `-S species` Sets the species. Currently supported: `human`, `mouse`, `rat`, `rabbit` and `rhesus_monkey`
 
@@ -104,13 +104,8 @@ Each mutation entry is encoded in the following comma-separated format:
 Here is an example:
 
 > 3505:1E0:107:1E0,67:C>G,22:T>S,FW2|4:1,1E-3:1:9,3E-3,87:A>T,29:S>C,CDR1
-
-## NOTE
-
-By default **IgBlastWrapper** only aligns to top alleles (marked by ```*01``` in IMGT nomenclature) to speed-up. Mismatches are then extracted from alignment and reported.
-Not all receptor & chain combinations are supported for species other than human and mouse.
  
-## HINT
+## Installation
 
 The most straightforward way to build the scripts is to create an Intellij Project (Groovy), then use "Open Module Settings"->Artifacts(+)Jar->from modules with dependencies followed by Build->Build artifacts. Module architecture could be changed to Maven soon..  
 As for now you are recommended to use platform-specific binaries from [Latest release](https://github.com/mikessh/igblastwrp/releases/latest)
