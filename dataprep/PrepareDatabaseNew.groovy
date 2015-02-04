@@ -74,6 +74,6 @@ speciesGeneHash.each {
     }
 }
 
-new File(outputPath).listFiles().each {
+new File(outputPath).listFiles().collect {
     "makeblastdb -parse_seqids -dbtype nucl -in $outputPath/$it.name -out $outputPath/${it.name[0..-4]}".execute()
-}
+}.each { it.waitFor() }
