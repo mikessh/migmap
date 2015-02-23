@@ -42,6 +42,8 @@ cli.l(args: 1, argName: '0, 1 or 2',
 cli.R(args: 1, argName: 'TRA|B|G|D and IGH|L|K', 'Receptor gene and chain, e.g. \'TRA\' [required]')
 cli._(longOpt: 'all-alleles', 'Use all alleles during alignment (this is going to be slower). ' +
         'Will use only major (*01) alleles if option is not set.')
+cli._(longOpt: 'dump-unmapped', args: 1, argName: 'path',
+        'Specifies a file that output sequences that were not mapped to V(D)J segments.')
 cli.a('[migec-compatibility] Assume MIG-assembled data. Header should contain UMI:NNNNN:count')
 cli.S(args: 1, argName: 'species name', 'human, mouse, rat, rabbit or rhesus_monkey [default=human]')
 cli.q(args: 1, 'quality threshold, 2..40 [default = 25]')
@@ -69,6 +71,7 @@ levels.each { level ->
 }
 int N = (opt.N ?: "-1").toInteger()
 String SPECIES = opt.S ?: "human", GENE = opt.R[0..1], CHAIN = opt.R[2]
+String outUnmapped = opt.'dump-unmapped'
 byte qualThreshold = (opt.q ?: "25").toInteger()
 boolean funcOnly = opt.f, completeOnly = opt.c, assembled = opt.a, reportNoCdr3 = opt.'no-cdr3',
         allAlleles = opt.'all-alleles', debug = opt.'debug'
@@ -235,12 +238,14 @@ listener.join()
 //
 // Group clonotypes
 //
+def dumpUnmapped = outUnmapped != null
+def pwDump = dumpUnmapped ? new File(outUnmapped).newPrintWriter() : null
 levels.each { level ->
     def resultsMap = new HashMap<String, ClonotypeData>()
     def outputFileName = outputFilePrefix + ".L${level}.txt"
 
     println "[${new Date()}] Generating clonotypes for level $level"
-    nonRedundantSequenceMap.each {
+    nonRedundantSequenceMap.eachWithIndex { it, ind ->
         def clonotype = clonotypeMap[it.value.seqId.toString()]
         if (clonotype != null) {
             def clonotypeKey = clonotype.generateKey(it.key, level, funcOnly, completeOnly, reportNoCdr3)
@@ -255,9 +260,22 @@ levels.each { level ->
                 else
                     clonotype.appendToData(clonotypeData, qual, qualThreshold,
                             it.value.nReads, it.value.nEvents, level)
+            } else if (dumpUnmapped) {
+                pwDump.println("INCOMPLETE SEQ$ind READS:${it.value.nReads} EVENTS:${it.value.nEvents}\n" +
+                        it.key +
+                        "\n+\n" +
+                        it.value.computeQual())
             }
+        } else if (dumpUnmapped) {
+            pwDump.println("UNMAPPED SEQ$ind READS:${it.value.nReads} EVENTS:${it.value.nEvents}\n" +
+                    it.key +
+                    "\n+\n" +
+                    it.value.computeQual())
         }
     }
+
+    if (pwDump)
+        pwDump.close()
 
 //
 // Write output
