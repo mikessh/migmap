@@ -1,9 +1,2 @@
-out/
-bin/
-test/
+*.iml
 .idea/
-old_data/
-data/
-META-INF/
-dataprep/database
-dataprep/jref.txt

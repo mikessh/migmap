@@ -1,0 +1,22 @@
+apply plugin: 'java'
+apply plugin: 'groovy'
+apply plugin: 'application'
+
+mainClassName = 'com.antigenomics.higblast.Main'
+
+repositories {
+    mavenCentral()
+}
+
+jar {
+    baseName = 'higblast'
+    version =  '2.0.0'
+}
+
+dependencies {
+    compile 'com.milaboratory:milib:1.0'
+    compile module('org.codehaus.groovy-all:groovy:2.4.3') {
+	dependency('commons-cli:commons-cli:1.2')
+	dependency('org.codehaus.gpars:gpars:1.2.1')
+    }
+}
