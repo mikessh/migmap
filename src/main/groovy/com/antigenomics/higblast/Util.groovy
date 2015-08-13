@@ -1,4 +1,4 @@
-package igblastwrp
+package com.antigenomics.higblast
 
 import java.util.regex.Matcher
 import java.util.zip.GZIPInputStream

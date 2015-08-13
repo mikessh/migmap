@@ -1,4 +1,4 @@
-package igblastwrp.io
+package com.antigenomics.higblast.io
 
 /**
  Copyright 2014 Mikhail Shugay (mikhail.shugay@gmail.com)

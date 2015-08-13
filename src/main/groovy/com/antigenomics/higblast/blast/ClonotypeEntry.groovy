@@ -1,6 +1,6 @@
-package igblastwrp.blast
+package com.antigenomics.higblast.blast
 
-import igblastwrp.shm.Hypermutation
+import com.antigenomics.higblast.shm.Hypermutation
 
 /**
  Copyright 2014 Mikhail Shugay (mikhail.shugay@gmail.com)

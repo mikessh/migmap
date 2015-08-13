@@ -1,4 +1,4 @@
-package igblastwrp.io
+package com.antigenomics.higblast.io
 
 /**
  Copyright 2014 Mikhail Shugay (mikhail.shugay@gmail.com)
@@ -38,7 +38,7 @@ class SeqData {
 
     String computeQual() {
         if (qual) {
-            if(computedQual)
+            if (computedQual)
                 return computedQual
             else {
                 for (int i = 0; i < qual.length; i++)

@@ -1,4 +1,4 @@
-package igblastwrp.blast
+package com.antigenomics.higblast.blast
 /**
  Copyright 2014 Mikhail Shugay (mikhail.shugay@gmail.com)
 

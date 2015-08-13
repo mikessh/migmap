@@ -1,7 +1,7 @@
-package igblastwrp.blast
+package com.antigenomics.higblast.blast
 
-import igblastwrp.Util
-import igblastwrp.shm.Hypermutation
+import com.antigenomics.higblast.Util
+import com.antigenomics.higblast.shm.Hypermutation
 
 /**
  Copyright 2014 Mikhail Shugay (mikhail.shugay@gmail.com)
@@ -18,31 +18,49 @@ import igblastwrp.shm.Hypermutation
  See the License for the specific language governing permissions and
  limitations under the License.
  */
-class Clonotype {
+class Mapping {
     final String vSegment, dSegment, jSegment
-    final int cdr1start, cdr1end, cdr2start, cdr2end, cdr3start, cdr3end
-    final boolean rc, complete, hasCdr3, inFrame,noStop
+    final boolean rc, complete, hasCdr3, inFrame, noStop
+    final int cdr3start, cdr3end, vEnd, dStart, dEnd, jStart
+    String cdr3nt = Util.MY_NA, cdr3aa = Util.MY_NA
     final List<Hypermutation> hypermutations
 
-    Clonotype(String vSegment, String dSegment, String jSegment,
-              int cdr1start, int cdr1end, int cdr2start, int cdr2end, int cdr3start, int cdr3end,
-              boolean rc, boolean complete, boolean hasCdr3, boolean inFrame, boolean noStop,
-              List<Hypermutation> hypermutations) {
+    Mapping(String vSegment, String dSegment, String jSegment,
+            int cdr3start, int cdr3end, int vEnd, int dStart, int dEnd, int jStart,
+            boolean rc, boolean complete, boolean hasCdr3, boolean inFrame, boolean noStop,
+            List<Hypermutation> hypermutations) {
         this.vSegment = vSegment
         this.dSegment = dSegment == Util.BLAST_NA ? Util.MY_NA : dSegment
         this.jSegment = jSegment
-        this.cdr1start = cdr1start
-        this.cdr1end = cdr1end
-        this.cdr2start = cdr2start
-        this.cdr2end = cdr2end
         this.cdr3start = cdr3start
         this.cdr3end = cdr3end
+        this.vEnd = vEnd
+        this.dStart = dStart
+        this.dEnd = dEnd
+        this.jStart = jStart
         this.rc = rc
         this.complete = complete
         this.hasCdr3 = hasCdr3
         this.inFrame = inFrame
         this.noStop = noStop
         this.hypermutations = hypermutations
+    }
+
+    void extractCdr3(String seq) {
+        if (hasCdr3) {
+            if (rc)
+                seq = Util.revCompl(seq)
+
+            this.cdr3nt =
+                    complete ? seq.substring(cdr3start, cdr3end) : (seq.substring(cdr3start) + "_")
+
+            this.cdr3aa =
+                    complete ? Util.translateCdr(cdr3nt) : (Util.translateLinear(cdr3nt) + "_")
+        }
+    }
+
+    String getSignature() {
+        vSegment + "_" + cdr3nt + "_" + jSegment + "_" + hypermutations.collect { it.signature }.join("_")
     }
 
     String generateKey(String seq, int level, boolean funcOnly, boolean completeOnly, boolean reportNoCdr3) {
@@ -78,7 +96,7 @@ class Clonotype {
             case 1:
                 boolean inFrame = ![cdr1aa, cdr2aa, cdr3aa].any { it.contains("?") },
                         noStop = ![cdr1aa, cdr2aa, cdr3aa].any { it.contains("*") },
-                        complete = ![cdr1aa, cdr2aa, cdr3aa].any { it == Util.MY_NA} &&
+                        complete = ![cdr1aa, cdr2aa, cdr3aa].any { it == Util.MY_NA } &&
                                 !cdr3aa.contains("_")
 
                 return [//vSegment, dSegment,jSegment,
@@ -133,10 +151,8 @@ class Clonotype {
 
     @Override
     String toString() {
-        [vSegment, dSegment, jSegment,
-         cdr1start, cdr1end,
-         cdr2start, cdr2end,
-         cdr3start, cdr3end,
-         complete].join("\t")
+        [cdr3nt, cdr3aa, vSegment, dSegment, jSegment,
+         vEnd, dStart, dEnd, jStart,
+         hypermutations.collect { it.toString() }].flatten().join("\t")
     }
 }

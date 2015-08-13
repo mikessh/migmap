@@ -1,7 +1,7 @@
-package igblastwrp.shm
+package com.antigenomics.higblast.shm
 
-import igblastwrp.Util
-import igblastwrp.io.FastaReader
+import com.antigenomics.higblast.Util
+import com.antigenomics.higblast.io.FastaReader
 
 /**
  Copyright 2014 Mikhail Shugay (mikhail.shugay@gmail.com)

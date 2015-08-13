@@ -1,7 +1,7 @@
-package igblastwrp.blast
+package com.antigenomics.higblast.blast
 
-import igblastwrp.Util
-import igblastwrp.shm.Hypermutation
+import com.antigenomics.higblast.Util
+import com.antigenomics.higblast.shm.Hypermutation
 
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols

@@ -1,6 +1,6 @@
-package igblastwrp.io
+package com.antigenomics.higblast.io
 
-import igblastwrp.Util
+import com.antigenomics.higblast.Util
 
 /**
  Copyright 2014 Mikhail Shugay (mikhail.shugay@gmail.com)

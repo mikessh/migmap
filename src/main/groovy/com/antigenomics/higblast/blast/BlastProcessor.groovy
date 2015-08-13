@@ -1,7 +1,7 @@
-package igblastwrp.blast
+package com.antigenomics.higblast.blast
 
-import igblastwrp.Util
-import igblastwrp.shm.SHMExtractor
+import com.antigenomics.higblast.Util
+import com.antigenomics.higblast.shm.SHMExtractor
 
 /**
  Copyright 2014 Mikhail Shugay (mikhail.shugay@gmail.com)
@@ -27,11 +27,11 @@ class BlastProcessor {
     public BlastProcessor(String chain, JRefSearcher jRefSearcher, SHMExtractor shmExtractor) {
         this.jRefSearcher = jRefSearcher
         this.shmExtractor = shmExtractor
-        this.hasD = chain =~ /[BH]$/
+        this.hasD = chain =~ /[BHD]$/
         this.chain = chain
     }
 
-    Clonotype processChunk(String chunk) {
+    Mapping processChunk(String chunk) {
         def segments, hits, cdrBounds
 
         // Rearrangement summary
@@ -133,8 +133,8 @@ class BlastProcessor {
                 hits[0][3],
                 cdr1Start, cdr1End, cdr2Start, cdr2End)
 
-        return new Clonotype(V_SEGM, D_SEGM, J_SEGM,
-                cdr1Start, cdr1End, cdr2Start, cdr2End, cdr3Start, cdr3End,
+        return new Mapping(V_SEGM, D_SEGM, J_SEGM,
+                cdr3Start, cdr3End,
                 rc, complete, hasCdr3, inFrame, noStop, hypermutations)
 
         //} catch (Exception e) {

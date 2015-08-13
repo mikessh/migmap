@@ -1,6 +1,6 @@
-package igblastwrp.blast
+package com.antigenomics.higblast.blast
 
-import igblastwrp.shm.SHMExtractor
+import com.antigenomics.higblast.shm.SHMExtractor
 
 import java.util.concurrent.ConcurrentHashMap
 
@@ -25,15 +25,15 @@ class BlastRunner implements Runnable {
     final List env
     final File dir
     final BlastProcessor processor
-    final ConcurrentHashMap<String, Clonotype> clonotypeMap
+    final ConcurrentHashMap<String, Mapping> clonotypeMap
 
-    public BlastRunner(int THREADS, String path, String species, String gene, String chain,
-                       boolean allAlleles, String inputFileName,
-                       ConcurrentHashMap<String, Clonotype> clonotypeMap) {
-        def IGBLAST_EXECUTABLE = "$path/bin/igblastn",
+    BlastRunner(String path, boolean prot,
+                String species, String gene, String chain,
+                boolean allAlleles, String inputFileName,
+                ConcurrentHashMap<String, Mapping> clonotypeMap) {
+        def IGBLAST_EXECUTABLE = "igblast${prot ? "p" : "n"}",
             IGBLAST_DATA = "$path/data",
-            IGBLAST_DB_PATH = "$IGBLAST_DATA/database",
-            IGBLAST_OPT_PATH = "$IGBLAST_DATA/optional_file"
+            IGBLAST_DB_PATH = "$IGBLAST_DATA/database"
 
         if (WIN)
             IGBLAST_EXECUTABLE += ".exe"
@@ -41,18 +41,13 @@ class BlastRunner implements Runnable {
         def seqtype = gene == "TR" ? "TCR" : "Ig"
 
         def OPTS = ["SEGM_OPT"  :
-                            ["V", "J", "D"].collect { segment ->
-                                "-germline_db_${segment} $IGBLAST_DB_PATH/${species}_${gene}_${chain}${allAlleles ? "_all" : ""}_${segment}"
-                            },
-
-                    "AUX_OPT"   :
-                            "-auxiliary_data $IGBLAST_OPT_PATH/${species}_gl.aux",
+                            prot ? "-germline_db_V $IGBLAST_DB_PATH/${species}_${gene}_V" :
+                                    ["V", "J", "D"].collect { segment ->
+                                        "-germline_db_${segment} $IGBLAST_DB_PATH/${species}_${gene}_${chain}${allAlleles ? "_all" : ""}_${segment}"
+                                    },
 
                     "ORG_OPT"   :
                             "-organism $species -ig_seqtype $seqtype",
-
-                    "THREAD_OPT":
-                            "-num_threads $THREADS",
 
                     "DOMAIN_OPT":
                             "-domain_system imgt"
@@ -68,8 +63,8 @@ class BlastRunner implements Runnable {
                    OUTFMT_TRICK
         ].flatten()
 
-        env = ["IGDATA=\"$IGBLAST_DATA\""]
-        dir = new File(IGBLAST_DATA)
+        this.env = ["IGDATA=\"$IGBLAST_DATA\""]
+        this.dir = new File(IGBLAST_DATA)
 
         def jRefSearcher = new JRefSearcher(species, gene, chain, new File("$IGBLAST_DATA/jref.txt"))
         def shmExtractor = new SHMExtractor("$IGBLAST_DB_PATH/${species}_${gene}_${chain}${allAlleles ? "_all" : ""}_V.fa")

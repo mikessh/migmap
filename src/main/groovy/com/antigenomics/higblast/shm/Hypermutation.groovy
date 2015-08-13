@@ -1,4 +1,4 @@
-package igblastwrp.shm
+package com.antigenomics.higblast.shm
 /**
  Copyright 2014 Mikhail Shugay (mikhail.shugay@gmail.com)
 
@@ -16,7 +16,7 @@ package igblastwrp.shm
  */
 class Hypermutation {
     final int pos, posInRead
-    final char ntFrom, ntTo, aaFrom, aaTo
+    final String ntFrom, ntTo, aaFrom, aaTo
     final String region
 
     Hypermutation(int pos, int posInRead,

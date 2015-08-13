@@ -1,12 +1,12 @@
-package igblastwrp
+package com.antigenomics.higblast
 
-import igblastwrp.blast.BlastRunner
-import igblastwrp.blast.Clonotype
-import igblastwrp.blast.ClonotypeData
-import igblastwrp.io.FastaReader
-import igblastwrp.io.FastqReader
-import igblastwrp.io.Read
-import igblastwrp.io.SeqData
+import com.antigenomics.higblast.blast.BlastRunner
+import com.antigenomics.higblast.blast.Mapping
+import com.antigenomics.higblast.blast.ClonotypeData
+import com.antigenomics.higblast.io.FastaReader
+import com.antigenomics.higblast.io.FastqReader
+import com.antigenomics.higblast.io.Read
+import com.antigenomics.higblast.io.SeqData
 
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
@@ -191,7 +191,7 @@ for (int i = 0; i < THREADS; i++) {
 //
 // Run IgBlast in parallel
 //
-def clonotypeMap = new ConcurrentHashMap<String, Clonotype>()
+def clonotypeMap = new ConcurrentHashMap<String, Mapping>()
 boolean finished = false
 
 println "[${new Date()}] Running IgBlast for $inputFileName and parsing output"
@@ -284,7 +284,7 @@ levels.each { level ->
     def nReads = 0, nEvents = 0
     new File(outputFileName).withPrintWriter { pw ->
         pw.println "#reads_count\treads_freq\tmig_count\tmig_freq\t" +
-                Clonotype.KEY_HEADER + "\t" + ClonotypeData.VALUE_HEADER
+                Mapping.KEY_HEADER + "\t" + ClonotypeData.VALUE_HEADER
 
         // quality filter (CDR3)
         resultsMap = resultsMap.findAll {
