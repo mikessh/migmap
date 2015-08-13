@@ -33,6 +33,10 @@ class Util {
                 new GZIPOutputStream(new FileOutputStream(outfile)) : new FileOutputStream(outfile)))
     }
 
+    static getResourceAsStream(String resourceName) {
+        new InputStreamReader(Util.class.classLoader.getResourceAsStream(resourceName))
+    }
+
     static List<String> groomMatch(Matcher matcher) {
         matcher.size() > 0 ? matcher[0][1..-1] : null//[]
     }

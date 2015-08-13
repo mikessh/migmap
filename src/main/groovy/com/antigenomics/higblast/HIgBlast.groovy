@@ -48,7 +48,7 @@ cli.a('[migec-compatibility] Assume MIG-assembled data. Header should contain UM
 cli.S(args: 1, argName: 'species name', 'human, mouse, rat, rabbit or rhesus_monkey [default=human]')
 cli.q(args: 1, 'quality threshold, 2..40 [default = 25]')
 cli.p(args: 1, 'number of threads to use [default = all available processors]')
-cli._(longOpt: 'data-dir', args: 1, argName: 'path', 'path to folder that contains IgBlastWrapper bundle: ' +
+cli._(longOpt: 'data-dir', args: 1, argName: 'path', 'path to folder that contains HIgBlast bundle: ' +
         'data/ and bin/ folders [default = parent directory of script]')
 cli._(longOpt: "debug", "Debug mode. Will run in a single thread and pring IgBlast output to stdout.")
 cli.h('display help message')
