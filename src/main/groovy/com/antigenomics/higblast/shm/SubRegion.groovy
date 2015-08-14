@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package com.antigenomics.higblast.genomic
+package com.antigenomics.higblast.shm
 
-class Alignment {
-    int qstart, sstart
-    String sseq, qseq
+enum SubRegion {
+    FR1, CDR1, FR2, CDR2, FR3, CDR3, FR4
 }
