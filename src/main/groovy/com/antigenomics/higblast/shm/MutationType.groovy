@@ -16,22 +16,6 @@
 
 package com.antigenomics.higblast.shm
 
-class Mutation {
-    final int startInRead, endInRead
-    final String ntFrom, ntTo
-
-    int start, end
-
-    String aaFrom, aaTo
-    String region
-    SubRegion subRegion
-
-    Mutation(int start, int end, int startInRead, int endInRead, String ntFrom, String ntTo) {
-        this.end = end
-        this.startInRead = startInRead
-        this.endInRead = endInRead
-        this.ntFrom = ntFrom
-        this.ntTo = ntTo
-        this.start = start
-    }
+enum MutationType {
+    Insertion, Deletion, Substiotution, None
 }

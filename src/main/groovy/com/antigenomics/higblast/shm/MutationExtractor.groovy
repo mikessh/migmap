@@ -22,9 +22,77 @@ import com.antigenomics.higblast.genomic.DSegment
 import com.antigenomics.higblast.genomic.JSegment
 import com.antigenomics.higblast.genomic.Segment
 import com.antigenomics.higblast.genomic.VSegment
+import com.antigenomics.higblast.mapping.Cdr3Markup
+
+import static com.antigenomics.higblast.shm.MutationType.None
 
 class MutationExtractor {
-    List<Mutation> extract(Segment segment, Alignment alignment) {
+
+    List<Mutation> extract(Alignment alignment) {
+        def mutations = new LinkedList<Mutation>()
+        int start = -1, end = -1
+        int qdelta = 0, sdelta = 0
+        def type = None
+
+        def writeMutation = {
+            if (type != None) {
+                mutations.add(new Mutation(
+                        start + alignment.sstart - sdelta, end + alignment.sstart - sdelta,
+                        start + alignment.qstart - qdelta, end + alignment.qstart - qdelta,
+                        alignment.sseq[start..<end], alignment.qseq[start..<end])
+                )
+            }
+        }
+
+        for (int i = 0; i < alignment.qseq.length(); i++) {
+            char q = alignment.qseq.charAt(i), s = alignment.sseq.charAt(i)
+
+            if (q == Util.GAP) {
+                if (type != MutationType.Deletion) {
+                    writeMutation()
+                    type = MutationType.Deletion
+                    start = i
+                    end = i + 1
+                } else {
+                    end++
+                }
+
+                qdelta++
+            } else if (s == Util.GAP) {
+                if (type != MutationType.Insertion) {
+                    writeMutation()
+                    type = MutationType.Insertion
+                    start = i
+                    end = i + 1
+                } else {
+                    end++
+                }
+
+                sdelta++
+            } else if (s != q) {
+                if (type != MutationType.Substiotution) {
+                    writeMutation()
+                }
+                type = MutationType.Substiotution
+                start = i
+                end = i + 1
+                writeMutation()
+            } else {
+                // no mutation here, flush
+                writeMutation()
+                type = None
+            }
+        }
+
+        // flush last
+        writeMutation()
+
+        mutations
+    }
+
+    List<Mutation> extract(Segment segment,Alignment alignment,
+                           Cdr3Markup cdr3Markup // to deduce D frame
+                           ) {
         def mutations = new LinkedList<Mutation>()
 
         int qdelta = 0, sdelta = 0
