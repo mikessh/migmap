@@ -1,5 +1,6 @@
 package com.antigenomics.higblast.blast
 
+import com.antigenomics.higblast.mapping.Mapping
 import com.antigenomics.higblast.shm.SHMExtractor
 
 import java.util.concurrent.ConcurrentHashMap

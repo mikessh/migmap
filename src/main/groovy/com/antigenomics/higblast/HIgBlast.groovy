@@ -1,7 +1,7 @@
 package com.antigenomics.higblast
 
 import com.antigenomics.higblast.blast.BlastRunner
-import com.antigenomics.higblast.blast.Mapping
+import com.antigenomics.higblast.mapping.Mapping
 import com.antigenomics.higblast.blast.ClonotypeData
 import com.antigenomics.higblast.io.FastaReader
 import com.antigenomics.higblast.io.FastqReader

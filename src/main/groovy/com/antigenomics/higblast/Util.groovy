@@ -20,7 +20,8 @@ import java.util.zip.GZIPOutputStream
  limitations under the License.
  */
 class Util {
-    final static String MY_NA = ".", BLAST_NA = "N/A"
+    static final String MY_NA = ".", BLAST_NA = "N/A"
+    static final char GAP = '-'
 
     static BufferedReader getReader(String fname) {
         new BufferedReader(new InputStreamReader(fname.endsWith(".gz") ? new GZIPInputStream(new FileInputStream(fname)) :
