@@ -41,10 +41,11 @@ class SegmentDatabase {
 
         new File(markupPath).splitEachLine("[\t ]+") { splitLine ->
             markupMap.put(splitLine[0],
-                    [splitLine[2].toInteger() - 1,
-                     splitLine[3].toInteger() - 1,
-                     splitLine[4].toInteger() - 1,
-                     splitLine[5].toInteger() - 1] as int[]
+                    [splitLine[3].toInteger() - 1,
+                     splitLine[4].toInteger(),
+                     splitLine[7].toInteger() - 1,
+                     splitLine[8].toInteger(),
+                     splitLine[10].toInteger()] as int[]
             )
         }
 
@@ -60,12 +61,16 @@ class SegmentDatabase {
                 def segmentName = splitLine[3]
 
                 if (allAlleles || segmentName.endsWith("*01")) {
+                    assert !segments.containsKey(segmentName)
+                    
                     if (splitLine[2].startsWith("V")) {
                         def markup = markupMap[segmentName]
                         if (markup) {
+                            int referencePoint = splitLine[4].toInteger()
+                            assert referencePoint == markup[4] // check if two reference files are concordant
                             segments.put(segmentName, new VSegment(name: segmentName, sequence: splitLine[5],
                                     cdr1start: markup[0], cdr1end: markup[1], cdr2start: markup[2], cdr2end: markup[3],
-                                    referencePoint: splitLine[4].toInteger()))
+                                    referencePoint: referencePoint))
                             vSegments++
                         } else {
                             vSegmentsNoMarkup

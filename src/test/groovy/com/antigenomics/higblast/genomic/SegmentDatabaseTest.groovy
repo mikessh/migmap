@@ -20,8 +20,20 @@ import org.junit.Test
 
 class SegmentDatabaseTest {
     @Test
+    void massiveLoadTest() {
+        SegmentDatabase.SPECIES_ALIAS.keySet().each {
+            println "Loading data for $it"
+            
+            def segDb = new SegmentDatabase("data/", it, ["TRA", "TRB", "TRG", "TRD",
+                                                          "IGH", "IGK", "IGL"] as Set<String>, true, false)
+
+            assert !segDb.segments.isEmpty()
+        }
+    }
+
+    @Test
     void loadTest() {
-        def segDb = new SegmentDatabase("data/", "human", ["TRA", "IGH"] as Set<String>, true, false)
+        def segDb = new SegmentDatabase("data/", "human", ["IGH"] as Set<String>, true, false)
 
         assert !segDb.segments.isEmpty()
 
@@ -47,5 +59,16 @@ class SegmentDatabaseTest {
         assert new File(segDb.dbPath).exists()
         assert new File("$segDb.dbPath/v.nhr").exists()
         assert new File("$segDb.dbPath/d.nhr").exists()
+    }
+
+    @Test
+    void markupTest() {
+        def segDb = new SegmentDatabase("data/", "human", ["IGH"] as Set<String>, true, false)
+        def segment = segDb.segments["IGHV1-18*01"]
+
+        assert (segment as VSegment).cdr1start == 75
+        assert (segment as VSegment).cdr1end == 99
+        assert (segment as VSegment).cdr2start == 150
+        assert (segment as VSegment).cdr2end == 174
     }
 }
