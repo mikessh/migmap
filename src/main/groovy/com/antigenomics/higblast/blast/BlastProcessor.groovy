@@ -163,7 +163,7 @@ class BlastProcessor {
 
         return new Mapping(vSegments, dSegments, jSegments,
                 regionMarkup, cdr3Markup,
-                rc, complete, hasCdr3, inFrame, noStop,
+                rc, complete, hasCdr3, inFrame, noStop, dFound,
                 mutations)
 
         //} catch (Exception e) {

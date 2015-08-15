@@ -27,7 +27,7 @@ class Mapping {
     final List<VSegment> vSegments
     final List<DSegment> dSegments
     final List<JSegment> jSegments
-    final boolean rc, complete, hasCdr3, inFrame, noStop
+    final boolean rc, complete, hasCdr3, inFrame, noStop, hasD
     final Cdr3Markup cdr3Markup
     final RegionMarkup regionMarkup
     String cdr3nt = Util.MY_NA, cdr3aa = Util.MY_NA
@@ -35,7 +35,7 @@ class Mapping {
 
     Mapping(List<VSegment> vSegments, List<DSegment> dSegments, List<JSegment> jSegments,
             RegionMarkup regionMarkup, Cdr3Markup cdr3Markup,
-            boolean rc, boolean complete, boolean hasCdr3, boolean inFrame, boolean noStop,
+            boolean rc, boolean complete, boolean hasCdr3, boolean inFrame, boolean noStop, hasD,
             List<Mutation> mutations) {
         // needed to extract CDR3 sequence
         this.regionMarkup = regionMarkup
@@ -54,6 +54,7 @@ class Mapping {
         this.hasCdr3 = hasCdr3
         this.inFrame = inFrame
         this.noStop = noStop
+        this.hasD = hasD
     }
 
     void extractCdr3(String seq) {
@@ -70,6 +71,7 @@ class Mapping {
         }
     }
 
+    /*
     VSegment getVSegment() {
         vSegments[0]
     }
@@ -173,5 +175,5 @@ class Mapping {
         [cdr3nt, cdr3aa, vSegment, dSegment, jSegment,
          vEnd, dStart, dEnd, jStart,
          mutations.collect { it.toString() }].flatten().join("\t")
-    }
+    }*/
 }

@@ -16,6 +16,8 @@
 
 package com.antigenomics.higblast.io
 
+import com.antigenomics.higblast.Util
+
 class Read {
     final String header, seq, qual
 
@@ -26,7 +28,7 @@ class Read {
     }
 
     byte qualAt(int pos) {
-        qual ? ((int) (qual.charAt(pos)) - 33) : 40
+        qual ? ((int) (qual.charAt(pos)) - Util.QUAL_OFFSET) : Util.MAX_QUAL
     }
 
     @Override
