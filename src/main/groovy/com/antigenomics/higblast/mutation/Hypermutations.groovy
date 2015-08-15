@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-package com.antigenomics.higblast.shm
+package com.antigenomics.higblast.mutation
 
-enum SubRegion {
-    FR1, CDR1, FR2, CDR2, FR3, CDR3, FR4
+class Hypermutations {
 }

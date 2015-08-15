@@ -18,8 +18,13 @@ package com.antigenomics.higblast.genomic
 
 class Segment {
     String name, sequence
+    int referencePoint
 
     String toFastaString() {
         ">$name\n$sequence"
+    }
+
+    int getFrame() {
+        referencePoint % 3
     }
 }

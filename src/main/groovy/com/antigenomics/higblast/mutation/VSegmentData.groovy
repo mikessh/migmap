@@ -1,4 +1,4 @@
-package com.antigenomics.higblast.shm
+package com.antigenomics.higblast.mutation
 /**
  Copyright 2014 Mikhail Shugay (mikhail.shugay@gmail.com)
 

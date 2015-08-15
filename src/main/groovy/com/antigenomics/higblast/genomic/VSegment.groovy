@@ -17,5 +17,5 @@
 package com.antigenomics.higblast.genomic
 
 class VSegment extends Segment {
-    int cdr1start, cdr1end, cdr2start, cdr2end, referencePoint
+    int cdr1start, cdr1end, cdr2start, cdr2end
 }

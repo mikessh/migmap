@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package com.antigenomics.higblast.shm
+package com.antigenomics.higblast.mutation
+
+import com.antigenomics.higblast.genomic.Segment
 
 class Mutation {
     final int startInRead, endInRead
@@ -22,16 +24,34 @@ class Mutation {
 
     int start, end
 
-    String aaFrom, aaTo
-    String region
+    String aaFrom, aaTo // todo
+
+    final MutationType type
+    Segment region
     SubRegion subRegion
 
-    Mutation(int start, int end, int startInRead, int endInRead, String ntFrom, String ntTo) {
+    Mutation(MutationType type,
+             int start, int end, int startInRead, int endInRead, String ntFrom, String ntTo) {
+        this.type = type
         this.end = end
         this.startInRead = startInRead
         this.endInRead = endInRead
         this.ntFrom = ntFrom
         this.ntTo = ntTo
         this.start = start
+    }
+
+    int getPos() {
+        type == MutationType.Insertion ? end : start
+    }
+
+    int getPosInRead() {
+        type == MutationType.Deletion ? endInRead : startInRead // deletion in ref == insertion in query
+    }
+
+    @Override
+    public String toString() {
+        // insertion occur before "position", so that seq[position, ...] is shifted forward
+        type.shortName + pos + ":" + ntFrom + ">" + ntTo
     }
 }

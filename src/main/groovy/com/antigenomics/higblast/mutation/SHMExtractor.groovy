@@ -1,4 +1,4 @@
-package com.antigenomics.higblast.shm
+package com.antigenomics.higblast.mutation
 
 import com.antigenomics.higblast.Util
 import com.antigenomics.higblast.io.FastaReader

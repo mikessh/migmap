@@ -157,7 +157,7 @@ class Util {
                 if (codonUpper.contains("N") && codonUpper.length() == 3)
                     return "X" // undefined
                 else
-                    return '?' // incomplete
+                    return '?' // incomplete/missing
         }
     }
 

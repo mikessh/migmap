@@ -14,8 +14,14 @@
  * limitations under the License.
  */
 
-package com.antigenomics.higblast.shm
+package com.antigenomics.higblast.mutation
 
 enum MutationType {
-    Insertion, Deletion, Substiotution, None
+    Insertion("I"), Deletion("D"), Substitution("S"), None("?")
+
+    final String shortName
+
+    MutationType(String shortName) {
+        this.shortName = shortName
+    }
 }

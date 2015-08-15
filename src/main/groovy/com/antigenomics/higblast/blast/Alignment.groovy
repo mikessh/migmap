@@ -17,6 +17,13 @@
 package com.antigenomics.higblast.blast
 
 class Alignment {
-    int qstart, sstart
-    String sseq, qseq
+    final int qstart, sstart
+    final String sseq, qseq
+
+    Alignment(int qstart, String qseq, int sstart, String sseq) {
+        this.qstart = qstart
+        this.sstart = sstart
+        this.sseq = sseq
+        this.qseq = qseq
+    }
 }

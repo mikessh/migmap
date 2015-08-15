@@ -18,7 +18,7 @@ package com.antigenomics.higblast.blast
 
 import com.antigenomics.higblast.genomic.JSegment
 
-import static com.antigenomics.higblast.Util.getGAP
+import static com.antigenomics.higblast.Util.GAP
 
 class JRefSearcher {
 

@@ -21,7 +21,7 @@ import com.antigenomics.higblast.blast.ClonotypeData
 import com.antigenomics.higblast.genomic.DSegment
 import com.antigenomics.higblast.genomic.JSegment
 import com.antigenomics.higblast.genomic.VSegment
-import com.antigenomics.higblast.shm.Hypermutation
+import com.antigenomics.higblast.mutation.Mutation
 
 class Mapping {
     final List<VSegment> vSegments
@@ -31,23 +31,23 @@ class Mapping {
     final Cdr3Markup cdr3Markup
     final RegionMarkup regionMarkup
     String cdr3nt = Util.MY_NA, cdr3aa = Util.MY_NA
-    final List<Hypermutation> hypermutations
+    final List<Mutation> mutations
 
     Mapping(List<VSegment> vSegments, List<DSegment> dSegments, List<JSegment> jSegments,
             RegionMarkup regionMarkup, Cdr3Markup cdr3Markup,
             boolean rc, boolean complete, boolean hasCdr3, boolean inFrame, boolean noStop,
-            List<Hypermutation> hypermutations) {
+            List<Mutation> mutations) {
         // needed to extract CDR3 sequence
         this.regionMarkup = regionMarkup
         this.rc = rc
-        
+
         // main data
         this.vSegments = vSegments
         this.dSegments = dSegments //== Util.BLAST_NA ? Util.MY_NA : dSegment
         this.jSegments = jSegments
 
         this.cdr3Markup = cdr3Markup
-        this.hypermutations = hypermutations
+        this.mutations = mutations
 
         // misc
         this.complete = complete
@@ -58,19 +58,28 @@ class Mapping {
 
     void extractCdr3(String seq) {
         if (hasCdr3) {
-            if (rc)
+            if (rc) {
                 seq = Util.revCompl(seq)
+            }
 
-            this.cdr3nt =
-                    complete ? seq.substring(cdr3start, cdr3end) : (seq.substring(cdr3start) + "_")
+            this.cdr3nt = complete ? seq.substring(regionMarkup.cdr3Start, regionMarkup.cdr3End) :
+                    (seq.substring(regionMarkup.cdr3Start) + "_")
 
-            this.cdr3aa =
-                    complete ? Util.translateCdr(cdr3nt) : (Util.translateLinear(cdr3nt) + "_")
+            this.cdr3aa = complete ? Util.translateCdr(cdr3nt) :
+                    (Util.translateLinear(cdr3nt) + "_")
         }
     }
 
+    VSegment getVSegment() {
+        vSegments[0]
+    }
+
+    DSegment getDSegment() {
+        vSegments[0]
+    }
+
     String getSignature() {
-        vSegment + "_" + cdr3nt + "_" + jSegment + "_" + hypermutations.collect { it.signature }.join("_")
+        vSegment + "_" + cdr3nt + "_" + jSegment + "_" + mutations.collect { it.signature }.join("_")
     }
 
     String generateKey(String seq, int level, boolean funcOnly, boolean completeOnly, boolean reportNoCdr3) {
@@ -101,7 +110,7 @@ class Mapping {
                         cdr1nt, cdr2nt, cdr3nt,
                         cdr1aa, cdr2aa, cdr3aa,
                         inFrame, noStop, complete,
-                        hypermutations.join('|')
+                        mutations.join('|')
                 ].join('\t')
             case 1:
                 boolean inFrame = ![cdr1aa, cdr2aa, cdr3aa].any { it.contains("?") },
@@ -132,9 +141,9 @@ class Mapping {
         if (rc && qual)
             qual = qual.reverse()
 
-        def filteredHyperm = qual ? hypermutations.findAll {
+        def filteredHyperm = qual ? mutations.findAll {
             ((int) qual.charAt(it.posInRead) - 33) >= qualThreshold
-        } : hypermutations
+        } : mutations
 
         def cdr1q = level > 0 && cdr1start >= 0 && qual ? qual.substring(cdr1start, cdr1end) : Util.MY_NA,
             cdr2q = level > 0 && cdr2start >= 0 && qual ? qual.substring(cdr2start, cdr2end) : Util.MY_NA,
@@ -163,6 +172,6 @@ class Mapping {
     String toString() {
         [cdr3nt, cdr3aa, vSegment, dSegment, jSegment,
          vEnd, dStart, dEnd, jStart,
-         hypermutations.collect { it.toString() }].flatten().join("\t")
+         mutations.collect { it.toString() }].flatten().join("\t")
     }
 }

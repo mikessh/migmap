@@ -16,6 +16,5 @@
 
 package com.antigenomics.higblast.genomic
 
-class JSegment extends Segment{
-    int referencePoint
+class JSegment extends Segment {
 }

@@ -1,6 +1,6 @@
 package com.antigenomics.higblast.blast
 
-import com.antigenomics.higblast.shm.Hypermutation
+import com.antigenomics.higblast.mutation.Hypermutation
 
 /**
  Copyright 2014 Mikhail Shugay (mikhail.shugay@gmail.com)

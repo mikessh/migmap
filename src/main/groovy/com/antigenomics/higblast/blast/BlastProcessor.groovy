@@ -23,7 +23,7 @@ import com.antigenomics.higblast.genomic.VSegment
 import com.antigenomics.higblast.mapping.Cdr3Markup
 import com.antigenomics.higblast.mapping.Mapping
 import com.antigenomics.higblast.mapping.RegionMarkup
-import com.antigenomics.higblast.shm.MutationExtractor
+import com.antigenomics.higblast.mutation.MutationExtractor
 
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -98,7 +98,7 @@ class BlastProcessor {
                 groomMatch(chunk =~
                         /# Hit table(?:.+\n)+J\t.+\t([0-9]+)\t([ATGCN-]+)\t([0-9]+)\t([ATGCN-]+)\n/)
         ].collect {
-            it ? new Alignment(qstart: it[0].toInteger() - 1, qseq: it[1], sstart: it[2].toInteger() - 1, sseq: it[3]) : null
+            it ? new Alignment(it[0].toInteger() - 1, it[1], it[2].toInteger() - 1, it[3]) : null
         }
 
         // Deduce CDR/FW markup
