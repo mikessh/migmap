@@ -27,6 +27,11 @@ class ReadMapping {
     ReadMapping(Mapping mapping, Read read) {
         this.mapping = mapping
 
+        if (mapping.rc) {
+            // don't forget to reverse complement
+            read = read.rc
+        }
+
         def seq = read.seq
         def regionMarkup = mapping.regionMarkup
         cdr3nt = mapping.hasCdr3 ?

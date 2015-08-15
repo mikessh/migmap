@@ -27,6 +27,11 @@ class Read {
         this.qual = qual
     }
 
+    Read getRc() {
+        new Read(header, Util.revCompl(seq), qual.reverse())
+
+    }
+
     byte qualAt(int pos) {
         qual ? ((int) (qual.charAt(pos)) - Util.QUAL_OFFSET) : Util.MAX_QUAL
     }
