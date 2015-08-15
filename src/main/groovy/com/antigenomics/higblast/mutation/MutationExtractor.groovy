@@ -128,11 +128,11 @@ class MutationExtractor {
     static SubRegion deduceSubRegionV(VSegment segment, int pos) {
         if (pos < segment.cdr1start) {
             return SubRegion.FR1
-        } else if (pos < segment.cdr2end) {
+        } else if (pos < segment.cdr1end) {
             return SubRegion.CDR1
         } else if (pos < segment.cdr2start) {
             return SubRegion.FR2
-        } else if (pos < segment.cdr1end) {
+        } else if (pos < segment.cdr2end) {
             return SubRegion.CDR2
         } else if (pos < segment.referencePoint - 3) {
             return SubRegion.FR3

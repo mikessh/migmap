@@ -17,7 +17,11 @@
 package com.antigenomics.higblast.mutation
 
 import com.antigenomics.higblast.blast.Alignment
+import com.antigenomics.higblast.genomic.SegmentDatabase
+import com.antigenomics.higblast.genomic.VSegment
 import org.junit.Test
+
+import static com.antigenomics.higblast.mutation.SubRegion.*
 
 class MutationExtractorTest {
     @Test
@@ -42,6 +46,32 @@ class MutationExtractorTest {
             assert it.toString() == expectedCodes[i]
             assert it.posInRead == posInReadExp[i]
         }
+    }
 
+    @Test
+    void markupTest() {
+        def query = "CAGCTGGAGTTGGTACAGTCTGGGGCTGAGGAGAAGAAGCCTGGGGCCTCAGTGAAGGTCTCCTGCAAGGCTTCTGGATCCACATTCAGC" +
+                "GGCCACTTTATGCACTGGGTGCGACAGGCCCCTGGACAAGGGCTTGAGTGGATGGGGTGGATCAACTCTTACAGTGGTGCCACAAAGTAT" +
+                "GCACAGAAGTTTCAGGGCAGGGTCACCATGACCAGGGACACGTCCATGACCACAATCTACATGGAGCTGAGCGGACTCACATCTGACGAC" +
+                "ACGGCCGTGTATTTTTGTACCAGA"
+
+        def segDb = new SegmentDatabase("data/", "human", ["IGH"] as Set<String>, true, false)
+
+        def segment = segDb.segments["IGHV1-2*02"]
+
+        def alignment = new Alignment(0, query, 0, segment.sequence.substring(0, query.length()))
+
+        def mutations = MutationExtractor.extract(segment, alignment)
+
+        def expectedSubRegions = [FR1, FR1, FR1, FR1, FR1,
+                                  CDR1, CDR1, CDR1, CDR1, CDR1,
+                                  FR2,
+                                  CDR2, CDR2, CDR2,
+                                  FR3, FR3, FR3, FR3, FR3, FR3, FR3, FR3, FR3, FR3, FR3,
+                                  CDR3, CDR3]
+
+        mutations.eachWithIndex { it, i ->
+            assert it.subRegion == expectedSubRegions[i]
+        }
     }
 }
