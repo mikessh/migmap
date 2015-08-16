@@ -47,7 +47,7 @@ class BlastInstanceFactory implements VoidProcessorFactory<Read> {
                             "-organism $species",
 
                     "DOMAIN_OPT":
-                            "-domain_system $useKabat"
+                            "-domain_system ${useKabat ? "kabat" : "imgt"}"
         ]
 
         def REPORT_OPT = ["-num_alignments_V 1", "-num_alignments_D 1", "-num_alignments_J 1"],
@@ -60,7 +60,7 @@ class BlastInstanceFactory implements VoidProcessorFactory<Read> {
         ].flatten()
 
         this.env = ["IGDATA=\"$dataBundlePath\""]
-        this.dir = new File(dataBundlePath)
+        this.dir = new File(dataBundlePath).parentFile
 
         segmentDatabase.makeBlastDb()
     }

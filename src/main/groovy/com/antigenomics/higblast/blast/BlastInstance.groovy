@@ -91,11 +91,10 @@ class BlastInstance implements VoidProcessor<Read>, OutputPortCloseable<ReadMapp
 
     @Override
     void close() {
-        reader.close()
         process.waitFor()
 
-        if (process.exitValue()) {
-            println "[ERROR] ${process.getErrorStream()}"
+        if (process.exitValue() > 0) {
+            println "[ERROR] code=${process.exitValue()} ${process.getErrorStream()}"
         }
     }
 }

@@ -19,8 +19,8 @@ package com.antigenomics.higblast
 class RuntimeInfo {
     static final boolean WIN = System.properties['os.name'].toLowerCase().contains('windows')
     static final int N_THREADS = Runtime.runtime.availableProcessors()
-    static final String HOME = new File(getClass().protectionDomain.codeSource.location.path).parent.
-            replaceAll("%20", " ")
+    //static final String HOME = new File(Main.getClass().protectionDomain.codeSource.location.path).parent.
+    //        replaceAll("%20", " ")
     static String BLAST_HOME = ""
 
     static String wrapCommand(String command) {
