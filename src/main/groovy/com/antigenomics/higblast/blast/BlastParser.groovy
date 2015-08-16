@@ -30,24 +30,20 @@ import java.util.concurrent.atomic.AtomicInteger
 import static com.antigenomics.higblast.Util.BLAST_NA
 import static com.antigenomics.higblast.Util.groomMatch
 
-class BlastProcessor {
+class BlastParser {
     final AtomicInteger total = new AtomicInteger(),
                         noMatch = new AtomicInteger(),
                         vNotFound = new AtomicInteger(),
                         noCdr3 = new AtomicInteger()
     final SegmentDatabase segmentDatabase
     final JRefSearcher jRefSearcher
-    final MutationExtractor mutationExtractor
 
-    public BlastProcessor(SegmentDatabase segmentDatabase) {
+    public BlastParser(SegmentDatabase segmentDatabase) {
         this.segmentDatabase = segmentDatabase
         this.jRefSearcher = new JRefSearcher()
     }
 
-    Mapping processChunk(String chunk) {
-        if (!chunk.startsWith("# IGBLASTN"))
-            throw new RuntimeException("Bad IGBLAST chunk, $chunk")
-
+    Mapping parse(String chunk) {
         total.incrementAndGet()
 
         def summary, alignments, cdrBounds
@@ -157,9 +153,13 @@ class BlastProcessor {
                 alignments[0][3],
                 cdr1Start, cdr1End, cdr2Start, cdr2End)*/
 
-        def mutations = []
+        def mutations = MutationExtractor.extract(vSegments[0], alignments[0])
 
-        mutations.addAll(mutationExtractor.extract(vSegments[0], cdr3m))
+        if (dFound)
+            mutations.addAll(MutationExtractor.extract(vSegments[1], alignments[1]))
+
+        if (dFound)
+            mutations.addAll(MutationExtractor.extract(vSegments[1], alignments[1]))
 
         return new Mapping(vSegments, dSegments, jSegments,
                 regionMarkup, cdr3Markup,

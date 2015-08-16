@@ -1,6 +1,6 @@
 package com.antigenomics.higblast
 
-import com.antigenomics.higblast.blast.BlastRunner
+import com.antigenomics.higblast.blast.BlastInstanceFactory
 import com.antigenomics.higblast.mapping.Mapping
 import com.antigenomics.higblast.blast.ClonotypeData
 import com.antigenomics.higblast.io.FastaReader
@@ -208,20 +208,20 @@ def listener = Thread.start {
 }
 
 if (debug) {
-    new BlastRunner(THREADS, SCRIPT_PATH, SPECIES, GENE, CHAIN, allAlleles, fastaChunks[0], clonotypeMap).runIdle()
+    new BlastInstanceFactory(THREADS, SCRIPT_PATH, SPECIES, GENE, CHAIN, allAlleles, fastaChunks[0], clonotypeMap).runIdle()
     System.exit(0)
 } else {
     if (THREADS > 1) {
         def pool = Executors.newFixedThreadPool(THREADS)
 
         (0..(THREADS - 1)).collect { p ->
-            pool.submit(new BlastRunner(THREADS, SCRIPT_PATH, SPECIES, GENE, CHAIN, allAlleles, fastaChunks[p], clonotypeMap))
+            pool.submit(new BlastInstanceFactory(THREADS, SCRIPT_PATH, SPECIES, GENE, CHAIN, allAlleles, fastaChunks[p], clonotypeMap))
         }
         pool.shutdown()
 
         while (!pool.terminated);
     } else {
-        new BlastRunner(THREADS, SCRIPT_PATH, SPECIES, GENE, CHAIN, allAlleles, fastaChunks[0], clonotypeMap).run()
+        new BlastInstanceFactory(THREADS, SCRIPT_PATH, SPECIES, GENE, CHAIN, allAlleles, fastaChunks[0], clonotypeMap).run()
     }
 }
 
