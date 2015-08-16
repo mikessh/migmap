@@ -16,6 +16,7 @@ jar {
 dependencies {
     compile 'org.codehaus.groovy:groovy-all:2.4.4'
     compile 'junit:junit:4.12'
+    compile 'cc.redberry:pipe:0.9.4'
     //compile module('org.codehaus.groovy-all:groovy:2.4.3') {
     //    dependency('commons-cli:commons-cli:1.2')
     //    dependency('org.codehaus.gpars:gpars:1.2.1')
@@ -23,5 +24,5 @@ dependencies {
 }
 
 test {
-    environment "PATH", "$System.env.PATH:/usr/local/bin/"
+    environment "PATH", "$System.env.PATH:/usr/local/bin/:/usr/local/ncbi/igblast/bin/"
 }
