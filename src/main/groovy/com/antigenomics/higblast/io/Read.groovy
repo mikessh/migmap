@@ -44,4 +44,21 @@ class Read {
 
         sb.toString()
     }
+
+    @Override
+    boolean equals(o) {
+        if (this.is(o)) return true
+        if (getClass() != o.class) return false
+
+        Read read = (Read) o
+
+        return header == read.header && seq == read.seq && qual == read.qual
+    }
+
+    @Override
+    int hashCode() {
+        int result = header.hashCode()
+        result = 31 * result + seq.hashCode()
+        31 * result + qual.hashCode()
+    }
 }

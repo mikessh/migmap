@@ -27,7 +27,7 @@ class BlastInstance implements VoidProcessor<Read>, OutputPortCloseable<ReadMapp
     final PrintWriter writer
     final BlastParser parser
 
-    private List<String> header = []
+    protected boolean last = false
 
     protected BlastInstance(Process process, BlastParser parser) {
         this.process = process
@@ -36,53 +36,54 @@ class BlastInstance implements VoidProcessor<Read>, OutputPortCloseable<ReadMapp
         this.parser = parser
     }
 
-    private Read getCurrentRead() {
-        new Read(header[0], header[1], header[2])
+    static Read getRead(String chunk) {
+        def header = (chunk =~ /# Query: (.+)\|(.+)\|(.+)/)[0]
+        new Read(header[1], header[2], header[3])
     }
 
-    private ReadMapping parse(String chunk) {
-        new ReadMapping(parser.parse(chunk), currentRead)
+    ReadMapping parse(String chunk) {
+        new ReadMapping(parser.parse(chunk), getRead(chunk))
     }
 
-    @Override
-    synchronized ReadMapping take() {
-        if (header == null) {
+    synchronized String nextChunk() {
+        if (last) {
             // finished
             return null
         }
 
-        ReadMapping readMapping
         String chunk = "", line
 
         while (true) {
             line = reader.readLine()
 
-            if (!line) {
+            if (line == null) {
                 if (chunk.length() == 0) {
                     return null // empty input
-                } else {
-                    readMapping = parse(chunk) // parse last chunk
                 }
-                header = null // warn of EOF
-                break
+                last = true // warn of EOF
+                break // went to EOF
             } else if (line.startsWith("# IGBLASTN") && chunk.length() > 0) {
-                // went to next chunk, extract header and parse
-                // header of next chunk will be with next readLine()
-                header = (chunk =~ /# Query: (.+)\\|(.+)\\|(.+)/)[0][1..3]
-                readMapping = parse(chunk)
-                break
+                break // went to the beginning of next chunk
             } else {
                 chunk += line + "\n"
             }
         }
 
-        readMapping
+        chunk
+    }
+
+    @Override
+    ReadMapping take() {
+        String chunk = nextChunk()
+
+        chunk ? parse(chunk) : null
     }
 
     @Override
     void process(Read input) {
         if (input) {
-            writer.println(input.header + "|" + input.seq + "|" + input.qual)
+            writer.println(">" + input.header + "|" + input.seq + "|" + input.qual)
+            writer.println(input.seq)
         } else {
             // no more reads
             writer.close()

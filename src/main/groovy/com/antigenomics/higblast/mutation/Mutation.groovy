@@ -54,4 +54,26 @@ class Mutation {
         // insertion occur before "position", so that seq[position, ...] is shifted forward
         type.shortName + pos + ":" + ntFrom + ">" + ntTo
     }
+
+    @Override
+    boolean equals(o) {
+        if (this.is(o)) return true
+        if (getClass() != o.class) return false
+
+        Mutation mutation = (Mutation) o
+
+        start == mutation.start &&
+                ntFrom == mutation.ntFrom &&
+                ntTo == mutation.ntTo &&
+                region == mutation.region
+    }
+
+    @Override
+    int hashCode() {
+        int result
+        result = ntFrom.hashCode()
+        result = 31 * result + ntTo.hashCode()
+        result = 31 * result + start
+        31 * result + region.hashCode()
+    }
 }
