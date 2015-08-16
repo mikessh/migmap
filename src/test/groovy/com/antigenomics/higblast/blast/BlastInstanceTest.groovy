@@ -20,6 +20,29 @@ import com.antigenomics.higblast.io.Read
 import org.junit.Test
 
 class BlastInstanceTest {
+    final String seq = "TAAGAGGGCAGTGGTATCAACGCAGAGTACGGATATTCTGAGGTCCGCTC" +
+            "TCTTGGGGGGCTTTCTGAGAGTCGTGGATCTCATGTGCAAGAAAATGAAG" +
+            "CACCTGTGGTTCTTCCTCCTGCTGGTGGCGGCTCCCAGATGGGTCCTGTC" +
+            "CCAGCTGCAGCTGCAGGAGTCGGGCCCAGGACTGGTGAAGCCCTCGGAGA" +
+            "CCCTGTCCCTCAGGTGCACTGTCTCTGGGGGCTCCATGACAAGAACTACT" +
+            "GACTACTGGGGCTGGGTCCGCCAGCCCCCAGGGAAGGGACTGGAGTGGAT" +
+            "TGCAAGTGTCTCTTATAGTGGGAGCACCACCTACAACCCGTCCCGGAAGA" +
+            "GTCGAGTCACAATCTCCCTAGACCCGTCCAGGAACGAACTCTCCCTGGAA" +
+            "CTGAGGTCCATGACCGCCGCAGACACGGCTGTGTATTTCTGTGCGAGGTG" +
+            "GCTTGGGGAAGACATTCGGACCTTTGACTCCTGGGGCCAGGGAACCCTGG" +
+            "TCACCGTCTCTAA",
+                 qual = "#'.IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII" +
+                         "IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII" +
+                         "IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII" +
+                         "IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIBIB" +
+                         "IIIIIIIIIIIIIIIIIIIIIBIIIIIIIIIIIIIIIIIIIIIIIIIIII" +
+                         "IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII" +
+                         "IIIIIIIIIIIBIIBIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII" +
+                         "IIIIIIIBIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII" +
+                         "IIIIIIIIIIIIIIIIIIIBIIIIIIIIIIIIIIIIIIIIIIIIIIIIII" +
+                         "IIIIBIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIB;II" +
+                         "IIIIIIIIII.''"
+
     @Test
     void singleQueryTest() {
         def factory = new BlastInstanceFactory("data/", "human", new HashSet<String>(["IGH"]), true, false)
@@ -27,35 +50,15 @@ class BlastInstanceTest {
 
         def read = new Read(
                 "@MIG UMI:GGATATGCCGCTC:8",
-                "TAAGAGGGCAGTGGTATCAACGCAGAGTACGGATATTCTGAGGTCCGCTC" +
-                        "TCTTGGGGGGCTTTCTGAGAGTCGTGGATCTCATGTGCAAGAAAATGAAG" +
-                        "CACCTGTGGTTCTTCCTCCTGCTGGTGGCGGCTCCCAGATGGGTCCTGTC" +
-                        "CCAGCTGCAGCTGCAGGAGTCGGGCCCAGGACTGGTGAAGCCCTCGGAGA" +
-                        "CCCTGTCCCTCAGGTGCACTGTCTCTGGGGGCTCCATGACAAGAACTACT" +
-                        "GACTACTGGGGCTGGGTCCGCCAGCCCCCAGGGAAGGGACTGGAGTGGAT" +
-                        "TGCAAGTGTCTCTTATAGTGGGAGCACCACCTACAACCCGTCCCGGAAGA" +
-                        "GTCGAGTCACAATCTCCCTAGACCCGTCCAGGAACGAACTCTCCCTGGAA" +
-                        "CTGAGGTCCATGACCGCCGCAGACACGGCTGTGTATTTCTGTGCGAGGTG" +
-                        "GCTTGGGGAAGACATTCGGACCTTTGACTCCTGGGGCCAGGGAACCCTGG" +
-                        "TCACCGTCTCTAA",
-                "#'.IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII" +
-                        "IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII" +
-                        "IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII" +
-                        "IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIBIB" +
-                        "IIIIIIIIIIIIIIIIIIIIIBIIIIIIIIIIIIIIIIIIIIIIIIIIII" +
-                        "IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII" +
-                        "IIIIIIIIIIIBIIBIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII" +
-                        "IIIIIIIBIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII" +
-                        "IIIIIIIIIIIIIIIIIIIBIIIIIIIIIIIIIIIIIIIIIIIIIIIIII" +
-                        "IIIIBIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIB;II" +
-                        "IIIIIIIIII.''"
+                seq,
+                qual
         )
 
         instance.process(read)
 
         instance.process(null)
 
-        //instance.process.in.eachLine { println it }
+        //instance.proc.in.eachLine { println it }
 
         String chunk = instance.nextChunk()
 
@@ -69,5 +72,28 @@ class BlastInstanceTest {
         assert chunk.contains("# Hit table ")
 
         instance.close()
+    }
+
+    @Test
+    void multiQueryTest() {
+        def factory = new BlastInstanceFactory("data/", "human", new HashSet<String>(["IGH"]), true, false)
+        def instance = factory.create() as BlastInstance
+
+        def readsIds = new HashSet<String>()
+
+        (0..<100).each {
+            def header = "@$it"
+            readsIds.add(header)
+            instance.process(new Read(header, seq, qual))
+        }
+
+        instance.process(null)
+
+        def extractedIds = new HashSet<String>((0..<100).collect { BlastInstance.getRead(instance.nextChunk()).header })
+
+        def intersection = extractedIds.intersect(readsIds)
+
+        assert extractedIds.size() == 100
+        assert intersection.size() == 100
     }
 }
