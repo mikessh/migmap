@@ -21,6 +21,8 @@ import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
 
 class Util {
+    static final String HOME = new File(getClass().protectionDomain.codeSource.location.path).parent.
+            replaceAll("%20", " ")
     static final String MY_NA = ".", BLAST_NA = "N/A"
     static final char GAP = '-'
     static final byte MAX_QUAL = 40, MIN_QUAL = 2

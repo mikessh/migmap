@@ -17,7 +17,6 @@
 package com.antigenomics.higblast.mapping
 
 import com.antigenomics.higblast.Util
-import com.antigenomics.higblast.blast.ClonotypeData
 import com.antigenomics.higblast.genomic.DSegment
 import com.antigenomics.higblast.genomic.JSegment
 import com.antigenomics.higblast.genomic.VSegment
@@ -57,6 +56,7 @@ class Mapping {
         this.hasD = hasD
     }
 
+    /*
     void extractCdr3(String seq) {
         if (hasCdr3) {
             if (rc) {
@@ -71,7 +71,6 @@ class Mapping {
         }
     }
 
-    /*
     VSegment getVSegment() {
         vSegments[0]
     }

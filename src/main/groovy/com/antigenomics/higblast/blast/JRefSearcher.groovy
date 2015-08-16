@@ -25,7 +25,7 @@ class JRefSearcher {
     JRefSearcher() {
     }
 
-    int getJRefPoint(JSegment jSegment, Alignment alignment) {
+    static int getJRefPoint(JSegment jSegment, Alignment alignment) {
         getJRefPointInner(jSegment.referencePoint, alignment.qstart, alignment.qseq, alignment.sstart, alignment.sseq)
     }
 
