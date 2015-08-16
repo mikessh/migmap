@@ -29,7 +29,6 @@ class Read {
 
     Read getRc() {
         new Read(header, Util.revCompl(seq), qual.reverse())
-
     }
 
     byte qualAt(int pos) {
