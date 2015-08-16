@@ -22,17 +22,17 @@ import com.antigenomics.higblast.io.Read
 import com.antigenomics.higblast.mapping.ReadMapping
 
 class BlastInstance implements VoidProcessor<Read>, OutputPortCloseable<ReadMapping> {
-    final Process process
+    final Process proc
     final BufferedReader reader
     final PrintWriter writer
     final BlastParser parser
 
     protected boolean last = false
 
-    protected BlastInstance(Process process, BlastParser parser) {
-        this.process = process
-        this.reader = process.in.newReader()
-        this.writer = process.out.newPrintWriter()
+    protected BlastInstance(Process proc, BlastParser parser) {
+        this.proc = proc
+        this.reader = proc.in.newReader()
+        this.writer = proc.out.newPrintWriter()
         this.parser = parser
     }
 
@@ -92,10 +92,10 @@ class BlastInstance implements VoidProcessor<Read>, OutputPortCloseable<ReadMapp
 
     @Override
     void close() {
-        process.waitFor()
+        proc.waitFor()
 
-        if (process.exitValue() > 0) {
-            println "[ERROR] code=${process.exitValue()} ${process.getErrorStream()}"
+        if (proc.exitValue() > 0) {
+            println "[ERROR] code=${proc.exitValue()} ${proc.getErrorStream()}"
         }
     }
 }
