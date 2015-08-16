@@ -27,4 +27,19 @@ class Segment {
     int getFrame() {
         referencePoint % 3
     }
+
+    @Override
+    boolean equals(o) {
+        if (this.is(o)) return true
+        if (getClass() != o.class) return false
+
+        Segment segment = (Segment) o
+
+        name == segment.name
+    }
+
+    @Override
+    int hashCode() {
+        name.hashCode()
+    }
 }

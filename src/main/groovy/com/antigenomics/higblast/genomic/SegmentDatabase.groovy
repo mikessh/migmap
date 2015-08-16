@@ -16,6 +16,7 @@
 
 package com.antigenomics.higblast.genomic
 
+import com.antigenomics.higblast.RuntimeInfo
 import com.antigenomics.higblast.Util
 
 class SegmentDatabase {
@@ -30,8 +31,8 @@ class SegmentDatabase {
              "rabbit"       : "OryctolagusCuniculus",
              "rhesus_monkey": "MacacaMulatta"]
 
-    SegmentDatabase(String dataBundlePath, String species,
-                    Set<String> genes,
+    SegmentDatabase(String dataBundlePath,
+                    String species, Set<String> genes,
                     boolean allAlleles, boolean useKabat) {
 
         def speciesAlias = SPECIES_ALIAS[species]
@@ -62,7 +63,7 @@ class SegmentDatabase {
 
                 if (allAlleles || segmentName.endsWith("*01")) {
                     assert !segments.containsKey(segmentName)
-                    
+
                     if (splitLine[2].startsWith("V")) {
                         def markup = markupMap[segmentName]
                         if (markup) {
@@ -117,7 +118,7 @@ class SegmentDatabase {
         }
 
         ["v", "d", "j"].each {
-            "makeblastdb -parse_seqids -dbtype nucl -in $dbPath/${it}.fa -out $dbPath/$it".execute().waitFor()
+            "$RuntimeInfo.makeDb -parse_seqids -dbtype nucl -in $dbPath/${it}.fa -out $dbPath/$it".execute().waitFor()
         }
     }
 
