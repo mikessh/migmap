@@ -88,11 +88,11 @@ class BlastParser {
         alignments = [
                 groomMatch(chunk =~
                         //                          qstart     qseq        sstart     sseq
-                        /# Hit table(?:.+\n)+V\t.+\t([0-9]+)\t([ATGCN-]+)\t([0-9]+)\t([ATGCN-]+)\n/),
+                        /# Hit table(?:.+\n)+V\t.+\t([0-9]+)\t([ATGCN-]+)\t([0-9]+)\t([ATGCN-]+)/),
                 dFound ? groomMatch(chunk =~
-                        /# Hit table(?:.+\n)+D\t.+\t([0-9]+)\t([ATGCN-]+)\t([0-9]+)\t([ATGCN-]+)\n/) : null,
+                        /# Hit table(?:.+\n)+D\t.+\t([0-9]+)\t([ATGCN-]+)\t([0-9]+)\t([ATGCN-]+)/) : null,
                 groomMatch(chunk =~
-                        /# Hit table(?:.+\n)+J\t.+\t([0-9]+)\t([ATGCN-]+)\t([0-9]+)\t([ATGCN-]+)\n/)
+                        /# Hit table(?:.+\n)+J\t.+\t([0-9]+)\t([ATGCN-]+)\t([0-9]+)\t([ATGCN-]+)/)
         ].collect {
             it ? new Alignment(it[0].toInteger() - 1, it[1], it[2].toInteger() - 1, it[3]) : null
         }
@@ -101,11 +101,11 @@ class BlastParser {
         // - CDR1,2 and CDR3(start only) coords
         cdrBounds = [
                 groomMatch(chunk =~
-                        /# Alignment summary(?:.+\n)+CDR1-IMGT\t([0-9]+)\t([0-9]+)\t/),
+                        /# Alignment summary(?:.+\n)+CDR1-IMGT\t([0-9]+)\t([0-9]+)/),
                 groomMatch(chunk =~
-                        /# Alignment summary(?:.+\n)+CDR2-IMGT\t([0-9]+)\t([0-9]+)\t/),
+                        /# Alignment summary(?:.+\n)+CDR2-IMGT\t([0-9]+)\t([0-9]+)/),
                 groomMatch(chunk =~
-                        /# Alignment summary(?:.+\n)+CDR3-IMGT \(germline\)\t([0-9]+)\t([0-9]+)\t/)
+                        /# Alignment summary(?:.+\n)+CDR3-IMGT \(germline\)\t([0-9]+)\t([0-9]+)/)
         ]
 
         int cdr1Start = -1, cdr1End = -1,
@@ -123,7 +123,7 @@ class BlastParser {
         }
 
         // - Find CDR3 end using J reference point manually
-        if (cdrBounds[2]) {
+        if (cdrBounds[2] && jFound) {
             cdr3Start = cdrBounds[2][0].toInteger() - 4
             def jRef = jFound ? jRefSearcher.getJRefPoint(jSegments[0], alignments[2]) : -1
             cdr3End = jRef < 0 ? -1 : jRef + 4

@@ -16,7 +16,6 @@
 
 package com.antigenomics.higblast.mapping
 
-import com.antigenomics.higblast.Util
 import com.antigenomics.higblast.genomic.DSegment
 import com.antigenomics.higblast.genomic.JSegment
 import com.antigenomics.higblast.genomic.VSegment
@@ -29,7 +28,6 @@ class Mapping {
     final boolean rc, complete, hasCdr3, inFrame, noStop, hasD
     final Cdr3Markup cdr3Markup
     final RegionMarkup regionMarkup
-    String cdr3nt = Util.MY_NA, cdr3aa = Util.MY_NA
     final List<Mutation> mutations
 
     Mapping(List<VSegment> vSegments, List<DSegment> dSegments, List<JSegment> jSegments,
