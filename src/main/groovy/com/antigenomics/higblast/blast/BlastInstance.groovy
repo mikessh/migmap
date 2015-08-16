@@ -29,7 +29,7 @@ class BlastInstance implements VoidProcessor<Read>, OutputPortCloseable<ReadMapp
 
     private List<String> header = []
 
-    BlastInstance(Process process, BlastParser parser) {
+    protected BlastInstance(Process process, BlastParser parser) {
         this.process = process
         this.reader = process.in.newReader()
         this.writer = process.out.newPrintWriter()

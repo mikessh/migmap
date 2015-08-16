@@ -30,7 +30,7 @@ class BlastInstanceFactory implements VoidProcessorFactory<Read> {
     final SegmentDatabase segmentDatabase
 
     BlastInstanceFactory(String dataBundlePath,
-                         String species, List<String> genes,
+                         String species, Set<String> genes,
                          boolean allAlleles, boolean useKabat) {
         this.segmentDatabase = new SegmentDatabase(dataBundlePath, species, genes, allAlleles, useKabat)
         this.parser = new BlastParser(segmentDatabase)
@@ -51,13 +51,12 @@ class BlastInstanceFactory implements VoidProcessorFactory<Read> {
         ]
 
         def REPORT_OPT = ["-num_alignments_V 1", "-num_alignments_D 1", "-num_alignments_J 1"],
-            OUTFMT_TRICK = ["-outfmt", "7 qseqid qstart qseq sstart sseq"],
-            OUTPUT_OPT = "-out -",
-            INPUT_OPT = "-in -" // todo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            OUTFMT_OPT = ["-outfmt", "7 qseqid qstart qseq sstart sseq"],
+            OUTPUT_OPT = "-out -"
 
-        this.cmdLine = [[RuntimeInfo.igBlast, OPTS.values(), REPORT_OPT, OUTPUT_OPT, INPUT_OPT].
+        this.cmdLine = [[RuntimeInfo.igBlast, OPTS.values(), REPORT_OPT, OUTPUT_OPT].
                                 flatten().join(" ").split(" "),
-                        OUTFMT_TRICK
+                        OUTFMT_OPT
         ].flatten()
 
         this.env = ["IGDATA=\"$dataBundlePath\""]
