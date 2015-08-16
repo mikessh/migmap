@@ -24,18 +24,18 @@ class SegmentDatabaseTest {
         SegmentDatabase.SPECIES_ALIAS.keySet().each {
             println "Loading data for $it"
             
-            def segDb = new SegmentDatabase("data/", it, ["TRA", "TRB", "TRG", "TRD",
+            def segmentDatabase = new SegmentDatabase("data/", it, ["TRA", "TRB", "TRG", "TRD",
                                                           "IGH", "IGK", "IGL"] as Set<String>, true, false)
 
-            assert !segDb.segments.isEmpty()
+            assert !segmentDatabase.segments.isEmpty()
         }
     }
 
     @Test
     void loadTest() {
-        def segDb = new SegmentDatabase("data/", "human", ["IGH"] as Set<String>, true, false)
+        def segmentDatabase = new SegmentDatabase("data/", "human", ["IGH"] as Set<String>, true, false)
 
-        assert !segDb.segments.isEmpty()
+        assert !segmentDatabase.segments.isEmpty()
 
         def testSegments = ["IGHV4-59*09",
                             "IGHV3-23*01",
@@ -48,23 +48,25 @@ class SegmentDatabaseTest {
                             "IGHV4-28*05",
                             "IGHV1/OR15-3*02"]
 
-        assert testSegments.each { segDb.segments.keySet().contains(it) }
+        assert testSegments.each { segmentDatabase.segments.keySet().contains(it) }
     }
 
     @Test
     void makeDbTest() {
-        def segDb = new SegmentDatabase("data/", "human", ["TRA"] as Set<String>, true, false)
-        segDb.makeBlastDb()
+        def segmentDatabase = new SegmentDatabase("data/", "human", ["TRA"] as Set<String>, true, false)
+        segmentDatabase.makeBlastDb()
 
-        assert new File(segDb.dbPath).exists()
-        assert new File("$segDb.dbPath/v.nhr").exists()
-        assert new File("$segDb.dbPath/d.nhr").exists()
+        assert new File(segmentDatabase.dbPath).exists()
+        assert new File("$segmentDatabase.dbPath/v.nhr").exists()
+        assert new File("$segmentDatabase.dbPath/d.nhr").exists()
+
+        segmentDatabase.clearBlastDb()
     }
 
     @Test
     void markupTest() {
-        def segDb = new SegmentDatabase("data/", "human", ["IGH"] as Set<String>, true, false)
-        def segment = segDb.segments["IGHV1-18*01"]
+        def segmentDatabase = new SegmentDatabase("data/", "human", ["IGH"] as Set<String>, true, false)
+        def segment = segmentDatabase.segments["IGHV1-18*01"]
 
         assert (segment as VSegment).cdr1start == 75
         assert (segment as VSegment).cdr1end == 99

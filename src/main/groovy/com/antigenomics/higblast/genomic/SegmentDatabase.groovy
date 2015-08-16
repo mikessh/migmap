@@ -122,9 +122,7 @@ class SegmentDatabase {
         }
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        super.finalize()
+    void clearBlastDb() {
         new File(dbPath).deleteDir()
     }
 }
