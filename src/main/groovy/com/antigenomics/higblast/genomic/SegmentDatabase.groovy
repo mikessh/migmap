@@ -54,7 +54,7 @@ class SegmentDatabase {
 
         int vSegments = 0, dSegments = 0, jSegments = 0, vSegmentsNoMarkup = 0
 
-        Util.getResourceAsStream("segments.txt").splitEachLine("[\t ]+") { splitLine ->
+        Util.getStream("segments.txt", true).splitEachLine("[\t ]+") { splitLine ->
             if (!splitLine[0].startsWith("#") &&
                     splitLine[0].startsWith(speciesAlias) &&
                     genes.contains(splitLine[1])) {

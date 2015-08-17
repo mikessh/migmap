@@ -26,9 +26,13 @@ class Util {
     static final byte MAX_QUAL = 40, MIN_QUAL = 2
     static final int QUAL_OFFSET = 33
 
-    static BufferedReader getReader(String fname) {
-        new BufferedReader(new InputStreamReader(fname.endsWith(".gz") ? new GZIPInputStream(new FileInputStream(fname)) :
-                new FileInputStream(fname)))
+    static InputStream getStream(String fname, boolean resource) {
+        resource ? Util.class.classLoader.getResourceAsStream(fname) : new FileInputStream(fname)
+    }
+
+    static BufferedReader getReader(String fname, boolean resource) {
+        def inputStream = getStream(fname, resource)
+        new BufferedReader(new InputStreamReader(fname.endsWith(".gz") ? new GZIPInputStream(inputStream) : inputStream))
     }
 
     static BufferedWriter getWriter(String outfile) {
@@ -37,9 +41,6 @@ class Util {
                 new GZIPOutputStream(new FileOutputStream(outfile)) : new FileOutputStream(outfile)))
     }
 
-    static getResourceAsStream(String resourceName) {
-        new InputStreamReader(Util.class.classLoader.getResourceAsStream(resourceName))
-    }
 
     static List<String> groomMatch(Matcher matcher) {
         matcher.size() > 0 ? matcher[0][1..-1] : null//[]
