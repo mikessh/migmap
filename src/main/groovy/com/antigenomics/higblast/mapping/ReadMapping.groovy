@@ -39,7 +39,7 @@ class ReadMapping {
             this.cdr3nt = mapping.hasCdr3 ?
                     (mapping.complete ?
                             seq.substring(regionMarkup.cdr3Start, regionMarkup.cdr3End) :
-                            seq.substring(regionMarkup.cdr3Start) + "_")
+                            seq.substring(regionMarkup.cdr3Start))
                     : Util.MY_NA
 
             this.mutationQual = new byte[mapping.mutations.size()]
@@ -55,18 +55,26 @@ class ReadMapping {
                     int i = 0
 
                     if (mapping.hasD) {
-                        this.cdrInsertQual = new byte[cdrMarkup.dStart - cdrMarkup.vEnd + cdrMarkup.jStart - cdrMarkup.dEnd]
+                        this.cdrInsertQual = new byte[Math.max(0, cdrMarkup.dStart - cdrMarkup.vEnd) +
+                                Math.max(0, cdrMarkup.jStart - cdrMarkup.dEnd)]
 
-                        ((regionMarkup.cdr3Start + cdrMarkup.vEnd)..<(regionMarkup.cdr3Start + cdrMarkup.dStart)).each {
-                            cdrInsertQual[i++] = read.qualAt(it)
+                        if (cdrMarkup.vEnd <= cdrMarkup.dStart) {
+                            ((regionMarkup.cdr3Start + cdrMarkup.vEnd)..<(regionMarkup.cdr3Start + cdrMarkup.dStart)).each {
+                                cdrInsertQual[i++] = read.qualAt(it) // todo: exception here
+                            }
                         }
-                        ((regionMarkup.cdr3Start + cdrMarkup.dEnd)..<(regionMarkup.cdr3Start + cdrMarkup.jStart)).each {
-                            cdrInsertQual[i++] = read.qualAt(it)
+
+                        if (cdrMarkup.dEnd <= cdrMarkup.jStart) {
+                            ((regionMarkup.cdr3Start + cdrMarkup.dEnd)..<(regionMarkup.cdr3Start + cdrMarkup.jStart)).each {
+                                cdrInsertQual[i++] = read.qualAt(it)
+                            }
                         }
                     } else {
-                        this.cdrInsertQual = new byte[cdrMarkup.jStart - cdrMarkup.vEnd]
-                        ((regionMarkup.cdr3Start + cdrMarkup.vEnd)..<(regionMarkup.cdr3Start + cdrMarkup.jStart)).each {
-                            cdrInsertQual[i++] = read.qualAt(it)
+                        this.cdrInsertQual = new byte[Math.max(0, cdrMarkup.jStart - cdrMarkup.vEnd)]
+                        if (cdrMarkup.vEnd <= cdrMarkup.jStart) {
+                            ((regionMarkup.cdr3Start + cdrMarkup.vEnd)..<(regionMarkup.cdr3Start + cdrMarkup.jStart)).each {
+                                cdrInsertQual[i++] = read.qualAt(it)
+                            }
                         }
                     }
                 } else {
@@ -78,6 +86,7 @@ class ReadMapping {
             } else {
                 this.cdrInsertQual = new byte[0]
             }
+
         } else {
             this.cdr3nt = null
             this.mutationQual = null

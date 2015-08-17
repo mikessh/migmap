@@ -62,7 +62,7 @@ class BlastParser {
             noMatch.incrementAndGet()
             return
         }
-        
+
         def rc = summary[-1] != "+", inFrame = summary[-2] == "In-frame", noStop = summary[-3] == "No"
 
         // Information on segments mapped
@@ -155,11 +155,14 @@ class BlastParser {
 
         def mutations = MutationExtractor.extract(vSegments[0], alignments[0])
 
-        if (dFound)
-            mutations.addAll(MutationExtractor.extract(vSegments[1], alignments[1]))
-
-        if (dFound)
-            mutations.addAll(MutationExtractor.extract(vSegments[1], alignments[1]))
+        if (hasCdr3) {
+            if (dFound) {
+                mutations.addAll(MutationExtractor.extract(vSegments[1], alignments[1]))
+            }
+            if (jFound) {
+                mutations.addAll(MutationExtractor.extract(vSegments[2], alignments[2]))
+            }
+        }
 
         return new Mapping(vSegments, dSegments, jSegments,
                 regionMarkup, cdr3Markup,

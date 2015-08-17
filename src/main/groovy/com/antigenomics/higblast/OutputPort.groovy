@@ -16,24 +16,6 @@
 
 package com.antigenomics.higblast
 
-import com.antigenomics.higblast.blast.BlastInstanceFactory
-import com.antigenomics.higblast.io.DummyOutput
-import com.antigenomics.higblast.io.FastqReader
-import org.junit.Test
-
-class PipelineTest {
-    @Test
-    void sampleTest() {
-        def reader = new FastqReader("sample.fastq.gz", true)
-        def factory = new BlastInstanceFactory("data/", "human", new HashSet<String>(["IGH"]), true, false)
-
-        def pipeline = new Pipeline(reader, factory, DummyOutput.INSTANCE)
-
-        pipeline.run()
-
-        assert pipeline.inputCount == 1000
-        assert pipeline.mappedRatio > 0.95
-        assert pipeline.cdr3FoundRatio > 0.90
-    }
-
+interface OutputPort<T> {
+    T take()
 }

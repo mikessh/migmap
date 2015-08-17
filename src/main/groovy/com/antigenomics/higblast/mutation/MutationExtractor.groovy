@@ -94,6 +94,7 @@ class MutationExtractor {
 
     static List<Mutation> extract(Segment segment,
                                   Alignment alignment) {
+
         // todo: cdr3start >= 0 !!!!
         def mutations = extract(alignment)
 
@@ -105,12 +106,12 @@ class MutationExtractor {
         } else if (segment instanceof JSegment) {
             mutations.each {
                 it.region = segment
-                it.subRegion = SubRegion.CDR3
+                it.subRegion = (it.start > segment.referencePoint + 3) ? SubRegion.FR4 : SubRegion.CDR3
             }
         } else {
             mutations.each {
                 it.region = segment
-                it.subRegion = (it.start > segment.referencePoint + 3) ? SubRegion.FR4 : SubRegion.CDR3
+                it.subRegion = SubRegion.CDR3
             }
         }
 

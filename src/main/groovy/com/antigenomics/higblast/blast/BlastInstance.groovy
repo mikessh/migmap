@@ -82,8 +82,7 @@ class BlastInstance implements OutputPort<ReadMapping>, InputPort<Read> {
     @Override
     void put(Read input) {
         if (input) {
-            writer.println(">" + input.header + "|" + input.seq + "|" + input.qual)
-            writer.println(input.seq)
+            writer.println(">" + input.header + "|" + input.seq + "|" + input.qual + "\n" + input.seq)
         } else {
             // no more reads
             writer.close()
