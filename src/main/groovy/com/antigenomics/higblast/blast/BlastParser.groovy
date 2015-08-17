@@ -58,12 +58,12 @@ class BlastParser {
                         //         V     J    chain   stop frame (prod)  strand
                         /# V-.+\n(.+)\t(.+)\tV.\t(.+)\t(.+)\t.+\t(.+)/)
 
-        def rc = summary[-1] != "+", inFrame = summary[-2] == "In-frame", noStop = summary[-3] == "No"
-
         if (summary == null) {
             noMatch.incrementAndGet()
             return
         }
+        
+        def rc = summary[-1] != "+", inFrame = summary[-2] == "In-frame", noStop = summary[-3] == "No"
 
         // Information on segments mapped
         // - Segment names, can be multiple of them

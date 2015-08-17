@@ -46,7 +46,7 @@ class BlastInstanceTest {
     @Test
     void singleQueryTest() {
         def factory = new BlastInstanceFactory("data/", "human", new HashSet<String>(["IGH"]), true, false)
-        def instance = factory.create() as BlastInstance
+        def instance = factory.create()
 
         def read = new Read(
                 "@MIG UMI:GGATATGCCGCTC:8",
@@ -54,9 +54,9 @@ class BlastInstanceTest {
                 qual
         )
 
-        instance.process(read)
+        instance.put(read)
 
-        instance.process(null)
+        instance.put(null)
 
         //instance.proc.in.eachLine { println it }
 
@@ -84,17 +84,17 @@ class BlastInstanceTest {
     void multiQueryTest() {
         int nQueries = 100
         def factory = new BlastInstanceFactory("data/", "human", new HashSet<String>(["IGH"]), true, false)
-        def instance = factory.create() as BlastInstance
+        def instance = factory.create()
 
         def readsIds = new HashSet<String>()
 
         (0..<nQueries).each {
             def header = "@$it"
             readsIds.add(header)
-            instance.process(new Read(header, seq, qual))
+            instance.put(new Read(header, seq, qual))
         }
 
-        instance.process(null)
+        instance.put(null)
 
         def extractedIds = new HashSet<String>((0..<nQueries).collect {
             BlastInstance.getRead(instance.nextChunk()).header

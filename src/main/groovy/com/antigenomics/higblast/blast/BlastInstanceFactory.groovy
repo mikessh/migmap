@@ -16,13 +16,10 @@
 
 package com.antigenomics.higblast.blast
 
-import cc.redberry.pipe.VoidProcessor
-import cc.redberry.pipe.VoidProcessorFactory
 import com.antigenomics.higblast.RuntimeInfo
 import com.antigenomics.higblast.genomic.SegmentDatabase
-import com.antigenomics.higblast.io.Read
 
-class BlastInstanceFactory implements VoidProcessorFactory<Read> {
+class BlastInstanceFactory {
     final List cmdLine
     final File dir
     final List<String> env
@@ -65,8 +62,7 @@ class BlastInstanceFactory implements VoidProcessorFactory<Read> {
         segmentDatabase.makeBlastDb()
     }
 
-    @Override
-    VoidProcessor<Read> create() {
+    BlastInstance create() {
         new BlastInstance(cmdLine.execute(env, dir), parser)
     }
 }

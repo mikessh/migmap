@@ -16,12 +16,12 @@
 
 package com.antigenomics.higblast.blast
 
-import cc.redberry.pipe.OutputPortCloseable
-import cc.redberry.pipe.VoidProcessor
+import com.antigenomics.higblast.InputPort
+import com.antigenomics.higblast.OutputPort
 import com.antigenomics.higblast.io.Read
 import com.antigenomics.higblast.mapping.ReadMapping
 
-class BlastInstance implements VoidProcessor<Read>, OutputPortCloseable<ReadMapping> {
+class BlastInstance implements OutputPort<ReadMapping>, InputPort<Read> {
     final Process proc
     final BufferedReader reader
     final PrintWriter writer
@@ -80,7 +80,7 @@ class BlastInstance implements VoidProcessor<Read>, OutputPortCloseable<ReadMapp
     }
 
     @Override
-    void process(Read input) {
+    void put(Read input) {
         if (input) {
             writer.println(">" + input.header + "|" + input.seq + "|" + input.qual)
             writer.println(input.seq)
