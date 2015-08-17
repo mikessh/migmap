@@ -21,16 +21,24 @@ import com.antigenomics.higblast.blast.BlastInstanceFactory
 import com.antigenomics.higblast.io.Read
 import com.antigenomics.higblast.mapping.ReadMapping
 
+import java.util.concurrent.atomic.AtomicLong
+
 class Pipeline {
+    private final AtomicLong inputCounter = new AtomicLong(),
+                             processedCounter = new AtomicLong(),
+                             mappedCounter = new AtomicLong(),
+                             cdr3FoundCounter = new AtomicLong()
+    final long limit
     final OutputPort<Read> input
     final BlastInstanceFactory blastInstanceFactory
     final InputPort<ReadMapping> output
 
     Pipeline(OutputPort<Read> input, BlastInstanceFactory blastInstanceFactory,
-             InputPort<ReadMapping> output) {
+             InputPort<ReadMapping> output, long limit = -1) {
         this.input = input
         this.blastInstanceFactory = blastInstanceFactory
         this.output = output
+        this.limit = limit < 0 ? Long.MAX_VALUE : limit
     }
 
     void run(int nThreads = RuntimeInfo.N_THREADS) {
@@ -45,7 +53,9 @@ class Pipeline {
                 @Override
                 void run() {
                     def read
-                    while ((read = input.take()) != null) {
+                    while (((read = input.take()) != null) &&
+                            (inputCounter.incrementAndGet() <= limit)
+                    ) {
                         instance.put(read)
                     }
                     instance.put(null) // finished
@@ -63,6 +73,13 @@ class Pipeline {
                 void run() {
                     def result
                     while ((result = instance.take()) != null) {
+                        if (result.mapping) {
+                            mappedCounter.incrementAndGet()
+                            if (result.mapping.hasCdr3) {
+                                cdr3FoundCounter.incrementAndGet()
+                            }
+                        }
+                        processedCounter.incrementAndGet()
                         output.put(result)
                     }
                 }
@@ -73,5 +90,29 @@ class Pipeline {
         threads.each { it.join() }
 
         output.close()
+    }
+
+    long getInputCount() {
+        inputCounter.get()
+    }
+
+    long getProcessedCount() {
+        processedCounter.get()
+    }
+
+    long getMappedCount() {
+        mappedCounter.get()
+    }
+
+    long getCdr3FoundCount() {
+        cdr3FoundCounter.get()
+    }
+
+    double getMappedRatio() {
+        (double) mappedCount / processedCount
+    }
+
+    double getCdr3FoundRatio() {
+        (double) cdr3FoundCount / processedCount
     }
 }

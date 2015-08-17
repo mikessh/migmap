@@ -14,8 +14,25 @@
  * limitations under the License.
  */
 
-package com.antigenomics.higblast
+package com.antigenomics.higblast.io
 
-interface OutputPort<T> {
-    T take()
+import com.antigenomics.higblast.InputPort
+import com.antigenomics.higblast.mapping.ReadMapping
+
+class DummyOutput implements InputPort<ReadMapping> {
+
+    final static DummyOutput INSTANCE = new DummyOutput()
+
+    private DummyOutput() {
+
+    }
+
+    @Override
+    void put(ReadMapping obj) {
+
+    }
+
+    @Override
+    void close() {
+    }
 }

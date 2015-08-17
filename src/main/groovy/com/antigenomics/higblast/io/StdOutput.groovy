@@ -19,11 +19,11 @@ package com.antigenomics.higblast.io
 import com.antigenomics.higblast.InputPort
 import com.antigenomics.higblast.mapping.ReadMapping
 
-class ReadMappingStdout implements InputPort<ReadMapping> {
-    final static ReadMappingStdout INSTANCE = new ReadMappingStdout()
+class StdOutput implements InputPort<ReadMapping> {
 
-    private ReadMappingStdout() {
+    final static StdOutput INSTANCE = new StdOutput()
 
+    private StdOutput() {
 
     }
 

@@ -84,4 +84,9 @@ class ReadMapping {
             this.cdrInsertQual = null
         }
     }
+
+    @Override
+    String toString() {
+        header
+    }
 }
