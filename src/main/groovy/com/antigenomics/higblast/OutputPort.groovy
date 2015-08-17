@@ -14,29 +14,8 @@
  * limitations under the License.
  */
 
-package com.antigenomics.higblast.io
+package com.antigenomics.higblast
 
-import com.antigenomics.higblast.OutputPort
-import com.antigenomics.higblast.Util
-
-class FastqReader implements OutputPort<Read> {
-    final BufferedReader reader
-
-    FastqReader(String fileName, boolean resource = false) {
-        reader = Util.getReader(fileName, resource)
-    }
-
-    @Override
-    synchronized Read take() {
-        def header = reader.readLine()
-        if (!header) {
-            return null
-        }
-
-        def seq = reader.readLine()
-        reader.readLine()
-        def qual = reader.readLine()
-
-        new Read(header, seq, qual)
-    }
+interface OutputPort<T> {
+    T take()
 }

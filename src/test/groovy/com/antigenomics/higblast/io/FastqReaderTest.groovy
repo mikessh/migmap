@@ -16,27 +16,22 @@
 
 package com.antigenomics.higblast.io
 
-import com.antigenomics.higblast.OutputPort
-import com.antigenomics.higblast.Util
+import org.junit.Test
 
-class FastqReader implements OutputPort<Read> {
-    final BufferedReader reader
+class FastqReaderTest {
+    @Test
+    void test() {
+        def reader = new FastqReader("sample.fastq.gz", true)
 
-    FastqReader(String fileName, boolean resource = false) {
-        reader = Util.getReader(fileName, resource)
-    }
-
-    @Override
-    synchronized Read take() {
-        def header = reader.readLine()
-        if (!header) {
-            return null
+        def nReads = 0
+        def read
+        while ((read = reader.take()) != null) {
+            assert read.header && read.header.length() > 0
+            assert read.seq && read.seq.length() > 0
+            assert read.qual && read.qual.length() > 0
+            nReads++
         }
 
-        def seq = reader.readLine()
-        reader.readLine()
-        def qual = reader.readLine()
-
-        new Read(header, seq, qual)
+        assert nReads == 1000
     }
 }

@@ -16,20 +16,15 @@
 
 package com.antigenomics.higblast.io
 
-import cc.redberry.pipe.OutputPortCloseable
+import com.antigenomics.higblast.OutputPort
 import com.antigenomics.higblast.Util
 
-class FastaReader implements OutputPortCloseable<Read> {
+class FastaReader implements OutputPort<Read> {
     final BufferedReader reader
     String header = ""
 
-    FastaReader(String fileName) {
-        reader = Util.getReader(fileName)
-    }
-
-    @Override
-    void close() {
-        reader.close()
+    FastaReader(String fileName, boolean resource = false) {
+        reader = Util.getReader(fileName, resource)
     }
 
     @Override
