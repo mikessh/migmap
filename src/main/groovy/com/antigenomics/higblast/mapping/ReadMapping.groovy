@@ -18,6 +18,7 @@ package com.antigenomics.higblast.mapping
 
 import com.antigenomics.higblast.Util
 import com.antigenomics.higblast.io.Read
+import com.antigenomics.higblast.mutation.MutationType
 
 class ReadMapping {
     final Mapping mapping
@@ -45,7 +46,7 @@ class ReadMapping {
             this.mutationQual = new byte[mapping.mutations.size()]
 
             mapping.mutations.eachWithIndex { it, i ->
-                mutationQual[i] = read.qualAt(it.posInRead)
+                mutationQual[i] = it.type == MutationType.Substitution ? read.qualAt(it.posInRead) : Util.MAX_QUAL
             }
 
             def cdrMarkup = mapping.cdr3Markup
