@@ -61,7 +61,7 @@ class ReadMapping {
 
                         if (cdrMarkup.vEnd <= cdrMarkup.dStart) {
                             ((regionMarkup.cdr3Start + cdrMarkup.vEnd)..<(regionMarkup.cdr3Start + cdrMarkup.dStart)).each {
-                                cdrInsertQual[i++] = read.qualAt(it) // todo: exception here
+                                cdrInsertQual[i++] = read.qualAt(it)
                             }
                         }
 
@@ -87,12 +87,15 @@ class ReadMapping {
             } else {
                 this.cdrInsertQual = new byte[0]
             }
-
         } else {
             this.cdr3nt = null
             this.mutationQual = null
             this.cdrInsertQual = null
         }
+    }
+
+    boolean isMapped() {
+        mapping != null
     }
 
     @Override

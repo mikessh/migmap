@@ -16,21 +16,34 @@
 
 package com.antigenomics.higblast.clonotype
 
-import com.antigenomics.higblast.genomic.Segment
+import com.antigenomics.higblast.genomic.VSegment
+import com.antigenomics.higblast.mapping.Mapping
 import com.antigenomics.higblast.mapping.ReadMapping
 import com.antigenomics.higblast.mutation.Mutation
 
 class ClonotypeKey {
     final String cdr3nt
-    final Segment vSegment, dSegment, jSegment
-    final List<Mutation> mutations
+    protected final Mapping representativeMapping
 
     ClonotypeKey(ReadMapping readMapping) {
         this.cdr3nt = readMapping.cdr3nt
-        this.vSegment = readMapping.mapping.vSegments[0]
-        this.dSegment = readMapping.mapping.dSegments[0]
-        this.jSegment = readMapping.mapping.jSegments[0]
-        this.mutations = readMapping.mapping.mutations
+        this.representativeMapping = readMapping.mapping
+    }
+
+    VSegment getvSegment() {
+        representativeMapping.vSegments[0]
+    }
+
+    VSegment getdSegment() {
+        representativeMapping.dSegments[0]
+    }
+
+    VSegment getjSegment() {
+        representativeMapping.jSegments[0]
+    }
+
+    List<Mutation> getMutations() {
+        representativeMapping.mutations
     }
 
     @Override

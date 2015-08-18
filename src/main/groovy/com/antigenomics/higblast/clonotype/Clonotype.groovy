@@ -28,6 +28,7 @@ class Clonotype implements Comparable<Clonotype> {
     final double freq
     final byte minQual
     final byte[] cdrInsertQual, mutationQual
+    final boolean hasCdr3, complete, inFrame, noStop
 
     Clonotype(ClonotypeKey key, ClonotypeData data, long total) {
         this.cdr3nt = key.cdr3nt
@@ -51,6 +52,9 @@ class Clonotype implements Comparable<Clonotype> {
             minQual = Math.min(qual, minQual)
         }
         this.minQual = minQual
+        this.hasCdr3 = key.representativeMapping.hasCdr3
+        this.inFrame = key.representativeMapping.inFrame
+        this.complete = key.representativeMapping.complete
     }
 
     @Override

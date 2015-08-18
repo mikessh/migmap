@@ -23,11 +23,12 @@ import com.antigenomics.higblast.mapping.ReadMapping
 class ClonotypeOutput implements InputPort<ReadMapping> {
     final ClonotypeAccumulator clonotypeAccumulator = new ClonotypeAccumulator()
     final PlainTextOutput plainTextOutput
-    final byte qualThreshold
+    final ClonotypeFilter clonotypeFilter
 
-    ClonotypeOutput(PlainTextOutput plainTextOutput, byte qualThreshold) {
+    ClonotypeOutput(PlainTextOutput plainTextOutput,
+                    ClonotypeFilter clonotypeFilter = new ClonotypeFilter()) {
         this.plainTextOutput = plainTextOutput
-        this.qualThreshold = qualThreshold
+        this.clonotypeFilter = clonotypeFilter
     }
 
     @Override
@@ -40,7 +41,7 @@ class ClonotypeOutput implements InputPort<ReadMapping> {
         clonotypeAccumulator.clonotypeMap.collect {
             new Clonotype(it.key, it.value, clonotypeAccumulator.total)
         }.sort().each {
-            if (it.minQual >= qualThreshold) {
+            if (clonotypeFilter.pass(it)) {
                 plainTextOutput.put(it.toString())
             }
         }
