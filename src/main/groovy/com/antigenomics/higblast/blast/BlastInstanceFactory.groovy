@@ -27,14 +27,14 @@ class BlastInstanceFactory {
     final SegmentDatabase segmentDatabase
 
     BlastInstanceFactory(String dataBundlePath,
-                         String species, Set<String> genes,
+                         String species, List<String> genes,
                          boolean allAlleles, boolean useKabat) {
         this.segmentDatabase = new SegmentDatabase(dataBundlePath, species, genes, allAlleles, useKabat)
         this.parser = new BlastParser(segmentDatabase)
 
         def OPTS = ["SEGM_OPT"  :
                             ["v", "d", "j"].collect { segment ->
-                                "-germline_db_${segment.toUpperCase()} $segmentDatabase.dbPath/$segment"
+                                "-germline_db_${segment.toUpperCase()} $segmentDatabase.databaseTempPath/$segment"
                             },
 
                     //"AUX_OPT"   :

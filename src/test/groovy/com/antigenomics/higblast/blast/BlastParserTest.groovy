@@ -22,7 +22,7 @@ import org.junit.Test
 class BlastParserTest {
     @Test
     void exactTest() {
-        def segmentDatabase = new SegmentDatabase("data/", "human", ["IGH"] as Set<String>, true, false)
+        def segmentDatabase = new SegmentDatabase("data/", "human", ["IGH"], true, false)
         def parser = new BlastParser(segmentDatabase)
 
         def chunk = "# IGBLASTN 2.2.29+\n" +

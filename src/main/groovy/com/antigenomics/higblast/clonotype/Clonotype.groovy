@@ -64,7 +64,7 @@ class Clonotype implements Comparable<Clonotype> {
         } else {
             this.cdr3aa = Util.MY_NA
         }
-        
+
         this.inFrame = key.representativeMapping.inFrame && inFrame
         this.noStop = key.representativeMapping.noStop && noStop
     }
@@ -73,4 +73,6 @@ class Clonotype implements Comparable<Clonotype> {
     int compareTo(Clonotype o) {
         -this.count.compareTo(o.count)
     }
+
+    static final String OUTPUT_HEADER = ""
 }

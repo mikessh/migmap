@@ -157,10 +157,10 @@ class BlastParser {
 
         if (hasCdr3) {
             if (dFound) {
-                mutations.addAll(MutationExtractor.extract(vSegments[1], alignments[1]))
+                mutations.addAll(MutationExtractor.extract(dSegments[0], alignments[1]))
             }
             if (jFound) {
-                mutations.addAll(MutationExtractor.extract(vSegments[2], alignments[2]))
+                mutations.addAll(MutationExtractor.extract(jSegments[0], alignments[2]))
             }
         }
 

@@ -14,36 +14,28 @@
  * limitations under the License.
  */
 
-package com.antigenomics.higblast.clonotype
 
-import com.antigenomics.higblast.io.InputPort
-import com.antigenomics.higblast.io.PlainTextOutput
+package com.antigenomics.higblast.io
+
 import com.antigenomics.higblast.mapping.ReadMapping
 
-class ClonotypeOutput implements InputPort<ReadMapping> {
-    final ClonotypeAccumulator clonotypeAccumulator = new ClonotypeAccumulator()
+class ReadMappingOutput implements InputPort<ReadMapping> {
     final PlainTextOutput plainTextOutput
-    final ClonotypeFilter clonotypeFilter
 
-    ClonotypeOutput(PlainTextOutput plainTextOutput,
-                    ClonotypeFilter clonotypeFilter = new ClonotypeFilter()) {
+    ReadMappingOutput(PlainTextOutput plainTextOutput) {
         this.plainTextOutput = plainTextOutput
-        this.clonotypeFilter = clonotypeFilter
+        plainTextOutput.println(ReadMapping.OUTPUT_HEADER)
     }
 
     @Override
     void put(ReadMapping obj) {
-        clonotypeAccumulator.put(obj)
+        if (obj.mapped) {
+            plainTextOutput.put(obj.toString())
+        }
     }
 
     @Override
     void close() {
-        clonotypeAccumulator.clonotypeMap.collect {
-            new Clonotype(it.key, it.value, clonotypeAccumulator.total)
-        }.sort().each {
-            if (clonotypeFilter.pass(it)) {
-                plainTextOutput.put(it.toString())
-            }
-        }
+        plainTextOutput.close()
     }
 }

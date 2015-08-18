@@ -45,7 +45,7 @@ class BlastInstanceTest {
 
     @Test
     void singleQueryTest() {
-        def factory = new BlastInstanceFactory("data/", "human", new HashSet<String>(["IGH"]), true, false)
+        def factory = new BlastInstanceFactory("data/", "human", ["IGH"], true, false)
         def instance = factory.create()
 
         def read = new Read(
@@ -83,7 +83,7 @@ class BlastInstanceTest {
     @Test
     void multiQueryTest() {
         int nQueries = 100
-        def factory = new BlastInstanceFactory("data/", "human", new HashSet<String>(["IGH"]), true, false)
+        def factory = new BlastInstanceFactory("data/", "human", ["IGH"], true, false)
         def instance = factory.create()
 
         def readsIds = new HashSet<String>()

@@ -28,7 +28,7 @@ class ClonotypeAccumulator implements InputPort<ReadMapping> {
 
     @Override
     void put(ReadMapping readMapping) {
-        if (readMapping.mapped) {
+        if(readMapping.mapped) {
             ClonotypeData clonotypeData = clonotypeMap.putIfAbsent(new ClonotypeKey(readMapping),
                     new ClonotypeData(readMapping))
             if (clonotypeData) {

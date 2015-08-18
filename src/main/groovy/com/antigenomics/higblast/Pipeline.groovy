@@ -31,19 +31,21 @@ class Pipeline {
                              mappedCounter = new AtomicLong(),
                              cdr3FoundCounter = new AtomicLong()
     final long limit
+    final int nThreads
     final OutputPort<Read> input
     final BlastInstanceFactory blastInstanceFactory
     final InputPort<ReadMapping> output
 
     Pipeline(OutputPort<Read> input, BlastInstanceFactory blastInstanceFactory,
-             InputPort<ReadMapping> output, long limit = -1) {
+             InputPort<ReadMapping> output, long limit = -1, int nThreads = RuntimeInfo.N_THREADS) {
         this.input = input
         this.blastInstanceFactory = blastInstanceFactory
         this.output = output
         this.limit = limit < 0 ? Long.MAX_VALUE : limit
+        this.nThreads = nThreads
     }
 
-    void run(int nThreads = RuntimeInfo.N_THREADS) {
+    void run() {
         def threads = new Thread[2 * nThreads]
         def instances = new BlastInstance[nThreads]
 

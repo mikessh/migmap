@@ -18,9 +18,7 @@ package com.antigenomics.higblast
 
 class RuntimeInfo {
     static final boolean WIN = System.properties['os.name'].toLowerCase().contains('windows')
-    static final int N_THREADS = Runtime.runtime.availableProcessors()
-    //static final String HOME = new File(Main.getClass().protectionDomain.codeSource.location.path).parent.
-    //        replaceAll("%20", " ")
+    static int N_THREADS = Runtime.runtime.availableProcessors()
     static String BLAST_HOME = ""
 
     static String wrapCommand(String command) {
@@ -33,5 +31,17 @@ class RuntimeInfo {
 
     static String getIgBlast() {
         wrapCommand("igblastn")
+    }
+
+    static boolean check() {
+        try {
+            makeDb.execute()
+            igBlast.execute()
+        } catch (Exception e) {
+            Util.report("[ERROR] Unable to run IGBLAST binaries. Error:\n${e.toString()}", 1)
+            return false
+        }
+
+        true
     }
 }

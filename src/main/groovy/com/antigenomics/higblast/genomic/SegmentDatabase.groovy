@@ -20,7 +20,7 @@ import com.antigenomics.higblast.RuntimeInfo
 import com.antigenomics.higblast.Util
 
 class SegmentDatabase {
-    final String dbPath
+    final String databaseTempPath
     final Map<String, Segment> segments = new HashMap<>()
     final boolean hasD
     final int vSegments, dSegments, jSegments, vSegmentsNoMarkup
@@ -33,8 +33,9 @@ class SegmentDatabase {
              "rhesus_monkey": "MacacaMulatta"]
 
     SegmentDatabase(String dataBundlePath,
-                    String species, Set<String> genes,
+                    String species, List<String> genes,
                     boolean allAlleles, boolean useKabat) {
+        genes = genes.unique()
 
         def speciesAlias = SPECIES_ALIAS[species]
 
@@ -97,7 +98,7 @@ class SegmentDatabase {
         }
 
         this.hasD = hasD
-        this.dbPath = dataBundlePath + "/database-" + UUID.randomUUID().toString()
+        this.databaseTempPath = dataBundlePath + "/database-" + UUID.randomUUID().toString()
         this.vSegments = vSegments
         this.dSegments = dSegments
         this.jSegments = jSegments
@@ -106,11 +107,11 @@ class SegmentDatabase {
     }
 
     void makeBlastDb() {
-        new File(dbPath).mkdir()
+        new File(databaseTempPath).mkdir()
 
-        new File("$dbPath/v.fa").withPrintWriter { pwV ->
-            new File("$dbPath/d.fa").withPrintWriter { pwD ->
-                new File("$dbPath/j.fa").withPrintWriter { pwJ ->
+        new File("$databaseTempPath/v.fa").withPrintWriter { pwV ->
+            new File("$databaseTempPath/d.fa").withPrintWriter { pwD ->
+                new File("$databaseTempPath/j.fa").withPrintWriter { pwJ ->
                     segments.values().each {
                         switch (it.type) {
                             case SegmentType.V:
@@ -131,11 +132,11 @@ class SegmentDatabase {
         }
 
         ["v", "d", "j"].each {
-            "$RuntimeInfo.makeDb -parse_seqids -dbtype nucl -in $dbPath/${it}.fa -out $dbPath/$it".execute().waitFor()
+            "$RuntimeInfo.makeDb -parse_seqids -dbtype nucl -in $databaseTempPath/${it}.fa -out $databaseTempPath/$it".execute().waitFor()
         }
     }
 
     void clearBlastDb() {
-        new File(dbPath).deleteDir()
+        new File(databaseTempPath).deleteDir()
     }
 }

@@ -16,12 +16,8 @@
 
 package com.antigenomics.higblast.io
 
-import com.antigenomics.higblast.io.PlainTextOutput
-
 class FileOutput extends PlainTextOutput {
-    FileOutput(OutputStream stream, String header) {
-        super(stream)
-
-        writer.println(header)
+    FileOutput(String fileName) {
+        super(new FileOutputStream(fileName))
     }
 }

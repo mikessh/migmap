@@ -25,7 +25,7 @@ class PipelineTest {
     @Test
     void sampleTest() {
         def reader = new FastqReader("sample.fastq.gz", true)
-        def factory = new BlastInstanceFactory("data/", "human", new HashSet<String>(["IGH"]), true, false)
+        def factory = new BlastInstanceFactory("data/", "human", ["IGH"], true, false)
 
         def pipeline = new Pipeline(reader, factory, DummyOutput.INSTANCE)
 
@@ -35,5 +35,4 @@ class PipelineTest {
         assert pipeline.mappedRatio > 0.95
         assert pipeline.cdr3FoundRatio > 0.90
     }
-
 }

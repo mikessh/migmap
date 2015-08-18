@@ -29,7 +29,7 @@ class BlastInstanceFactoryTest {
 
     @Test
     void createTest() {
-        def factory = new BlastInstanceFactory("data/", "human", new HashSet<String>(["TRB"]), true, false)
+        def factory = new BlastInstanceFactory("data/", "human", ["TRB"], true, false)
         def instances = (1..RuntimeInfo.N_THREADS).collect { factory.create() }
         instances.each { BlastInstance it -> it.put(null); it.close() }
         factory.segmentDatabase.clearBlastDb()

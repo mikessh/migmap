@@ -25,7 +25,7 @@ class SegmentDatabaseTest {
             println "Loading data for $it"
             
             def segmentDatabase = new SegmentDatabase("data/", it, ["TRA", "TRB", "TRG", "TRD",
-                                                          "IGH", "IGK", "IGL"] as Set<String>, true, false)
+                                                          "IGH", "IGK", "IGL"], true, false)
 
             assert !segmentDatabase.segments.isEmpty()
         }
@@ -33,7 +33,7 @@ class SegmentDatabaseTest {
 
     @Test
     void loadTest() {
-        def segmentDatabase = new SegmentDatabase("data/", "human", ["IGH"] as Set<String>, true, false)
+        def segmentDatabase = new SegmentDatabase("data/", "human", ["IGH"], true, false)
 
         assert !segmentDatabase.segments.isEmpty()
 
@@ -53,19 +53,19 @@ class SegmentDatabaseTest {
 
     @Test
     void makeDbTest() {
-        def segmentDatabase = new SegmentDatabase("data/", "human", ["TRA"] as Set<String>, true, false)
+        def segmentDatabase = new SegmentDatabase("data/", "human", ["TRA"], true, false)
         segmentDatabase.makeBlastDb()
 
-        assert new File(segmentDatabase.dbPath).exists()
-        assert new File("$segmentDatabase.dbPath/v.nhr").exists()
-        assert new File("$segmentDatabase.dbPath/d.nhr").exists()
+        assert new File(segmentDatabase.databaseTempPath).exists()
+        assert new File("$segmentDatabase.databaseTempPath/v.nhr").exists()
+        assert new File("$segmentDatabase.databaseTempPath/d.nhr").exists()
 
         segmentDatabase.clearBlastDb()
     }
 
     @Test
     void markupTest() {
-        def segmentDatabase = new SegmentDatabase("data/", "human", ["IGH"] as Set<String>, true, false)
+        def segmentDatabase = new SegmentDatabase("data/", "human", ["IGH"], true, false)
         def segment = segmentDatabase.segments["IGHV1-18*01"]
 
         assert (segment as VSegment).cdr1start == 75

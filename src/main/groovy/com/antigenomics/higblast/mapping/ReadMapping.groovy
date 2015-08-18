@@ -102,4 +102,6 @@ class ReadMapping {
     String toString() {
         header
     }
+    
+    static final String OUTPUT_HEADER = ""
 }
