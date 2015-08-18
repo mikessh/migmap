@@ -18,10 +18,11 @@ package com.antigenomics.higblast.mutation
 
 import com.antigenomics.higblast.Util
 import com.antigenomics.higblast.blast.Alignment
-import com.antigenomics.higblast.genomic.JSegment
 import com.antigenomics.higblast.genomic.Segment
+import com.antigenomics.higblast.genomic.SegmentType
 import com.antigenomics.higblast.genomic.VSegment
 
+import static com.antigenomics.higblast.mutation.MutationType.Deletion
 import static com.antigenomics.higblast.mutation.MutationType.None
 
 class MutationExtractor {
@@ -47,9 +48,9 @@ class MutationExtractor {
             char q = alignment.qseq.charAt(i), s = alignment.sseq.charAt(i)
 
             if (q == Util.GAP) {
-                if (type != MutationType.Deletion) {
+                if (type != Deletion) {
                     writeMutation()
-                    type = MutationType.Deletion
+                    type = Deletion
                     start = i
                     end = i + 1
                 } else {
@@ -98,21 +99,25 @@ class MutationExtractor {
         // todo: cdr3start >= 0 !!!!
         def mutations = extract(alignment)
 
-        if (segment instanceof VSegment) {
-            mutations.each {
-                it.region = segment
-                it.subRegion = deduceSubRegionV(segment as VSegment, it.start)
-            }
-        } else if (segment instanceof JSegment) {
-            mutations.each {
-                it.region = segment
-                it.subRegion = (it.start > segment.referencePoint + 3) ? SubRegion.FR4 : SubRegion.CDR3
-            }
-        } else {
-            mutations.each {
-                it.region = segment
-                it.subRegion = SubRegion.CDR3
-            }
+        switch (segment.type) {
+            case SegmentType.V:
+                mutations.each {
+                    it.region = segment
+                    it.subRegion = deduceSubRegionV(segment as VSegment, it.start)
+                }
+                break
+            case SegmentType.J:
+                mutations.each {
+                    it.region = segment
+                    it.subRegion = (it.start > segment.referencePoint + 3) ? SubRegion.FR4 : SubRegion.CDR3
+                }
+                break
+            case SegmentType.D:
+                mutations.each {
+                    it.region = segment
+                    it.subRegion = SubRegion.CDR3
+                }
+                break
         }
 
         /*

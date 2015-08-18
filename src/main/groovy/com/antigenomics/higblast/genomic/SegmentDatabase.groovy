@@ -70,21 +70,20 @@ class SegmentDatabase {
                         if (markup) {
                             int referencePoint = splitLine[4].toInteger()
                             assert referencePoint == markup[4] // check if two reference files are concordant
-                            segments.put(segmentName, new VSegment(name: segmentName, sequence: splitLine[5],
-                                    cdr1start: markup[0], cdr1end: markup[1], cdr2start: markup[2], cdr2end: markup[3],
-                                    referencePoint: referencePoint))
+                            segments.put(segmentName, new VSegment(segmentName, splitLine[5], referencePoint,
+                                    markup[0], markup[1], markup[2], markup[3]))
                             vSegments++
                         } else {
                             vSegmentsNoMarkup++
                             Util.report("[WARNING] No markup for $segmentName V segment.", 3)
                         }
                     } else if (splitLine[2].startsWith("D")) {
-                        segments.put(segmentName, new DSegment(name: segmentName, sequence: splitLine[5]))
+                        segments.put(segmentName, new DSegment(segmentName, splitLine[5]))
                         hasD = true
                         dSegments++
                     } else if (splitLine[2].startsWith("J")) {
-                        segments.put(segmentName, new JSegment(name: segmentName, sequence: splitLine[5],
-                                referencePoint: splitLine[4].toInteger()))
+                        segments.put(segmentName, new JSegment(segmentName, splitLine[5],
+                                splitLine[4].toInteger()))
                         jSegments++
                     }
                 }
@@ -94,7 +93,7 @@ class SegmentDatabase {
         Util.report("Loaded database. #v=$vSegments,#d=$dSegments,#j=$jSegments.", 2)
 
         if (!hasD) {
-            segments.put(".", new DSegment(name: ".", sequence: "GGGGGGGGGGGGGGG"))
+            segments.put(DSegment.DUMMY.name, DSegment.DUMMY)
         }
 
         this.hasD = hasD
@@ -113,12 +112,19 @@ class SegmentDatabase {
             new File("$dbPath/d.fa").withPrintWriter { pwD ->
                 new File("$dbPath/j.fa").withPrintWriter { pwJ ->
                     segments.values().each {
-                        if (it instanceof VSegment)
-                            pwV.println(it.toFastaString())
-                        else if (it instanceof JSegment)
-                            pwJ.println(it.toFastaString())
-                        else if (it instanceof DSegment)
-                            pwD.println(it.toFastaString())
+                        switch (it.type) {
+                            case SegmentType.V:
+                                pwV.println(it.toFastaString())
+                                break
+
+                            case SegmentType.J:
+                                pwJ.println(it.toFastaString())
+                                break
+
+                            case SegmentType.D:
+                                pwD.println(it.toFastaString())
+                                break
+                        }
                     }
                 }
             }

@@ -16,5 +16,12 @@
 
 package com.antigenomics.higblast.genomic
 
+import com.antigenomics.higblast.Util
+
 class JSegment extends Segment {
+    static final JSegment DUMMY = new JSegment(Util.MY_NA, "AAAAAAAAAAAAAAAAAAAAAAAAA", -1)
+
+    JSegment(String name, String sequence, int referencePoint) {
+        super(SegmentType.J,name, sequence, referencePoint)
+    }
 }

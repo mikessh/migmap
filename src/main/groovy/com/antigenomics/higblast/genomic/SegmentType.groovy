@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-{year} Mikhail Shugay (mikhail.shugay@gmail.com)
+ * Copyright 2013-2015 Mikhail Shugay (mikhail.shugay@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,6 @@
 
 package com.antigenomics.higblast.genomic
 
-class VSegment extends Segment {
-    final int cdr1start, cdr1end, cdr2start, cdr2end
-
-    VSegment(String name, String sequence, int referencePoint,
-             cdr1start, cdr1end, cdr2start, cdr2end) {
-        super(SegmentType.V, name, sequence, referencePoint)
-        this.cdr1start = cdr1start
-        this.cdr1end = cdr1end
-        this.cdr2start = cdr2start
-        this.cdr2end = cdr2end
-    }
+enum SegmentType {
+    V, D, J
 }

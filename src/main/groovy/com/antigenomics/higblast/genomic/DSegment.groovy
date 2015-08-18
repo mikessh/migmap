@@ -16,5 +16,12 @@
 
 package com.antigenomics.higblast.genomic
 
+import com.antigenomics.higblast.Util
+
 class DSegment extends Segment {
+    static final DSegment DUMMY = new DSegment(Util.MY_NA, "AAAAAAAAAAAAAAAAAAAAAAAAA")
+
+    DSegment(String name, String sequence) {
+        super(SegmentType.D, name, sequence, -1)
+    }
 }

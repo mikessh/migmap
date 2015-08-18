@@ -17,8 +17,16 @@
 package com.antigenomics.higblast.genomic
 
 class Segment {
-    String name, sequence
-    int referencePoint
+    final String name, sequence
+    final int referencePoint
+    final SegmentType type
+
+    Segment(SegmentType type, String name, String sequence, int referencePoint) {
+        this.type = type
+        this.name = name
+        this.sequence = sequence
+        this.referencePoint = referencePoint
+    }
 
     String toFastaString() {
         ">$name\n$sequence"
