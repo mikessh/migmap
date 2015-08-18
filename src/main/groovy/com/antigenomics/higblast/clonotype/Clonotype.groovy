@@ -21,7 +21,7 @@ import com.antigenomics.higblast.genomic.Segment
 import com.antigenomics.higblast.mutation.Mutation
 
 class Clonotype implements Comparable<Clonotype> {
-    final String cdr3nt
+    final String cdr3nt, cdr3aa
     final Segment vSegment, dSegment, jSegment
     final List<Mutation> mutations
     final long count
@@ -53,8 +53,20 @@ class Clonotype implements Comparable<Clonotype> {
         }
         this.minQual = minQual
         this.hasCdr3 = key.representativeMapping.hasCdr3
-        this.inFrame = key.representativeMapping.inFrame
         this.complete = key.representativeMapping.complete
+
+        boolean inFrame, noStop
+
+        if (hasCdr3) {
+            this.cdr3aa = complete ? Util.translateCdr(cdr3nt) : Util.translateLinear(cdr3nt)
+            inFrame = !cdr3aa.contains("?")
+            noStop = !cdr3aa.contains("*")
+        } else {
+            this.cdr3aa = Util.MY_NA
+        }
+        
+        this.inFrame = key.representativeMapping.inFrame && inFrame
+        this.noStop = key.representativeMapping.noStop && noStop
     }
 
     @Override
