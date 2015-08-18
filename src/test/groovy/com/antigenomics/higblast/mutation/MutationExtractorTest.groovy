@@ -35,7 +35,7 @@ class MutationExtractorTest {
                 "AAATCGATCGAAACTGCTACGACTGC---ACTCAGT")
 
         def posInReadExp = [1, 11, 24, 32]
-        def expectedCodes = ["S1:A>G", "D11:AA>--", "I26:--->ATG", "S31:G>A"]
+        def expectedCodes = ["S1:A>G", "D11:AA", "I26:ATG", "S31:G>A"]
         def mutations = MutationExtractor.extract(alignment)
 
         println mutations

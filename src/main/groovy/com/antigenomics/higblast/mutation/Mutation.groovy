@@ -31,7 +31,8 @@ class Mutation {
     SubRegion subRegion
 
     Mutation(MutationType type,
-             int start, int end, int startInRead, int endInRead, String ntFrom, String ntTo) {
+             int start, int end, int startInRead, int endInRead,
+             String ntFrom, String ntTo) {
         this.type = type
         this.end = end
         this.startInRead = startInRead
@@ -52,7 +53,10 @@ class Mutation {
     @Override
     public String toString() {
         // insertion occur before "position", so that seq[position, ...] is shifted forward
-        type.shortName + pos + ":" + ntFrom + ">" + ntTo
+        type.shortName + pos + ":" +
+                (type == MutationType.Insertion ? "" : ntFrom) +
+                (type == MutationType.Substitution ? ">" : "") +
+                (type == MutationType.Deletion ? "" : ntTo)
     }
 
     @Override
