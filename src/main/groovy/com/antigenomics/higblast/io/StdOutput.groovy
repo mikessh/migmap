@@ -16,23 +16,10 @@
 
 package com.antigenomics.higblast.io
 
-import com.antigenomics.higblast.InputPort
-import com.antigenomics.higblast.mapping.ReadMapping
+import com.antigenomics.higblast.io.PlainTextOutput
 
-class StdOutput implements InputPort<ReadMapping> {
-
-    final static StdOutput INSTANCE = new StdOutput()
-
-    private StdOutput() {
-
-    }
-
-    @Override
-    void put(ReadMapping obj) {
-        println obj.toString()
-    }
-
-    @Override
-    void close() {
+class StdOutput extends PlainTextOutput {
+    StdOutput() {
+        super(System.out)
     }
 }

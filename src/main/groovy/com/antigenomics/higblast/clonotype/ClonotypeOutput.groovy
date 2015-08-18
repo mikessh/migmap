@@ -16,8 +16,8 @@
 
 package com.antigenomics.higblast.clonotype
 
-import com.antigenomics.higblast.InputPort
-import com.antigenomics.higblast.PlainTextOutput
+import com.antigenomics.higblast.io.InputPort
+import com.antigenomics.higblast.io.PlainTextOutput
 import com.antigenomics.higblast.mapping.ReadMapping
 
 class ClonotypeOutput implements InputPort<ReadMapping> {

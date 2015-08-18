@@ -18,6 +18,8 @@ package com.antigenomics.higblast
 
 import com.antigenomics.higblast.blast.BlastInstance
 import com.antigenomics.higblast.blast.BlastInstanceFactory
+import com.antigenomics.higblast.io.InputPort
+import com.antigenomics.higblast.io.OutputPort
 import com.antigenomics.higblast.io.Read
 import com.antigenomics.higblast.mapping.ReadMapping
 
@@ -44,6 +46,8 @@ class Pipeline {
     void run(int nThreads = RuntimeInfo.N_THREADS) {
         def threads = new Thread[2 * nThreads]
         def instances = new BlastInstance[nThreads]
+
+        Util.report("Started analysis", 2)
 
         // read >> blast instance threads
         (0..<nThreads).each {
@@ -86,8 +90,33 @@ class Pipeline {
             })
         }
 
+        def reporter = new Thread(new Runnable() {
+            @Override
+            void run() {
+                try {
+                    while (!Thread.currentThread().isInterrupted()) {
+                        Util.report("Loaded $inputCount reads, processed $processedCount. " +
+                                (processedCount > 0L ?
+                                        ("Mapping efficincy ${(int) (mappedRatio * 10000) / 100}% " +
+                                                "(with CDR3 ${(int) (cdr3FoundRatio * 10000) / 100}%)") :
+                                        ""), 2)
+                        Thread.sleep(10000)
+                    }
+                } catch (InterruptedException e) {
+
+                }
+            }
+        })
+
         threads.each { it.start() }
+
+        reporter.start()
+
         threads.each { it.join() }
+
+        reporter.interrupt()
+
+        Util.report("Finished analysis. Reads mapped $mappedCount (with CDR3 $cdr3FoundCount) of $processedCount", 2)
 
         output.close()
     }

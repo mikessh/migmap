@@ -23,6 +23,7 @@ class SegmentDatabase {
     final String dbPath
     final Map<String, Segment> segments = new HashMap<>()
     final boolean hasD
+    final int vSegments, dSegments, jSegments, vSegmentsNoMarkup
 
     static final SPECIES_ALIAS =
             ["human"        : "HomoSapiens",
@@ -74,7 +75,8 @@ class SegmentDatabase {
                                     referencePoint: referencePoint))
                             vSegments++
                         } else {
-                            vSegmentsNoMarkup
+                            vSegmentsNoMarkup++
+                            Util.report("[WARNING] No markup for $segmentName V segment.", 3)
                         }
                     } else if (splitLine[2].startsWith("D")) {
                         segments.put(segmentName, new DSegment(name: segmentName, sequence: splitLine[5]))
@@ -89,7 +91,7 @@ class SegmentDatabase {
             }
         }
 
-        println "Loaded database. #v=$vSegments,#d=$dSegments,#j=$jSegments. No markup for $vSegmentsNoMarkup v"
+        Util.report("Loaded database. #v=$vSegments,#d=$dSegments,#j=$jSegments.", 2)
 
         if (!hasD) {
             segments.put(".", new DSegment(name: ".", sequence: "GGGGGGGGGGGGGGG"))
@@ -97,6 +99,11 @@ class SegmentDatabase {
 
         this.hasD = hasD
         this.dbPath = dataBundlePath + "/database-" + UUID.randomUUID().toString()
+        this.vSegments = vSegments
+        this.dSegments = dSegments
+        this.jSegments = jSegments
+        this.vSegmentsNoMarkup = vSegmentsNoMarkup
+
     }
 
     void makeBlastDb() {

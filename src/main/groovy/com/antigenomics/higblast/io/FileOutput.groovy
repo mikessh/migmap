@@ -14,10 +14,14 @@
  * limitations under the License.
  */
 
-package com.antigenomics.higblast
+package com.antigenomics.higblast.io
 
-interface InputPort<T> {
-    void put(T obj)
+import com.antigenomics.higblast.io.PlainTextOutput
 
-    void close()
+class FileOutput extends PlainTextOutput {
+    FileOutput(OutputStream stream, String header) {
+        super(stream)
+
+        writer.println(header)
+    }
 }

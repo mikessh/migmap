@@ -14,23 +14,10 @@
  * limitations under the License.
  */
 
-package com.antigenomics.higblast
+package com.antigenomics.higblast.io
 
-class PlainTextOutput implements InputPort<String> {
-    final PrintWriter writer
+interface InputPort<T> {
+    void put(T obj)
 
-    PlainTextOutput(OutputStream stream, String header) {
-        this.writer = new PrintWriter(stream)
-        writer.println(header)
-    }
-
-    @Override
-    void put(String obj) {
-        writer.println(obj)
-    }
-
-    @Override
-    void close() {
-        writer.close()
-    }
+    void close()
 }

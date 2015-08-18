@@ -16,7 +16,7 @@
 
 package com.antigenomics.higblast.clonotype
 
-import com.antigenomics.higblast.InputPort
+import com.antigenomics.higblast.io.InputPort
 import com.antigenomics.higblast.mapping.ReadMapping
 
 import java.util.concurrent.ConcurrentHashMap

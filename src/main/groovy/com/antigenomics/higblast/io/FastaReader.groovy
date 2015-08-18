@@ -16,7 +16,6 @@
 
 package com.antigenomics.higblast.io
 
-import com.antigenomics.higblast.OutputPort
 import com.antigenomics.higblast.Util
 
 class FastaReader implements OutputPort<Read> {

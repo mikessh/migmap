@@ -16,7 +16,6 @@
 
 package com.antigenomics.higblast.io
 
-import com.antigenomics.higblast.InputPort
 import com.antigenomics.higblast.mapping.ReadMapping
 
 class DummyOutput implements InputPort<ReadMapping> {
