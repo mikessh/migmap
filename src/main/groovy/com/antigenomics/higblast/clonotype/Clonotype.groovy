@@ -18,6 +18,7 @@ package com.antigenomics.higblast.clonotype
 
 import com.antigenomics.higblast.Util
 import com.antigenomics.higblast.genomic.Segment
+import com.antigenomics.higblast.mapping.MutationStringifier
 import com.antigenomics.higblast.mutation.Mutation
 
 class Clonotype implements Comparable<Clonotype> {
@@ -74,5 +75,15 @@ class Clonotype implements Comparable<Clonotype> {
         -this.count.compareTo(o.count)
     }
 
-    static final String OUTPUT_HEADER = ""
+    static
+    final String OUTPUT_HEADER = "freq\tcount\tv\td\tj\tcdr3nt\tcdr3aa\t" + MutationStringifier.OUTPUT_HEADER + "\tcdr.insert.qual\tmutations.qual"
+
+    @Override
+    String toString() {
+        [freq, count,
+         vSegment.toString(), dSegment.toString(), jSegment.toString(),
+         cdr3nt, cdr3aa,
+         MutationStringifier.toString(mutations),
+         Util.qualToString(cdrInsertQual), Util.qualToString(mutationQual)].join("\t")
+    }
 }

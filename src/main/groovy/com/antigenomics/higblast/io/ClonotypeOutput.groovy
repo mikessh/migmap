@@ -35,8 +35,8 @@ class ClonotypeOutput implements InputPort<ReadMapping> {
     }
 
     @Override
-    void put(ReadMapping obj) {
-        clonotypeAccumulator.put(obj)
+    void put(ReadMapping readMapping) {
+        clonotypeAccumulator.put(readMapping)
     }
 
     @Override

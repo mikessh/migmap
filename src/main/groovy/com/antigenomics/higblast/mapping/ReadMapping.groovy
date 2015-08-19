@@ -98,10 +98,10 @@ class ReadMapping {
         mapping != null
     }
 
+    static final String OUTPUT_HEADER = "read.header\tcdr3nt\tcdr.insert.qual\tmutations.qual\t" + Mapping.OUTPUT_HEADER
+
     @Override
     String toString() {
-        header
+        [header, cdr3nt, Util.qualToString(cdrInsertQual), Util.qualToString(mutationQual), mapping.toString()].join("\t")
     }
-    
-    static final String OUTPUT_HEADER = ""
 }

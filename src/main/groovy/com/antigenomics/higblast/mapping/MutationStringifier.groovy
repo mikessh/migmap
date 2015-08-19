@@ -16,20 +16,22 @@
 
 package com.antigenomics.higblast.mapping
 
-class Cdr3Markup {
-    final int vEnd, dStart, dEnd, jStart   // within CDR3 coordinates, used for output
+import com.antigenomics.higblast.mutation.Mutation
+import com.antigenomics.higblast.mutation.SubRegion
 
-    Cdr3Markup(int vEnd, int dStart, int dEnd, int jStart) {
-        this.vEnd = vEnd
-        this.dStart = dStart
-        this.dEnd = dEnd
-        this.jStart = jStart
-    }
+class MutationStringifier {
+    static final String OUTPUT_HEADER = SubRegion.REGION_LIST.collect { "mutations." + it }.join("\t")
 
-    static final String OUTPUT_HEADER = "v.end.in.cdr3\td.start.in.cdr3\td.end.in.cdr3\tj.start.in.cdr3"
+    static String toString(List<Mutation> mutations) {
+        def mutationStrings = new String[SubRegion.REGION_LIST.length]
 
-    @Override
-    public String toString() {
-        [vEnd, dStart, dEnd, jStart].join("\t")
+        mutations.each {
+            int order = it.subRegion.order
+            if (mutationStrings[order].length() > 0)
+                mutationStrings[order] += ","
+            mutationStrings[order] += it.toString()
+        }
+
+        mutationStrings.join("\t")
     }
 }

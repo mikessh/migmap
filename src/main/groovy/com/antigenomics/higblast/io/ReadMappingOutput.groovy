@@ -28,9 +28,9 @@ class ReadMappingOutput implements InputPort<ReadMapping> {
     }
 
     @Override
-    void put(ReadMapping obj) {
-        if (obj.mapped) {
-            plainTextOutput.put(obj.toString())
+    void put(ReadMapping readMapping) {
+        if (readMapping.mapped) {
+            plainTextOutput.put(readMapping.toString())
         }
     }
 

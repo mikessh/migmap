@@ -17,5 +17,12 @@
 package com.antigenomics.higblast.mutation
 
 enum SubRegion {
-    FR1, CDR1, FR2, CDR2, FR3, CDR3, FR4
+    FR1(0), CDR1(1), FR2(2), CDR2(3), FR3(4), CDR3(5), FR4(6)
+
+    final int order
+
+    SubRegion(int order) {
+        this.order = order
+    }
+    static final SubRegion[] REGION_LIST = [FR1, CDR1, FR2, CDR2, FR3, CDR3, FR4] as SubRegion[]
 }

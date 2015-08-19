@@ -25,10 +25,10 @@ class Mapping {
     final List<VSegment> vSegments
     final List<DSegment> dSegments
     final List<JSegment> jSegments
-    final boolean rc, complete, hasCdr3, inFrame, noStop, hasD
-    final Cdr3Markup cdr3Markup
     final RegionMarkup regionMarkup
+    final Cdr3Markup cdr3Markup
     final List<Mutation> mutations
+    final boolean rc, complete, hasCdr3, inFrame, noStop, hasD
 
     Mapping(List<VSegment> vSegments, List<DSegment> dSegments, List<JSegment> jSegments,
             RegionMarkup regionMarkup, Cdr3Markup cdr3Markup,
@@ -52,5 +52,21 @@ class Mapping {
         this.inFrame = inFrame
         this.noStop = noStop
         this.hasD = hasD
+    }
+
+    static final String OUTPUT_HEADER = "v.segments\td.segments\tj.segments\t" +
+            RegionMarkup.OUTPUT_HEADER + "\t" +
+            Cdr3Markup.OUTPUT_HEADER + "\t" +
+            MutationStringifier.OUTPUT_HEADER + "\t" +
+            "rc\tcomplete\thas.cdr3\tin.frame\tno.stop"
+
+
+    @Override
+    public String toString() {
+        [vSegments.join(","), dSegments.join(","), jSegments.join(","),
+         regionMarkup.toString(),
+         cdr3Markup.toString(),
+         MutationStringifier.toString(mutations),
+         rc, complete, hasCdr3, inFrame, noStop]
     }
 }

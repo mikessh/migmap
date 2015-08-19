@@ -32,6 +32,10 @@ class Util {
             System.err.println("[${new Date()} HIGBLAST] $message")
         }
     }
+    
+    static String qualToString(byte [] qual) {
+        qual.collect {(char)((int)qual+33)}.join("")
+    }
 
     static InputStream getStream(String fname, boolean resource) {
         resource ? Util.class.classLoader.getResourceAsStream(fname) : new FileInputStream(fname)
