@@ -22,7 +22,7 @@ import org.junit.Test
 class SegmentDatabaseTest {
     @Test
     void massiveLoadTest() {
-        SegmentDatabase.SPECIES_ALIAS.keySet().each {
+        ["human", "mouse", "rat", "rabbit"].each { // todo: monkey
             println "Loading data for $it"
 
             def segmentDatabase = new SegmentDatabase("data/", it, ["TRA", "TRB", "TRG", "TRD",

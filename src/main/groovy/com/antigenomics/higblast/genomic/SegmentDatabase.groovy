@@ -93,6 +93,7 @@ class SegmentDatabase {
         }
 
         Util.report("Loaded database. #v=$vSegments,#d=$dSegments,#j=$jSegments.", 2)
+        //Segments with markup = ${markupMap.size()}", 2)
 
         if (!hasD) {
             segments.put(DSegment.DUMMY.name, DSegment.DUMMY)

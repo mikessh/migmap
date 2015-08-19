@@ -130,7 +130,7 @@ class BlastParser {
             cdr3Start = cdrBounds[2][0].toInteger() - 4
             def jRef = jFound ? jRefSearcher.getJRefPoint(jSegments[0], alignments[2]) : -1
             cdr3End = jRef < 0 ? -1 : jRef + 4
-            delta = vSegments[0].referencePoint - 3 - cdr3Start // offset between V segment and read
+            delta = vSegments[0].referencePoint - 3 - cdr3Start // offset between CDR3 start in germline and read
         }
 
         def hasCdr3 = cdr3Start >= 0, complete = cdr3End >= 0 && hasCdr3

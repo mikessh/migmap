@@ -25,16 +25,16 @@ class Util {
     static final char GAP = '-'
     static final byte MAX_QUAL = 40, MIN_QUAL = 2
     static final int QUAL_OFFSET = 33
-    static int VERBOSITY_LEVEL = 3
+    static int VERBOSITY_LEVEL = 2
 
     static void report(String message, int verbosity = 1) {
         if (verbosity <= VERBOSITY_LEVEL) {
             System.err.println("[${new Date()} HIGBLAST] $message")
         }
     }
-    
-    static String qualToString(byte [] qual) {
-        qual.collect {(char)((int)qual+33)}.join("")
+
+    static String qualToString(byte[] qual) {
+        qual.collect { (char) ((int) qual + 33) }.join("")
     }
 
     static InputStream getStream(String fname, boolean resource) {
