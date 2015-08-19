@@ -14,10 +14,7 @@
  * limitations under the License.
  */
 
-package com.antigenomics.higblast.mapping
-
-import com.antigenomics.higblast.mutation.Mutation
-import com.antigenomics.higblast.mutation.SubRegion
+package com.antigenomics.higblast.mutation
 
 class MutationStringifier {
     static final String OUTPUT_HEADER = SubRegion.REGION_LIST.collect { "mutations." + it }.join("\t")

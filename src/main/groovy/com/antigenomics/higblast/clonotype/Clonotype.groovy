@@ -18,7 +18,7 @@ package com.antigenomics.higblast.clonotype
 
 import com.antigenomics.higblast.Util
 import com.antigenomics.higblast.genomic.Segment
-import com.antigenomics.higblast.mapping.MutationStringifier
+import com.antigenomics.higblast.mutation.MutationStringifier
 import com.antigenomics.higblast.mutation.Mutation
 
 class Clonotype implements Comparable<Clonotype> {

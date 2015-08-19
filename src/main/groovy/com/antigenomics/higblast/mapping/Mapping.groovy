@@ -20,6 +20,7 @@ import com.antigenomics.higblast.genomic.DSegment
 import com.antigenomics.higblast.genomic.JSegment
 import com.antigenomics.higblast.genomic.VSegment
 import com.antigenomics.higblast.mutation.Mutation
+import com.antigenomics.higblast.mutation.MutationStringifier
 
 class Mapping {
     final List<VSegment> vSegments

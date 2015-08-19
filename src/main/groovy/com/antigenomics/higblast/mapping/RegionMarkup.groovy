@@ -17,17 +17,20 @@
 package com.antigenomics.higblast.mapping
 
 class RegionMarkup {
-    final int cdr1Start, cdr1End, cdr2Start, cdr2End, cdr3Start, cdr3End // in read, used for extraction
+    final int cdr1Start, cdr1End, cdr2Start, cdr2End, cdr3Start, cdr3End, dStart, jStart // in read, used for extraction
 
     RegionMarkup(int cdr1Start, int cdr1End,
                  int cdr2Start, int cdr2End,
-                 int cdr3Start, int cdr3End) {
+                 int cdr3Start, int cdr3End,
+                 int dStart, int jStart) {
         this.cdr1Start = cdr1Start
         this.cdr1End = cdr1End
         this.cdr2Start = cdr2Start
         this.cdr2End = cdr2End
         this.cdr3Start = cdr3Start
         this.cdr3End = cdr3End
+        this.dStart = dStart
+        this.jStart = jStart
     }
 
     static final String OUTPUT_HEADER = "cdr1.start.in.read\tcdr1.end.in.read\t" +

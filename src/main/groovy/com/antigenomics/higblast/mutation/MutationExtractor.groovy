@@ -21,11 +21,17 @@ import com.antigenomics.higblast.blast.Alignment
 import com.antigenomics.higblast.genomic.Segment
 import com.antigenomics.higblast.genomic.SegmentType
 import com.antigenomics.higblast.genomic.VSegment
+import com.antigenomics.higblast.mapping.RegionMarkup
 
 import static com.antigenomics.higblast.mutation.MutationType.Deletion
 import static com.antigenomics.higblast.mutation.MutationType.None
 
 class MutationExtractor {
+    final RegionMarkup regionMarkup
+
+    MutationExtractor(RegionMarkup regionMarkup = null) {
+        this.regionMarkup = regionMarkup
+    }
 
     static List<Mutation> extract(Alignment alignment) {
         def mutations = new LinkedList<Mutation>()
@@ -93,10 +99,8 @@ class MutationExtractor {
         mutations
     }
 
-    static List<Mutation> extract(Segment segment,
-                                  Alignment alignment) {
-
-        // todo: cdr3start >= 0 !!!!
+    List<Mutation> extract(Segment segment,
+                           Alignment alignment) {
         def mutations = extract(alignment)
 
         switch (segment.type) {
@@ -110,12 +114,20 @@ class MutationExtractor {
                 mutations.each {
                     it.region = segment
                     it.subRegion = (it.start > segment.referencePoint + 3) ? SubRegion.FR4 : SubRegion.CDR3
+                    if (regionMarkup) {
+                        it.start += regionMarkup.jStart
+                        it.end += regionMarkup.jStart
+                    }
                 }
                 break
             case SegmentType.D:
                 mutations.each {
                     it.region = segment
                     it.subRegion = SubRegion.CDR3
+                    if (regionMarkup) {
+                        it.start += regionMarkup.dStart
+                        it.end += regionMarkup.dStart
+                    }
                 }
                 break
         }

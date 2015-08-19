@@ -37,10 +37,12 @@ class BlastParser {
                         noCdr3 = new AtomicInteger()
     final SegmentDatabase segmentDatabase
     final JRefSearcher jRefSearcher
+    final boolean absoluteMutationCoordinates
 
-    public BlastParser(SegmentDatabase segmentDatabase) {
+    public BlastParser(SegmentDatabase segmentDatabase, boolean absoluteMutationCoordinates = true) {
         this.segmentDatabase = segmentDatabase
         this.jRefSearcher = new JRefSearcher()
+        this.absoluteMutationCoordinates = absoluteMutationCoordinates
     }
 
     Mapping parse(String chunk) {
@@ -110,7 +112,8 @@ class BlastParser {
 
         int cdr1Start = -1, cdr1End = -1,
             cdr2Start = -1, cdr2End = -1,
-            cdr3Start = -1, cdr3End = -1
+            cdr3Start = -1, cdr3End = -1,
+            delta = -1
 
         if (cdrBounds[0]) {
             cdr1Start = cdrBounds[0][0].toInteger() - 1
@@ -127,6 +130,7 @@ class BlastParser {
             cdr3Start = cdrBounds[2][0].toInteger() - 4
             def jRef = jFound ? jRefSearcher.getJRefPoint(jSegments[0], alignments[2]) : -1
             cdr3End = jRef < 0 ? -1 : jRef + 4
+            delta = vSegments[0].referencePoint - 3 - cdr3Start // offset between V segment and read
         }
 
         def hasCdr3 = cdr3Start >= 0, complete = cdr3End >= 0 && hasCdr3
@@ -135,13 +139,15 @@ class BlastParser {
             noCdr3.incrementAndGet()
         }
 
-        def regionMarkup = new RegionMarkup(cdr1Start, cdr1End, cdr2Start, cdr2End, cdr3Start, cdr3End)
+        def regionMarkup = new RegionMarkup(cdr1Start, cdr1End, cdr2Start, cdr2End, cdr3Start, cdr3End,
+                hasCdr3 && dFound ? (delta + alignments[1].qstart) : -1,
+                hasCdr3 ? (delta + alignments[2].qstart) : -1)
 
         // Markup in CDR3 coordinates
         def vCdr3End = hasCdr3 ? (alignments[0].qstart + alignments[0].qseq.length() - cdr3Start) : -1,
             dCdr3Start = hasCdr3 && dFound ? (alignments[1].qstart - cdr3Start) : -1,
             dCdr3End = hasCdr3 && dFound ? (dCdr3Start + alignments[1].qseq.length()) : -1,
-            jCdr3Start = hasCdr3 && jFound ? (alignments[2].qstart - cdr3Start) : -1
+            jCdr3Start = hasCdr3 ? (alignments[2].qstart - cdr3Start) : -1
 
         def cdr3Markup = new Cdr3Markup(vCdr3End, dCdr3Start, dCdr3End, jCdr3Start)
 
@@ -153,15 +159,15 @@ class BlastParser {
                 alignments[0][3],
                 cdr1Start, cdr1End, cdr2Start, cdr2End)*/
 
-        def mutations = MutationExtractor.extract(vSegments[0], alignments[0])
+        def mutationExtractor = new MutationExtractor(absoluteMutationCoordinates ? regionMarkup : null)
+
+        def mutations = mutationExtractor.extract(vSegments[0], alignments[0])
 
         if (hasCdr3) {
             if (dFound) {
-                mutations.addAll(MutationExtractor.extract(dSegments[0], alignments[1]))
+                mutations.addAll(mutationExtractor.extract(dSegments[0], alignments[1]))
             }
-            if (jFound) {
-                mutations.addAll(MutationExtractor.extract(jSegments[0], alignments[2]))
-            }
+            mutations.addAll(mutationExtractor.extract(jSegments[0], alignments[2]))
         }
 
         return new Mapping(vSegments, dSegments, jSegments,
