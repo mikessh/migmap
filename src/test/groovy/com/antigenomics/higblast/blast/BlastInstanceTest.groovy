@@ -16,7 +16,9 @@
 
 package com.antigenomics.higblast.blast
 
+import com.antigenomics.higblast.genomic.SegmentDatabase
 import com.antigenomics.higblast.io.Read
+import org.junit.AfterClass
 import org.junit.Test
 
 class BlastInstanceTest {
@@ -76,8 +78,6 @@ class BlastInstanceTest {
         assert instance.proc.exitValue() == 0
 
         assert instance.parse(chunk).cdr3nt == "TGTGCGAGGTGGCTTGGGGAAGACATTCGGACCTTTGACTCCTGG"
-
-        factory.segmentDatabase.clearBlastDb()
     }
 
     @Test
@@ -108,7 +108,10 @@ class BlastInstanceTest {
         assert intersection.size() == nQueries
 
         assert instance.proc.exitValue() == 0
+    }
 
-        factory.segmentDatabase.clearBlastDb()
+    @AfterClass
+    static void tearDown() {
+        SegmentDatabase.clearTemporaryFiles()
     }
 }

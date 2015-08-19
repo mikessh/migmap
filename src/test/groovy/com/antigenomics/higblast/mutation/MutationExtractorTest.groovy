@@ -18,6 +18,7 @@ package com.antigenomics.higblast.mutation
 
 import com.antigenomics.higblast.blast.Alignment
 import com.antigenomics.higblast.genomic.SegmentDatabase
+import org.junit.AfterClass
 import org.junit.Test
 
 import static com.antigenomics.higblast.mutation.SubRegion.*
@@ -72,5 +73,10 @@ class MutationExtractorTest {
         mutations.eachWithIndex { it, i ->
             assert it.subRegion == expectedSubRegions[i]
         }
+    }
+
+    @AfterClass
+    static void tearDown() {
+        SegmentDatabase.clearTemporaryFiles()
     }
 }

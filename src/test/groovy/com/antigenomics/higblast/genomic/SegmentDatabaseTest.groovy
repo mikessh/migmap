@@ -16,6 +16,7 @@
 
 package com.antigenomics.higblast.genomic
 
+import org.junit.AfterClass
 import org.junit.Test
 
 class SegmentDatabaseTest {
@@ -23,9 +24,9 @@ class SegmentDatabaseTest {
     void massiveLoadTest() {
         SegmentDatabase.SPECIES_ALIAS.keySet().each {
             println "Loading data for $it"
-            
+
             def segmentDatabase = new SegmentDatabase("data/", it, ["TRA", "TRB", "TRG", "TRD",
-                                                          "IGH", "IGK", "IGL"], true, false)
+                                                                    "IGH", "IGK", "IGL"], true, false)
 
             assert !segmentDatabase.segments.isEmpty()
         }
@@ -59,8 +60,6 @@ class SegmentDatabaseTest {
         assert new File(segmentDatabase.databaseTempPath).exists()
         assert new File("$segmentDatabase.databaseTempPath/v.nhr").exists()
         assert new File("$segmentDatabase.databaseTempPath/d.nhr").exists()
-
-        segmentDatabase.clearBlastDb()
     }
 
     @Test
@@ -72,5 +71,10 @@ class SegmentDatabaseTest {
         assert (segment as VSegment).cdr1end == 99
         assert (segment as VSegment).cdr2start == 150
         assert (segment as VSegment).cdr2end == 174
+    }
+
+    @AfterClass
+    static void tearDown() {
+        SegmentDatabase.clearTemporaryFiles()
     }
 }

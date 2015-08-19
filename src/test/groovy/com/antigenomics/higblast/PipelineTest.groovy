@@ -17,8 +17,10 @@
 package com.antigenomics.higblast
 
 import com.antigenomics.higblast.blast.BlastInstanceFactory
+import com.antigenomics.higblast.genomic.SegmentDatabase
 import com.antigenomics.higblast.io.DummyOutput
 import com.antigenomics.higblast.io.FastqReader
+import org.junit.AfterClass
 import org.junit.Test
 
 class PipelineTest {
@@ -34,5 +36,10 @@ class PipelineTest {
         assert pipeline.inputCount == 1000
         assert pipeline.mappedRatio > 0.95
         assert pipeline.cdr3FoundRatio > 0.90
+    }
+
+    @AfterClass
+    static void tearDown() {
+        SegmentDatabase.clearTemporaryFiles()
     }
 }

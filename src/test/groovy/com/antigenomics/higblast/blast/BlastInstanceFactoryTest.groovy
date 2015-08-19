@@ -17,6 +17,8 @@
 package com.antigenomics.higblast.blast
 
 import com.antigenomics.higblast.RuntimeInfo
+import com.antigenomics.higblast.genomic.SegmentDatabase
+import org.junit.AfterClass
 import org.junit.Test
 
 class BlastInstanceFactoryTest {
@@ -32,6 +34,10 @@ class BlastInstanceFactoryTest {
         def factory = new BlastInstanceFactory("data/", "human", ["TRB"], true, false)
         def instances = (1..RuntimeInfo.N_THREADS).collect { factory.create() }
         instances.each { BlastInstance it -> it.put(null); it.close() }
-        factory.segmentDatabase.clearBlastDb()
+    }
+
+    @AfterClass
+    static void tearDown() {
+        SegmentDatabase.clearTemporaryFiles()
     }
 }

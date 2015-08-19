@@ -17,6 +17,7 @@
 package com.antigenomics.higblast.blast
 
 import com.antigenomics.higblast.genomic.SegmentDatabase
+import org.junit.AfterClass
 import org.junit.Test
 
 class BlastParserTest {
@@ -67,7 +68,10 @@ class BlastParserTest {
         assert mapping.regionMarkup.cdr1End == 256
         assert mapping.regionMarkup.cdr2Start == 307
         assert mapping.regionMarkup.cdr2End == 328
+    }
 
-        segmentDatabase.clearBlastDb()
+    @AfterClass
+    static void tearDown() {
+        SegmentDatabase.clearTemporaryFiles()
     }
 }

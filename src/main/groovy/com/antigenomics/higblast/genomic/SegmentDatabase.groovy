@@ -20,6 +20,7 @@ import com.antigenomics.higblast.RuntimeInfo
 import com.antigenomics.higblast.Util
 
 class SegmentDatabase {
+    private static final List<SegmentDatabase> DB_CACHE = new LinkedList<>()
     final String databaseTempPath
     final Map<String, Segment> segments = new HashMap<>()
     final boolean hasD
@@ -104,6 +105,7 @@ class SegmentDatabase {
         this.jSegments = jSegments
         this.vSegmentsNoMarkup = vSegmentsNoMarkup
 
+        DB_CACHE.add(this)
     }
 
     void makeBlastDb() {
@@ -136,7 +138,9 @@ class SegmentDatabase {
         }
     }
 
-    void clearBlastDb() {
-        new File(databaseTempPath).deleteDir()
+    static void clearTemporaryFiles() {
+        DB_CACHE.each {
+            new File(it.databaseTempPath).deleteDir()
+        }
     }
 }
