@@ -37,12 +37,10 @@ class BlastParser {
                         noCdr3 = new AtomicInteger()
     final SegmentDatabase segmentDatabase
     final JRefSearcher jRefSearcher
-    final boolean absoluteMutationCoordinates
 
-    public BlastParser(SegmentDatabase segmentDatabase, boolean absoluteMutationCoordinates = true) {
+    public BlastParser(SegmentDatabase segmentDatabase) {
         this.segmentDatabase = segmentDatabase
         this.jRefSearcher = new JRefSearcher()
-        this.absoluteMutationCoordinates = absoluteMutationCoordinates
     }
 
     Mapping parse(String chunk) {
@@ -65,7 +63,7 @@ class BlastParser {
             return
         }
 
-        def rc = summary[-1] != "+", inFrame = summary[-2] == "In-frame", noStop = summary[-3] == "No"
+        def rc = summary[-1] != "+", inFrame = summary[-2] != "Out-of-frame", noStop = summary[-3] != "Yes"
 
         // Information on segments mapped
         // - Segment names, can be multiple of them
@@ -82,9 +80,9 @@ class BlastParser {
             return null
         }
 
-        def vSegments = vSegmentNames.split(",").collect { segmentDatabase.segments[it] as VSegment },
-            dSegments = dFound ? dSegmentNames.split(",").collect { segmentDatabase.segments[it] as DSegment } : [],
-            jSegments = jFound ? jSegmentNames.split(",").collect { segmentDatabase.segments[it] as JSegment } : []
+        def vSegment = segmentDatabase.segments[vSegmentNames.split(",")[0]] as VSegment,
+            dSegment = dFound ? segmentDatabase.segments[dSegmentNames.split(",")[0]] as DSegment : DSegment.DUMMY,
+            jSegment = jFound ? segmentDatabase.segments[jSegmentNames.split(",")[0]] as JSegment : JSegment.DUMMY
 
         // - Alignments for V, D and J segments, remember here and further BLAST coordinates are 1-based
         alignments = [
@@ -127,7 +125,7 @@ class BlastParser {
         // - Find CDR3 end using J reference point manually
         if (cdrBounds[2] && jFound) {
             cdr3Start = cdrBounds[2][0].toInteger() - 4
-            def jRef = jFound ? jRefSearcher.getJRefPoint(jSegments[0], alignments[2]) : -1
+            def jRef = jFound ? jRefSearcher.getJRefPoint(jSegment, alignments[2]) : -1
             cdr3End = jRef < 0 ? -1 : jRef + 4
         }
 
@@ -155,16 +153,16 @@ class BlastParser {
 
         // Finally, deal with hypermutations
         // offset for converting coordinate in read to coordinate in germline V
-        def mutationExtractor = new MutationExtractor(vSegments[0], alignments[0])
+        def mutationExtractor = new MutationExtractor(vSegment, alignments[0])
 
         if (hasCdr3) {
             if (dFound) {
-                mutationExtractor.extractD(dSegments[0], alignments[1])
+                mutationExtractor.extractD(dSegment, alignments[1])
             }
-            mutationExtractor.extractJ(jSegments[0], alignments[2])
+            mutationExtractor.extractJ(jSegment, alignments[2])
         }
 
-        return new Mapping(vSegments, dSegments, jSegments,
+        return new Mapping(vSegment, dSegment, jSegment,
                 regionMarkup, cdr3Markup,
                 rc, complete, hasCdr3, inFrame, noStop, dFound,
                 mutationExtractor.mutations)

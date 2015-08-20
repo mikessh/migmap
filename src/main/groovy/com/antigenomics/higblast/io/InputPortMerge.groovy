@@ -16,22 +16,20 @@
 
 package com.antigenomics.higblast.io
 
-import com.antigenomics.higblast.mapping.ReadMapping
+class InputPortMerge<T> implements InputPort<T> {
+    final InputPort<T>[] inputPorts
 
-class DummyOutput implements InputPort<ReadMapping> {
-
-    final static DummyOutput INSTANCE = new DummyOutput()
-
-    private DummyOutput() {
-
+    InputPortMerge(InputPort<T>... inputPorts) {
+        this.inputPorts = inputPorts
     }
 
     @Override
-    void put(ReadMapping obj) {
-
+    void put(T obj) {
+        inputPorts.each { it.put(obj) }
     }
 
     @Override
     void close() {
+        inputPorts.each { it.close() }
     }
 }

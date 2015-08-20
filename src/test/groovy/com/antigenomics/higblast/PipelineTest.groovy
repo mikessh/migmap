@@ -18,8 +18,10 @@ package com.antigenomics.higblast
 
 import com.antigenomics.higblast.blast.BlastInstanceFactory
 import com.antigenomics.higblast.genomic.SegmentDatabase
-import com.antigenomics.higblast.io.DummyOutput
+import com.antigenomics.higblast.io.ClonotypeOutput
 import com.antigenomics.higblast.io.FastqReader
+import com.antigenomics.higblast.io.InputPortMerge
+import com.antigenomics.higblast.io.ReadMappingOutput
 import org.junit.AfterClass
 import org.junit.Test
 
@@ -29,7 +31,8 @@ class PipelineTest {
         def reader = new FastqReader("sample.fastq.gz", true)
         def factory = new BlastInstanceFactory("data/", "human", ["IGH"], true, false)
 
-        def pipeline = new Pipeline(reader, factory, DummyOutput.INSTANCE)
+        def pipeline = new Pipeline(reader, factory,
+                new InputPortMerge(new ReadMappingOutput(), new ClonotypeOutput()))
 
         pipeline.run()
 
@@ -42,4 +45,6 @@ class PipelineTest {
     static void tearDown() {
         SegmentDatabase.clearTemporaryFiles()
     }
+
+
 }

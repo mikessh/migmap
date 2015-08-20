@@ -34,7 +34,7 @@ class Util {
     }
 
     static String qualToString(byte[] qual) {
-        qual.collect { (char) ((int) qual + 33) }.join("")
+        qual.collect { (char) ((int) it + 33) }.join("")
     }
 
     static InputStream getStream(String fname, boolean resource) {

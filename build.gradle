@@ -18,12 +18,13 @@ jar {
 
     from {
         configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
-    } with jar
+    }
 }
 
 dependencies {
     compile 'org.codehaus.groovy:groovy-all:2.4.4'
     compile 'junit:junit:4.12'
+    compile 'commons-cli:commons-cli:1.2'
 }
 
 test {

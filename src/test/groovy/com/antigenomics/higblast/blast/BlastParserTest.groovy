@@ -55,9 +55,9 @@ class BlastParserTest {
 
         def mapping = parser.parse(chunk)
 
-        assert mapping.vSegments[0].name == "IGHV4-39*01"
-        assert mapping.dSegments[0].name == "IGHD6-19*01"
-        assert mapping.jSegments[0].name == "IGHJ4*02"
+        assert mapping.vSegment.name == "IGHV4-39*01"
+        assert mapping.dSegment.name == "IGHD6-19*01"
+        assert mapping.jSegment.name == "IGHJ4*02"
 
         assert mapping.cdr3Markup.vEnd == 8
         assert mapping.cdr3Markup.dStart == 8

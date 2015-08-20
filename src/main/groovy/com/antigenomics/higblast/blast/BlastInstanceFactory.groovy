@@ -37,8 +37,8 @@ class BlastInstanceFactory {
                                 "-germline_db_${segment.toUpperCase()} $segmentDatabase.databaseTempPath/$segment"
                             },
 
-                    //"AUX_OPT"   :
-                    //        "-auxiliary_data $dataBundlePath/optional_file/${species}_gl.aux",
+                    "AUX_OPT"   :
+                            "-auxiliary_data $dataBundlePath/optional_file/${species}_gl.aux",
 
                     "ORG_OPT"   :
                             "-organism $species",

@@ -50,4 +50,10 @@ class Segment {
     int hashCode() {
         name.hashCode()
     }
+
+
+    @Override
+    public String toString() {
+        name
+    }
 }

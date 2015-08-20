@@ -23,15 +23,15 @@ import com.antigenomics.higblast.mutation.Mutation
 import com.antigenomics.higblast.mutation.MutationStringifier
 
 class Mapping {
-    final List<VSegment> vSegments
-    final List<DSegment> dSegments
-    final List<JSegment> jSegments
+    final VSegment vSegment
+    final DSegment dSegment
+    final JSegment jSegment
     final RegionMarkup regionMarkup
     final Cdr3Markup cdr3Markup
     final List<Mutation> mutations
     final boolean rc, complete, hasCdr3, inFrame, noStop, hasD
 
-    Mapping(List<VSegment> vSegments, List<DSegment> dSegments, List<JSegment> jSegments,
+    Mapping(VSegment vSegment, DSegment dSegment, JSegment jSegment,
             RegionMarkup regionMarkup, Cdr3Markup cdr3Markup,
             boolean rc, boolean complete, boolean hasCdr3, boolean inFrame, boolean noStop, hasD,
             List<Mutation> mutations) {
@@ -40,9 +40,9 @@ class Mapping {
         this.rc = rc
 
         // main data
-        this.vSegments = vSegments
-        this.dSegments = dSegments
-        this.jSegments = jSegments
+        this.vSegment = vSegment
+        this.dSegment = dSegment
+        this.jSegment = jSegment
 
         this.cdr3Markup = cdr3Markup
         this.mutations = mutations
@@ -55,7 +55,7 @@ class Mapping {
         this.hasD = hasD
     }
 
-    static final String OUTPUT_HEADER = "v.segments\td.segments\tj.segments\t" +
+    static final String OUTPUT_HEADER = "v.segment\td.segment\tj.segment\t" +
             RegionMarkup.OUTPUT_HEADER + "\t" +
             Cdr3Markup.OUTPUT_HEADER + "\t" +
             MutationStringifier.OUTPUT_HEADER + "\t" +
@@ -64,10 +64,10 @@ class Mapping {
 
     @Override
     public String toString() {
-        [vSegments.join(","), dSegments.join(","), jSegments.join(","),
+        [vSegment.toString(), dSegment.toString(), jSegment.toString(),
          regionMarkup.toString(),
          cdr3Markup.toString(),
          MutationStringifier.toString(mutations),
-         rc, complete, hasCdr3, inFrame, noStop]
+         rc, complete, hasCdr3, inFrame, noStop].join("\t")
     }
 }
