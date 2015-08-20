@@ -10,7 +10,15 @@ repositories {
 
 jar {
     baseName = 'higblast'
-    version = '2.0.0'
+    version = '1.0.0'
+
+    manifest {
+        attributes "Main-Class": "$mainClassName"
+    }
+
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    } with jar
 }
 
 dependencies {

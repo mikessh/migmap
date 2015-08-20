@@ -18,20 +18,14 @@ package com.antigenomics.higblast.mutation
 
 import com.antigenomics.higblast.Util
 import com.antigenomics.higblast.blast.Alignment
-import com.antigenomics.higblast.genomic.Segment
-import com.antigenomics.higblast.genomic.SegmentType
+import com.antigenomics.higblast.genomic.DSegment
+import com.antigenomics.higblast.genomic.JSegment
 import com.antigenomics.higblast.genomic.VSegment
-import com.antigenomics.higblast.mapping.RegionMarkup
 
 import static com.antigenomics.higblast.mutation.MutationType.Deletion
 import static com.antigenomics.higblast.mutation.MutationType.None
 
 class MutationExtractor {
-    final RegionMarkup regionMarkup
-
-    MutationExtractor(RegionMarkup regionMarkup = null) {
-        this.regionMarkup = regionMarkup
-    }
 
     static List<Mutation> extract(Alignment alignment) {
         def mutations = new LinkedList<Mutation>()
@@ -99,46 +93,44 @@ class MutationExtractor {
         mutations
     }
 
-    List<Mutation> extract(Segment segment,
-                           Alignment alignment) {
+    static List<Mutation> extractV(VSegment segment,
+                                   Alignment alignment) {
         def mutations = extract(alignment)
 
-        switch (segment.type) {
-            case SegmentType.V:
-                mutations.each {
-                    it.region = segment
-                    it.subRegion = deduceSubRegionV(segment as VSegment, it.start)
-                }
-                break
-            case SegmentType.J:
-                mutations.each {
-                    it.region = segment
-                    it.subRegion = (it.start > segment.referencePoint + 3) ? SubRegion.FR4 : SubRegion.CDR3
-                    if (regionMarkup) {
-                        it.start += regionMarkup.jStart
-                        it.end += regionMarkup.jStart
-                    }
-                }
-                break
-            case SegmentType.D:
-                mutations.each {
-                    it.region = segment
-                    it.subRegion = SubRegion.CDR3
-                    if (regionMarkup) {
-                        it.start += regionMarkup.dStart
-                        it.end += regionMarkup.dStart
-                    }
-                }
-                break
+        mutations.each {
+            it.region = segment
+            it.subRegion = deduceSubRegionV(segment as VSegment, it.start)
         }
 
-        /*
-        int frame = regionMarkup.cdr3Start % 3
+        mutations
+    }
+
+    static List<Mutation> extractJ(JSegment segment,
+                                   Alignment alignment,
+                                   int delta) {
+        def mutations = extract(alignment)
+
         mutations.each {
-            int frameShift = (it.startInRead - frame) % 3
-            int start = it.startInRead - frameShift,
-                end = start + (it.endInRead - it.startInRead) / 3
-        }*/
+            it.region = segment
+            it.subRegion = (it.start > segment.referencePoint + 3) ? SubRegion.FR4 : SubRegion.CDR3
+            it.start = it.startInRead + delta
+            it.end = it.endInRead + delta
+        }
+
+        mutations
+    }
+
+    static List<Mutation> extractD(DSegment segment,
+                                   Alignment alignment,
+                                   int delta) {
+        def mutations = extract(alignment)
+
+        mutations.each {
+            it.region = segment
+            it.subRegion = SubRegion.CDR3
+            it.start = it.startInRead + delta
+            it.end = it.endInRead + delta
+        }
 
         mutations
     }

@@ -112,8 +112,7 @@ class BlastParser {
 
         int cdr1Start = -1, cdr1End = -1,
             cdr2Start = -1, cdr2End = -1,
-            cdr3Start = -1, cdr3End = -1,
-            delta = -1
+            cdr3Start = -1, cdr3End = -1
 
         if (cdrBounds[0]) {
             cdr1Start = cdrBounds[0][0].toInteger() - 1
@@ -130,57 +129,45 @@ class BlastParser {
             cdr3Start = cdrBounds[2][0].toInteger() - 4
             def jRef = jFound ? jRefSearcher.getJRefPoint(jSegments[0], alignments[2]) : -1
             cdr3End = jRef < 0 ? -1 : jRef + 4
-            delta = vSegments[0].referencePoint - 3 - cdr3Start // offset between CDR3 start in germline and read
         }
 
+        def regionMarkup = new RegionMarkup(cdr1Start, cdr1End, cdr2Start, cdr2End, cdr3Start, cdr3End)
         def hasCdr3 = cdr3Start >= 0, complete = cdr3End >= 0 && hasCdr3
 
-        if (!hasCdr3) {
+        // - Markup of V/D/J within CDR3
+        int vCdr3End = -1,
+            dCdr3Start = -1,
+            dCdr3End = -1,
+            jCdr3Start = -1
+
+        if (hasCdr3) {
+            vCdr3End = alignments[0].qstart + alignments[0].qseq.length() - cdr3Start
+            jCdr3Start = alignments[2].qstart - cdr3Start
+            if (dFound) {
+                dCdr3Start = alignments[1].qstart - cdr3Start
+                dCdr3End = dCdr3Start + alignments[1].qseq.length()
+            }
+        } else {
             noCdr3.incrementAndGet()
         }
-
-        def regionMarkup = new RegionMarkup(cdr1Start, cdr1End, cdr2Start, cdr2End, cdr3Start, cdr3End,
-                hasCdr3 && dFound ? (delta + alignments[1].qstart) : -1,
-                hasCdr3 ? (delta + alignments[2].qstart) : -1)
-
-        // Markup in CDR3 coordinates
-        def vCdr3End = hasCdr3 ? (alignments[0].qstart + alignments[0].qseq.length() - cdr3Start) : -1,
-            dCdr3Start = hasCdr3 && dFound ? (alignments[1].qstart - cdr3Start) : -1,
-            dCdr3End = hasCdr3 && dFound ? (dCdr3Start + alignments[1].qseq.length()) : -1,
-            jCdr3Start = hasCdr3 ? (alignments[2].qstart - cdr3Start) : -1
 
         def cdr3Markup = new Cdr3Markup(vCdr3End, dCdr3Start, dCdr3End, jCdr3Start)
 
         // Finally, deal with hypermutations
-        /*def hypermutations = shmExtractor.extract(vSegmentNames,
-                alignments[0][0].toInteger() - 1,
-                alignments[0][1],
-                alignments[0][2].toInteger() - 1,
-                alignments[0][3],
-                cdr1Start, cdr1End, cdr2Start, cdr2End)*/
-
-        def mutationExtractor = new MutationExtractor(absoluteMutationCoordinates ? regionMarkup : null)
-
-        def mutations = mutationExtractor.extract(vSegments[0], alignments[0])
+        // offset for converting coordinate in read to coordinate in germline V
+        def mutations = MutationExtractor.extractV(vSegments[0], alignments[0])
 
         if (hasCdr3) {
+            int delta = alignments[0].sstart - alignments[0].qstart
             if (dFound) {
-                mutations.addAll(mutationExtractor.extract(dSegments[0], alignments[1]))
+                mutations.addAll(MutationExtractor.extractD(dSegments[0], alignments[1], delta))
             }
-            mutations.addAll(mutationExtractor.extract(jSegments[0], alignments[2]))
+            mutations.addAll(MutationExtractor.extractJ(jSegments[0], alignments[2], delta))
         }
 
         return new Mapping(vSegments, dSegments, jSegments,
                 regionMarkup, cdr3Markup,
                 rc, complete, hasCdr3, inFrame, noStop, dFound,
                 mutations)
-
-        //} catch (Exception e) {
-        //    println "Error parsing $chunk"
-        //    println segments
-        //    println hits
-        //    println cdrBounds
-        //}
-        //return null
     }
 }

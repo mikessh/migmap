@@ -20,7 +20,7 @@ class MutationStringifier {
     static final String OUTPUT_HEADER = SubRegion.REGION_LIST.collect { "mutations." + it }.join("\t")
 
     static String toString(List<Mutation> mutations) {
-        def mutationStrings = new String[SubRegion.REGION_LIST.length]
+        def mutationStrings = [""] * SubRegion.REGION_LIST.length
 
         mutations.each {
             int order = it.subRegion.order

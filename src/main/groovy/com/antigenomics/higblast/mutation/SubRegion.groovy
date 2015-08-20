@@ -24,5 +24,6 @@ enum SubRegion {
     SubRegion(int order) {
         this.order = order
     }
+    
     static final SubRegion[] REGION_LIST = [FR1, CDR1, FR2, CDR2, FR3, CDR3, FR4] as SubRegion[]
 }

@@ -70,6 +70,65 @@ class BlastParserTest {
         assert mapping.regionMarkup.cdr2End == 328
     }
 
+    @Test
+    void mutationCoordinatesTest() {
+        // def seq = "GACACGGCTGTGTATTTCTGTGCGAGATATAGTGACTACGATTACCGGACCTTTGACTCCTGGGGCCAGGGAACCCTGGTCACCGTCTC"
+        //            ................A.........--------------------------------------------------------------- IGHV3-33*01
+        //            --------------------------........T..........-------------------------------------------- IGHD5/OR15-5a*01
+        //            --------------------------------------------------........A.............................. IGHJ4*02
+        //            78901234567890123456789012345678901234567890123456789012345678901234567890123456789012345
+        //            66677777777778888888888999999999900000000001111111111222222222233333333334444444444555555
+        //            22222222222222222222222222222222233333333333333333333333333333333333333333333333333333333
+
+        // def factory = new BlastInstanceFactory("data/", "human", ["IGH"], true, false)
+        // def instance = factory.create()
+
+        // def read = new Read(
+        //        "@",
+        //        seq,
+        //        "I" * seq.length()
+        // )
+
+        // instance.put(read)
+        // instance.put(null)
+        // def readMapping = instance.take()
+
+        def chunk = "# IGBLASTN 2.2.29+\n" +
+                "# Query: @|GACACGGCTGTGTATTTCTGTGCGAGATATAGTGACTACGATTACCGGACCTTTGACTCCTGGGGCCAGGGAACCCTGGTCACCGTCTC|IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII\n" +
+                "# Database: data//database-a52bccf8-da3b-473f-bacc-f9d34e532516/v data//database-a52bccf8-da3b-473f-bacc-f9d34e532516/d data//database-a52bccf8-da3b-473f-bacc-f9d34e532516/j\n" +
+                "# Domain classification requested: imgt\n" +
+                "\n" +
+                "# V-(D)-J rearrangement summary for query sequence (Top V gene match, Top D gene match, Top J gene match, Chain type, stop codon, V-J frame, Productive, Strand).  Multiple equivalent top matches having the same score and percent identity, if present, are separated by a comma.\n" +
+                "IGHV3-33*01\tIGHD5/OR15-5a*01\tIGHJ4*02\tVH\tNo\tN/A\tN/A\t+\n" +
+                "\n" +
+                "# V-(D)-J junction details based on top germline gene matches (V end, V-D junction, D region, D-J junction, J start).  Note that possible overlapping nucleotides at VDJ junction (i.e, nucleotides that could be assigned to either rearranging gene) are indicated in parentheses (i.e., (TACT)) but are not included under the V, D, or J gene itself\n" +
+                "TGCGA\t(GA)\tTATAGTGACTACGATTAC\tCGGAC\tCTTTG\t\n" +
+                "\n" +
+                "# Alignment summary between query and top germline V gene hit (from, to, length, matches, mismatches, gaps, percent identity)\n" +
+                "FR3-IMGT\t1\t21\t21\t20\t1\t0\t95.2\n" +
+                "CDR3-IMGT (germline)\t22\t27\t6\t6\t0\t0\t100\n" +
+                "Total\tN/A\tN/A\t27\t26\t1\t0\t96.3\n" +
+                "\n" +
+                "# Hit table (the first field indicates the chain type of the hit)\n" +
+                "# Fields: query id, q. start, query seq, s. start, subject seq\n" +
+                "# 3 hits found\n" +
+                "V\t@|GACACGGCTGTGTATTTCTGTGCGAGATATAGTGACTACGATTACCGGACCTTTGACTCCTGGGGCCAGGGAACCCTGGTCACCGTCTC|IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII\t1\tGACACGGCTGTGTATTTCTGTGCGAGA\t268\tGACACGGCTGTGTATTACTGTGCGAGA\n" +
+                "D\t@|GACACGGCTGTGTATTTCTGTGCGAGATATAGTGACTACGATTACCGGACCTTTGACTCCTGGGGCCAGGGAACCCTGGTCACCGTCTC|IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII\t26\tGATATAGTGACTACGATTAC\t4\tGATATAGTGTCTACGATTAC\n" +
+                "J\t@|GACACGGCTGTGTATTTCTGTGCGAGATATAGTGACTACGATTACCGGACCTTTGACTCCTGGGGCCAGGGAACCCTGGTCACCGTCTC|IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII\t51\tCTTTGACTCCTGGGGCCAGGGAACCCTGGTCACCGTCTC\t5\tCTTTGACTACTGGGGCCAGGGAACCCTGGTCACCGTCTC\n" +
+                "# BLAST processed 1 queries"
+
+        def segmentDatabase = new SegmentDatabase("data/", "human", ["IGH"], true, false)
+        def parser = new BlastParser(segmentDatabase)
+
+        def mapping = parser.parse(chunk)
+        def mutations = mapping.mutations
+
+        assert mutations.size() == 3
+        assert mutations[0].pos == 283
+        assert mutations[1].pos == 301
+        assert mutations[2].pos == 325
+    }
+
     @AfterClass
     static void tearDown() {
         SegmentDatabase.clearTemporaryFiles()
