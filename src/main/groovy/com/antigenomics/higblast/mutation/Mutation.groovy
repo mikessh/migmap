@@ -27,7 +27,7 @@ class Mutation {
     String aaFrom, aaTo // todo
 
     final MutationType type
-    Segment region
+    Segment parent
     SubRegion subRegion
 
     Mutation(MutationType type,
@@ -69,7 +69,7 @@ class Mutation {
         start == mutation.start &&
                 ntFrom == mutation.ntFrom &&
                 ntTo == mutation.ntTo &&
-                region == mutation.region
+                parent == mutation.parent
     }
 
     @Override
@@ -78,6 +78,6 @@ class Mutation {
         result = ntFrom.hashCode()
         result = 31 * result + ntTo.hashCode()
         result = 31 * result + start
-        31 * result + region.hashCode()
+        31 * result + parent.hashCode()
     }
 }

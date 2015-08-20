@@ -37,7 +37,7 @@ class MutationExtractorTest {
 
         def posInReadExp = [1, 11, 24, 32]
         def expectedCodes = ["S1:A>G", "D11:AA", "I26:ATG", "S31:G>A"]
-        def mutations = MutationExtractor.extract(alignment)
+        def mutations = MutationExtractor.extract(alignment).mutations
 
         println mutations
 
@@ -62,7 +62,7 @@ class MutationExtractorTest {
 
         def alignment = new Alignment(0, query, 0, segment.sequence.substring(0, query.length()))
 
-        def mutations = MutationExtractor.extractV(segment, alignment)
+        def mutations = new MutationExtractor(segment, alignment).mutations
 
         def expectedSubRegions = [FR1, FR1, FR1, FR1, FR1,
                                   CDR1, CDR1, CDR1, CDR1, CDR1,

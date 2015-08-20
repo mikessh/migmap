@@ -155,19 +155,18 @@ class BlastParser {
 
         // Finally, deal with hypermutations
         // offset for converting coordinate in read to coordinate in germline V
-        def mutations = MutationExtractor.extractV(vSegments[0], alignments[0])
+        def mutationExtractor = new MutationExtractor(vSegments[0], alignments[0])
 
         if (hasCdr3) {
-            int delta = alignments[0].sstart - alignments[0].qstart
             if (dFound) {
-                mutations.addAll(MutationExtractor.extractD(dSegments[0], alignments[1], delta))
+                mutationExtractor.extractD(dSegments[0], alignments[1])
             }
-            mutations.addAll(MutationExtractor.extractJ(jSegments[0], alignments[2], delta))
+            mutationExtractor.extractJ(jSegments[0], alignments[2])
         }
 
         return new Mapping(vSegments, dSegments, jSegments,
                 regionMarkup, cdr3Markup,
                 rc, complete, hasCdr3, inFrame, noStop, dFound,
-                mutations)
+                mutationExtractor.mutations)
     }
 }
