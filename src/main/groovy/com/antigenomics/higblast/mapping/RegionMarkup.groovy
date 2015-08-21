@@ -16,6 +16,8 @@
 
 package com.antigenomics.higblast.mapping
 
+import com.antigenomics.higblast.mutation.SubRegion
+
 class RegionMarkup {
     final int cdr1Start, cdr1End, cdr2Start, cdr2End, cdr3Start, cdr3End // in read, used for extraction
 
@@ -28,6 +30,22 @@ class RegionMarkup {
         this.cdr2End = cdr2End
         this.cdr3Start = cdr3Start
         this.cdr3End = cdr3End
+    }
+
+    SubRegion getSubRegion(int pos) {
+        if (pos < cdr1Start) {
+            return SubRegion.FR1
+        } else if (pos < cdr1End) {
+            return SubRegion.CDR1
+        } else if (pos < cdr2Start) {
+            return SubRegion.FR2
+        } else if (pos < cdr2End) {
+            return SubRegion.CDR2
+        } else if (pos < cdr3Start) {
+            return SubRegion.FR3
+        } else {
+            return SubRegion.CDR3
+        }
     }
 
     static final String OUTPUT_HEADER = "cdr1.start.in.read\tcdr1.end.in.read\t" +

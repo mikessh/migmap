@@ -16,22 +16,18 @@
 
 package com.antigenomics.higblast.mapping
 
-import com.antigenomics.higblast.genomic.DSegment
-import com.antigenomics.higblast.genomic.JSegment
-import com.antigenomics.higblast.genomic.VSegment
+import com.antigenomics.higblast.genomic.Segment
 import com.antigenomics.higblast.mutation.Mutation
 import com.antigenomics.higblast.mutation.MutationStringifier
 
 class Mapping {
-    final VSegment vSegment
-    final DSegment dSegment
-    final JSegment jSegment
+    final Segment vSegment, dSegment, jSegment
     final RegionMarkup regionMarkup
     final Cdr3Markup cdr3Markup
     final List<Mutation> mutations
     final boolean rc, complete, hasCdr3, inFrame, noStop, hasD
 
-    Mapping(VSegment vSegment, DSegment dSegment, JSegment jSegment,
+    Mapping(Segment vSegment, Segment dSegment, Segment jSegment,
             RegionMarkup regionMarkup, Cdr3Markup cdr3Markup,
             boolean rc, boolean complete, boolean hasCdr3, boolean inFrame, boolean noStop, hasD,
             List<Mutation> mutations) {

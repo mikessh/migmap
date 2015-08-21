@@ -16,10 +16,8 @@
 
 package com.antigenomics.higblast.blast
 
-import com.antigenomics.higblast.genomic.DSegment
-import com.antigenomics.higblast.genomic.JSegment
+import com.antigenomics.higblast.genomic.Segment
 import com.antigenomics.higblast.genomic.SegmentDatabase
-import com.antigenomics.higblast.genomic.VSegment
 import com.antigenomics.higblast.mapping.Cdr3Markup
 import com.antigenomics.higblast.mapping.Mapping
 import com.antigenomics.higblast.mapping.RegionMarkup
@@ -80,9 +78,9 @@ class BlastParser {
             return null
         }
 
-        def vSegment = segmentDatabase.segments[vSegmentNames.split(",")[0]] as VSegment,
-            dSegment = dFound ? segmentDatabase.segments[dSegmentNames.split(",")[0]] as DSegment : DSegment.DUMMY,
-            jSegment = jFound ? segmentDatabase.segments[jSegmentNames.split(",")[0]] as JSegment : JSegment.DUMMY
+        def vSegment = segmentDatabase.segments[vSegmentNames.split(",")[0]],
+            dSegment = dFound ? segmentDatabase.segments[dSegmentNames.split(",")[0]] : Segment.DUMMY_D,
+            jSegment = jFound ? segmentDatabase.segments[jSegmentNames.split(",")[0]] : Segment.DUMMY_J
 
         // - Alignments for V, D and J segments, remember here and further BLAST coordinates are 1-based
         alignments = [
@@ -153,7 +151,7 @@ class BlastParser {
 
         // Finally, deal with hypermutations
         // offset for converting coordinate in read to coordinate in germline V
-        def mutationExtractor = new MutationExtractor(vSegment, alignments[0])
+        def mutationExtractor = new MutationExtractor(vSegment, alignments[0], regionMarkup)
 
         if (hasCdr3) {
             if (dFound) {

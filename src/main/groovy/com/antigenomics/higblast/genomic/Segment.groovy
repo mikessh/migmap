@@ -16,7 +16,12 @@
 
 package com.antigenomics.higblast.genomic
 
+import com.antigenomics.higblast.Util
+
 class Segment {
+    static final Segment DUMMY_J = new Segment(SegmentType.J, Util.MY_NA, "AAAAAAAAAAAAAAAAAAAAAAAAA", -1),
+                         DUMMY_D = new Segment(SegmentType.D, Util.MY_NA, "AAAAAAAAAAAAAAAAAAAAAAAAA", -1)
+
     final String name, sequence
     final int referencePoint
     final SegmentType type

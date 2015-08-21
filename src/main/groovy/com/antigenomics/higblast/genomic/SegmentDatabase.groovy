@@ -40,19 +40,6 @@ class SegmentDatabase {
 
         def speciesAlias = SPECIES_ALIAS[species]
 
-        def markupMap = new HashMap<String, int[]>()
-        def markupPath = dataBundlePath + "/internal_data/$species/${species}.ndm.${useKabat ? "kabat" : "imgt"}"
-
-        new File(markupPath).splitEachLine("[\t ]+") { splitLine ->
-            markupMap.put(splitLine[0],
-                    [splitLine[3].toInteger() - 1,
-                     splitLine[4].toInteger(),
-                     splitLine[7].toInteger() - 1,
-                     splitLine[8].toInteger(),
-                     splitLine[10].toInteger()] as int[]
-            )
-        }
-
         boolean hasD = false
 
         int vSegments = 0, dSegments = 0, jSegments = 0, vSegmentsNoMarkup = 0
@@ -65,27 +52,20 @@ class SegmentDatabase {
                 def segmentName = splitLine[3]
 
                 if (allAlleles || segmentName.endsWith("*01")) {
+                    def seq = splitLine[5],
+                        referencePoint = splitLine[4].toInteger(), segmentTypeStr = splitLine[2]
+
                     assert !segments.containsKey(segmentName)
 
-                    if (splitLine[2].startsWith("V")) {
-                        def markup = markupMap[segmentName]
-                        if (markup) {
-                            int referencePoint = splitLine[4].toInteger()
-                            assert referencePoint == markup[4] // check if two reference files are concordant
-                            segments.put(segmentName, new VSegment(segmentName, splitLine[5], referencePoint,
-                                    markup[0], markup[1], markup[2], markup[3]))
-                            vSegments++
-                        } else {
-                            vSegmentsNoMarkup++
-                            Util.report("[WARNING] No markup for $segmentName V segment.", 3)
-                        }
-                    } else if (splitLine[2].startsWith("D")) {
-                        segments.put(segmentName, new DSegment(segmentName, splitLine[5]))
+                    if (segmentTypeStr.startsWith("V")) {
+                        segments.put(segmentName, new Segment(SegmentType.V, segmentName, seq, referencePoint))
+                        vSegments++
+                    } else if (segmentTypeStr.startsWith("D")) {
+                        segments.put(segmentName, new Segment(SegmentType.D, segmentName, seq, referencePoint))
                         hasD = true
                         dSegments++
-                    } else if (splitLine[2].startsWith("J")) {
-                        segments.put(segmentName, new JSegment(segmentName, splitLine[5],
-                                splitLine[4].toInteger()))
+                    } else if (segmentTypeStr.startsWith("J")) {
+                        segments.put(segmentName, new Segment(SegmentType.J, segmentName, seq, referencePoint))
                         jSegments++
                     }
                 }
@@ -93,10 +73,9 @@ class SegmentDatabase {
         }
 
         Util.report("Loaded database. #v=$vSegments,#d=$dSegments,#j=$jSegments.", 2)
-        //Segments with markup = ${markupMap.size()}", 2)
 
         if (!hasD) {
-            segments.put(DSegment.DUMMY.name, DSegment.DUMMY)
+            segments.put(Segment.DUMMY_D.name, Segment.DUMMY_D)
         }
 
         this.hasD = hasD

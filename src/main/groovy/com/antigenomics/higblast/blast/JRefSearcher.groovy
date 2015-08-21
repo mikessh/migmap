@@ -16,7 +16,7 @@
 
 package com.antigenomics.higblast.blast
 
-import com.antigenomics.higblast.genomic.JSegment
+import com.antigenomics.higblast.genomic.Segment
 
 import static com.antigenomics.higblast.Util.GAP
 
@@ -25,7 +25,7 @@ class JRefSearcher {
     JRefSearcher() {
     }
 
-    static int getJRefPoint(JSegment jSegment, Alignment alignment) {
+    static int getJRefPoint(Segment jSegment, Alignment alignment) {
         getJRefPointInner(jSegment.referencePoint, alignment.qstart, alignment.qseq, alignment.sstart, alignment.sseq)
     }
 

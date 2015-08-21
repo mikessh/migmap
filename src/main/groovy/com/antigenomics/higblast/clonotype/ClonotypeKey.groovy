@@ -16,9 +16,7 @@
 
 package com.antigenomics.higblast.clonotype
 
-import com.antigenomics.higblast.genomic.DSegment
-import com.antigenomics.higblast.genomic.JSegment
-import com.antigenomics.higblast.genomic.VSegment
+import com.antigenomics.higblast.genomic.Segment
 import com.antigenomics.higblast.mapping.Mapping
 import com.antigenomics.higblast.mapping.ReadMapping
 import com.antigenomics.higblast.mutation.Mutation
@@ -32,15 +30,15 @@ class ClonotypeKey {
         this.representativeMapping = readMapping.mapping
     }
 
-    VSegment getvSegment() {
+    Segment getvSegment() {
         representativeMapping.vSegment
     }
 
-    DSegment getdSegment() {
+    Segment getdSegment() {
         representativeMapping.dSegment
     }
 
-    JSegment getjSegment() {
+    Segment getjSegment() {
         representativeMapping.jSegment
     }
 

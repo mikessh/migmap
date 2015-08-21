@@ -18,9 +18,8 @@ package com.antigenomics.higblast.mutation
 
 import com.antigenomics.higblast.Util
 import com.antigenomics.higblast.blast.Alignment
-import com.antigenomics.higblast.genomic.DSegment
-import com.antigenomics.higblast.genomic.JSegment
-import com.antigenomics.higblast.genomic.VSegment
+import com.antigenomics.higblast.genomic.Segment
+import com.antigenomics.higblast.mapping.RegionMarkup
 
 import static com.antigenomics.higblast.mutation.MutationType.Deletion
 import static com.antigenomics.higblast.mutation.MutationType.None
@@ -29,13 +28,14 @@ class MutationExtractor {
     final List<Mutation> mutations
     final int offset
 
-    MutationExtractor(VSegment segment,
-                      Alignment alignment) {
+    MutationExtractor(Segment segment,
+                      Alignment alignment,
+                      RegionMarkup regionMarkup) {
         def vResult = extract(alignment)
 
         vResult.mutations.each {
             it.parent = segment
-            it.subRegion = deduceSubRegionV(segment as VSegment, it.start)
+            it.subRegion = regionMarkup.getSubRegion(it.startInRead)
         }
 
         // This will be used later to recompute J and D mutations to V segment germline coords
@@ -132,7 +132,7 @@ class MutationExtractor {
         new MutationExtractorResult(mutations, qdelta, sdelta)
     }
 
-    void extractJ(JSegment segment,
+    void extractJ(Segment segment,
                   Alignment alignment) {
         extract(alignment).mutations.each {
             it.parent = segment
@@ -143,7 +143,7 @@ class MutationExtractor {
         }
     }
 
-    void extractD(DSegment segment,
+    void extractD(Segment segment,
                   Alignment alignment) {
         extract(alignment).mutations.each {
             it.parent = segment
@@ -151,22 +151,6 @@ class MutationExtractor {
             it.start = it.startInRead + offset
             it.end = it.endInRead + offset
             this.mutations.add(it)
-        }
-    }
-
-    static SubRegion deduceSubRegionV(VSegment segment, int pos) {
-        if (pos < segment.cdr1start) {
-            return SubRegion.FR1
-        } else if (pos < segment.cdr1end) {
-            return SubRegion.CDR1
-        } else if (pos < segment.cdr2start) {
-            return SubRegion.FR2
-        } else if (pos < segment.cdr2end) {
-            return SubRegion.CDR2
-        } else if (pos < segment.referencePoint - 3) {
-            return SubRegion.FR3
-        } else {
-            return SubRegion.CDR3
         }
     }
 
