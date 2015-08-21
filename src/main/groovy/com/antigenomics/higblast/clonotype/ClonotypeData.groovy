@@ -35,7 +35,7 @@ class ClonotypeData {
 
     void update(ReadMapping readMapping) {
         count.incrementAndGet()
-        readMapping.cdrInsertQual.eachWithIndex { it, i -> cdrInsertQual.addAndGet(i, it) }
         readMapping.mutationQual.eachWithIndex { it, i -> mutationQual.addAndGet(i, it) }
+        readMapping.cdrInsertQual.eachWithIndex { it, i -> cdrInsertQual.addAndGet(i, it) }
     }
 }

@@ -56,9 +56,10 @@ class ClonotypeKey {
         ClonotypeKey that = (ClonotypeKey) o
 
         cdr3nt == that.cdr3nt &&
+                vSegment == that.vSegment &&
+                dSegment == that.dSegment &&
                 jSegment == that.jSegment &&
-                mutations == that.mutations &&
-                vSegment == that.vSegment
+                mutations == that.mutations
     }
 
     @Override
@@ -66,6 +67,7 @@ class ClonotypeKey {
         int result
         result = cdr3nt.hashCode()
         result = 31 * result + vSegment.hashCode()
+        result = 31 * result + dSegment.hashCode()
         result = 31 * result + jSegment.hashCode()
         31 * result + mutations.hashCode()
     }
