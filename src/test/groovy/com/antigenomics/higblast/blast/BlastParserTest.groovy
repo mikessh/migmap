@@ -23,7 +23,7 @@ import org.junit.Test
 class BlastParserTest {
     @Test
     void exactTest() {
-        def segmentDatabase = new SegmentDatabase("data/", "human", ["IGH"], true, false)
+        def segmentDatabase = new SegmentDatabase("data/", "human", ["IGH"])
         def parser = new BlastParser(segmentDatabase)
 
         def chunk = "# IGBLASTN 2.2.29+\n" +
@@ -117,7 +117,7 @@ class BlastParserTest {
                 "J\t@|GACACGGCTGTGTATTTCTGTGCGAGATATAGTGACTACGATTACCGGACCTTTGACTCCTGGGGCCAGGGAACCCTGGTCACCGTCTC|IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII\t51\tCTTTGACTCCTGGGGCCAGGGAACCCTGGTCACCGTCTC\t5\tCTTTGACTACTGGGGCCAGGGAACCCTGGTCACCGTCTC\n" +
                 "# BLAST processed 1 queries"
 
-        def segmentDatabase = new SegmentDatabase("data/", "human", ["IGH"], true, false)
+        def segmentDatabase = new SegmentDatabase("data/", "human", ["IGH"])
         def parser = new BlastParser(segmentDatabase)
 
         def mapping = parser.parse(chunk)
