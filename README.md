@@ -1,111 +1,102 @@
-#  IgBlast wrapper  
+#  HIgBlast
 
-A wrapper for [IgBlast](http://www.ncbi.nlm.nih.gov/igblast/igblast.cgi) immune repertoire analysis tool to facilitate analysis of NGS immune repertoire profiling data
+A wrapper for [IgBlast](http://www.ncbi.nlm.nih.gov/igblast/igblast.cgi) V-(D)-J mapping tool designed to facilitate analysis immune receptor libraries profiled using high-throughput sequencing.
 
-The software is distributed as a bundle with .jar executable, pre-compiled platform-specific IgBlast distribution and immune gene segments library
+The software is distributed as an executable JAR file and a data bundle.
 
+**NOTE** Last IgBlastWrp version is available [here](https://github.com/mikessh/higblast/releases/tag/v0.6) (source and readme are available [here](https://github.com/mikessh/higblast/tree/v0.6)), this is a completely re-written version of original software.
 
-## Motivation:
+## Motivation
 
-- IgBlast doesn't extract sequence of CDR3 region directly, neither provide coordinates for CDR3 region in reads. It reports reference Cys residue of Variable segment and Variable segment end in CDR3, but not Phe/Trp residue of J segment that marks the end of CDR3
+While being a gold standard of V-(D)-J mapping, the following limitations apply to IgBlast:
 
-- IgBlast output is not straightforward to parse and summarize, which is important to count clonotype diversity of high-throughput sequencing sample
+- It doesn't extract sequence of CDR3 region directly, neither provide coordinates for CDR3 region in reads. It reports reference Cys residue of Variable segment and Variable segment end in CDR3, but not Phe/Trp residue of J segment that marks the end of CDR3
 
-- IgBlast doesn't account for sequence quality
+- Output is not straightforward to parse and summarize, which is important to count clonotype diversity of high-throughput sequencing sample
 
+- It doesn't account for sequence quality
 
-## Features:
-
-- Run IgBlast on FASTQ data, provide quality filtering for CDRs and alleles/hypermutations
-
-- Speed-up by splitting reads into chunks of data and parallelizing IgBlast (the conventional --num-threads argument doesn't work well)
-
-- Speed-up by removing redundant reads
-
-- Report V/D/J segments and CDR1/2/3 sequences
-
-- Group clonotypes and enumerate them
-
-- Reporting of mismatches (alleles/hypermutations) in V gene
+- It cannot group reads into clonotypes
 
 
-## Execution:
+## Features
+
+Present wrapper adds the following capabilities to IgBlast:
+
+- Run on FASTQ data
+
+- Use a comprehensive V/D/J segment database for human, mouse, rat, rabbit and rhesus monkey
+
+- Speed-up by piping reads to IgBlast and parsing the output in parallel as the built-in ``--num-threads`` argument doesn't offer much optimization
+
+- Assemble clonotypes, apply various filtering options such as quality filtering for CDR3 N-regions and mutations, non-coding sequence filtering, etc
+
+- Reporting mutations (including indels) in V, D and J segments, grouped by CDR/FW region
+
+## Pre-requisites
+
+[Java v1.8](http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html) is required to run HIgBlast. Users should then install [IgBlast v1.4.0](ftp://ftp.ncbi.nih.gov/blast/executables/igblast/release/1.4.0/) binaries that are appropriate for their system and make sure that ``igblastn`` and ``makeblastdb`` are added to ``$PATH`` or the directory that contains binaries is specified using ``--blast-dir /path/to/bin/`` argument during HIgBlast execution.
+
+## Execution
+
+To see the full list of HIgBlast options run 
 
 ```bash
-java -jar path/to/igblastwrp.jar [options] inputFile outputPrefix
+java -jar higblast-1.0.0.jar -h
 ```
 
-For example
+The following command will process ``sample.fastq.gz`` file, assemble clonotypes and store them in ``out.txt``:
+
 ```bash
-java -Xmx40G -jar igblastwrp.jar -cf -R IGH --all-alleles input.fastq.gz output.txt
+java -Xmx8G -jar higblast-1.0.0.jar -R IGH -S human sample.fastq.gz out.txt
 ```
 
-Input file could be either in FASTQ or FASTA format, raw or GZipped.
+HIgBlast can be also run in per-read mode and allows piping results, e.g.:
 
-### Options:
+```bash
+java -Xmx8G -jar higblast-1.0.0.jar --by-read -R IGH -S human sample.fastq.gz - | grep IGHV1-8*01 > out.txt
+```
 
-* `-R chain` Sets the receptor chain. **Required**. Currently supported: `TRA`, `TRB`, `TRG`, `TRD`, `IGH`, `IGK`, `IGL`
+## Output format
 
-* `--all-alleles` Use all alleles during alignment (this is going to be slower). **NOTE** By default only major (*01) alleles are used for alignment.
+The output is provided in a tab-delimited format. Note that no header column is present in piped output. Mutations are grouped by their FW/CDR region in several columns, mutations in the same region are separated with commas. Mutation entries are stored as follows,
 
-* `-S species` Sets the species. Currently supported: `human`, `mouse`, `rat`, `rabbit` and `rhesus_monkey`
+```
+$type$position:$reference>$query
+```
 
-* `-f` filter clonotypes with non-functional CDR3 region (contains stop or is out-of-frame)
+where ``$type`` is ``S`` for substitution, ``D`` for deletion or ``I`` for indel. Position field ``$position`` marks either the substituted base, the first deleted base or the first base after insertion. Mutation positions are provided in Variable segment coordinates with the first Variable segment germline nucleotide having position of ``0``. Reference and query bases are provided for substitution, deleted and inserted bases are provided for deletions and insertions (omitting ``>``).
 
-* `-c` filter clonotypes with incomplete CDR3 sequence
+Output format for assembled clonotypes is the following:
 
-* `--no-cdr3` report clonotypes, for which not even a portion of CDR3 is identified
-
-* `-q x` quality threshold. Lowest quality for CDR sequences should be higher than the threshold for a clonotype to pass filter. Mutations having quality lower than the threshold are also filtered
-
-* `-l x` clonotype detalizaiton level. Possible values: `0`, `1`, `2` and `0,1`, `0,1,2`, etc. At detalization level `0` clonotypes are grouped by CDR3 sequence, all mutations are then assembled and enumerated within clonotype. For detalization level `1` CDR1,2 and 3 sequences are used. For level `2` CDR3 sequence and all sequence mutations are used in clonotype grouping. Output will be generated for all specified levels and `outputPrefix` will be appended with `L$level.txt`. Note that out-of-frame and stop codon presence is calculated corresponding to detalization level, i.e. stop codons in FW1 don't *noStop* field in level `2` output.
-
-* `-N x` take `x` first reads for analysis (useful for down-sampling)
-
-* `-p x` use `x` cores (uses all cores by default)
-
-* `-a` [MIGEC](https://github.com/mikessh/migec) compatibility mode. Assumes FASTQ headers contain a *UMI:NNNNN:READ_COUNT* entry and performs separate read and UMI (event) counting
-
-* `--debug` Debug mode. Will run in a single thread and pring IgBlast output to stdout. Should be used as `java -jar igblastwrp.jar --debug input_file - > results.txt`
-
-* `-h` display help message
-
-### Output table format:
-
-Column       | Definition
--------------|--------------------------------------------------------------------------------------------------------
-reads_count  | number of reads
-reads_freq   | share of reads
-mig_count    | number of MIGs (read groups with distinct UMIs), only applies when using `-a` optional
-mig_freq     | share of MIGs
-cdr1nt       | CDR1 nucleotide sequence
-cdr2nt       | CDR2 nucleotide sequence
-cdr3nt       | CDR3 nucleotide sequence
-cdr1aa       | CDR1 amino acid sequence
-cdr2aa       | CDR2 amino acid sequence
-cdr3aa       | CDR3 amino acid sequence
-inFrame      | clonotype is in-frame. Applies to CDR3 (level 0), CDR1-3 (level 1) and whole sequence (level 2)
-noStop       | clonotype doesn't contain stop codons. Applies to CDR3 (level 0), CDR1-3 (level 1) and whole sequence (level 2)
-complete     | CDR3 region is identified completely
-vSegment     | Variable segment (major allele only)
-dSegment     | Diversity segment (major allele only)
-jSegment     | Joining segment (major allele only)
-cdr1q        | quality string for CDR1 region
-cdr2q        | quality string for CDR2 region
-cdr3q        | quality string for CDR3 region
-mutations    | mutations string
-
-Mutation string is a list of mutation entries separated by "|", i.e. `entry1``|``entry2``|``...`. 
-
-Each mutation entry is encoded in the following comma-separated format:
-
-`reads_count:reads_freq:mig_count:mig_freq``,``nt_pos:nt_from>nt_to``,``aa_pos:aa_from>aa_to``,``region`
-
-Here is an example:
-
-> 3505:1E0:107:1E0,67:C>G,22:T>S,FW2|4:1,1E-3:1:9,3E-3,87:A>T,29:S>C,CDR1
+Column           | Definition
+-----------------|------------------------------------------------------------------------
+freq             | clonotype frequency (0..1)
+count            | number of reads
+mig_freq         | share of MIGs
+v                | Variable segment (top hit only)
+d                | Diversity segment (top hit only)
+j                | Joining segment (top hit only)
+cdr3nt           | CDR3 nucleotide sequence
+cdr3aa           | CDR3 amino acid sequence
+mutations.FR1    | Mutations in FR1 region
+mutations.CDR1   | Mutations in CDR1 region
+mutations.FR2    | Mutations in FR2 region
+mutations.CDR2   | Mutations in CDR2 region
+mutations.FR3    | Mutations in FR3 region
+mutations.CDR3   | Mutations in V/D/J germline sequence in CDR3 region
+mutations.FR4    | 
+cdr.insert.qual  | quality string N-nucleotides in CDR3 region
+mutations.qual   | mutation quality string
  
 ## Installation
 
-The most straightforward way to build the scripts is to create an Intellij Project (Groovy), then use "Open Module Settings"->Artifacts(+)Jar->from modules with dependencies followed by Build->Build artifacts. Module architecture could be changed to Maven soon..  
-As for now you are recommended to use platform-specific binaries from [Latest release](https://github.com/mikessh/igblastwrp/releases/latest)
+See [latest release](https://github.com/mikessh/igblastwrp/releases/latest) section for HIgBlast package.
+
+HIgBlast can be also compiled from sources using [Gradle](https://gradle.org/) with ``gradle build``. Note that in order for tests to pass IgBlast binaries should be in ``$PATH`` variable, you may need to modify following part of ``build.gradle`` 
+
+```gradle
+test {
+    environment "PATH", "$System.env.PATH:/usr/local/bin/:/usr/local/ncbi/igblast/bin/"
+}
+```
