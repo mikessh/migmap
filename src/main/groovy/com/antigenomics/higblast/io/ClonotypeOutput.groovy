@@ -50,7 +50,7 @@ class ClonotypeOutput implements InputPort<ReadMapping> {
         }.sort().each {
             if (clonotypeFilter.pass(it)) {
                 plainTextOutput.put(it.toString())
-                nPassed = 0
+                nPassed++
             }
         }
         plainTextOutput.close()
