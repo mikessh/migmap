@@ -35,7 +35,7 @@ class SegmentDatabase {
 
     SegmentDatabase(String dataBundlePath,
                     String species, List<String> genes,
-                    boolean allAlleles, boolean useKabat) {
+                    boolean allAlleles = true) {
         genes = genes.unique()
 
         def speciesAlias = SPECIES_ALIAS[species]
@@ -72,7 +72,7 @@ class SegmentDatabase {
             }
         }
 
-        Util.report("Loaded database. #v=$vSegments,#d=$dSegments,#j=$jSegments.", 2)
+        Util.report("Loaded database for $species:${genes.join(",")}. #v=$vSegments,#d=$dSegments,#j=$jSegments.", 2)
 
         if (!hasD) {
             segments.put(Segment.DUMMY_D.name, Segment.DUMMY_D)
