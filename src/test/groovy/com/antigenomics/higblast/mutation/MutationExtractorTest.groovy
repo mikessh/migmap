@@ -18,7 +18,7 @@ package com.antigenomics.higblast.mutation
 
 import com.antigenomics.higblast.blast.Alignment
 import com.antigenomics.higblast.genomic.SegmentDatabase
-import com.antigenomics.higblast.genomic.VSegment
+import com.antigenomics.higblast.mapping.RegionMarkup
 import org.junit.AfterClass
 import org.junit.Test
 
@@ -56,13 +56,12 @@ class MutationExtractorTest {
                 "GCACAGAAGTTTCAGGGCAGGGTCACCATGACCAGGGACACGTCCATGACCACAATCTACATGGAGCTGAGCGGACTCACATCTGACGAC" +
                 "ACGGCCGTGTATTTTTGTACCAGA"
 
-        def segDb = new SegmentDatabase("data/", "human", ["IGH"], true, false)
+        def segmentDatabase = new SegmentDatabase("data/", "human", ["IGH"])
 
-        def segment = segDb.segments["IGHV1-2*02"] as VSegment
-
+        def segment = segmentDatabase.segments["IGHV1-2*02"]
+        def regionMarkup = new RegionMarkup(75, 99, 150, 174, 287, 288)
         def alignment = new Alignment(0, query, 0, segment.sequence.substring(0, query.length()))
-
-        def mutations = new MutationExtractor(segment, alignment).mutations
+        def mutations = new MutationExtractor(segment, alignment, regionMarkup).mutations
 
         def expectedSubRegions = [FR1, FR1, FR1, FR1, FR1,
                                   CDR1, CDR1, CDR1, CDR1, CDR1,
