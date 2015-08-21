@@ -31,7 +31,8 @@ class ClonotypeOutput implements InputPort<ReadMapping> {
                     ClonotypeFilter clonotypeFilter = new ClonotypeFilter()) {
         this.plainTextOutput = plainTextOutput
         this.clonotypeFilter = clonotypeFilter
-        plainTextOutput.put(Clonotype.OUTPUT_HEADER)
+        if (plainTextOutput != StdOutput.INSTANCE)
+            plainTextOutput.put(Clonotype.OUTPUT_HEADER)
     }
 
     @Override

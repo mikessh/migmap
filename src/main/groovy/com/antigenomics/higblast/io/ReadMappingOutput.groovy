@@ -24,7 +24,8 @@ class ReadMappingOutput implements InputPort<ReadMapping> {
 
     ReadMappingOutput(PlainTextOutput plainTextOutput = StdOutput.INSTANCE) {
         this.plainTextOutput = plainTextOutput
-        plainTextOutput.put(ReadMapping.OUTPUT_HEADER)
+        if (plainTextOutput != StdOutput.INSTANCE)
+            plainTextOutput.put(ReadMapping.OUTPUT_HEADER)
     }
 
     @Override
