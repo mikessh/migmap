@@ -22,19 +22,20 @@ import org.junit.Test
 class SegmentDatabaseTest {
     @Test
     void massiveLoadTest() {
-        ["human", "mouse", "rat", "rabbit"].each { // todo: monkey
-            println "Loading data for $it"
-
+        ["human", "mouse", "rat", "rabbit", "rhesus_monkey"].each {
             def segmentDatabase = new SegmentDatabase("data/", it, ["TRA", "TRB", "TRG", "TRD",
-                                                                    "IGH", "IGK", "IGL"], true, false)
+                                                                    "IGH", "IGK", "IGL"])
 
             assert !segmentDatabase.segments.isEmpty()
+            assert segmentDatabase.vSegments > 0
+            assert segmentDatabase.dSegments > 0
+            assert segmentDatabase.jSegments > 0
         }
     }
 
     @Test
     void loadTest() {
-        def segmentDatabase = new SegmentDatabase("data/", "human", ["IGH"], true, false)
+        def segmentDatabase = new SegmentDatabase("data/", "human", ["IGH"])
 
         assert !segmentDatabase.segments.isEmpty()
 
@@ -54,23 +55,13 @@ class SegmentDatabaseTest {
 
     @Test
     void makeDbTest() {
-        def segmentDatabase = new SegmentDatabase("data/", "human", ["TRA"], true, false)
+        def segmentDatabase = new SegmentDatabase("data/", "human", ["TRA"])
         segmentDatabase.makeBlastDb()
 
         assert new File(segmentDatabase.databaseTempPath).exists()
         assert new File("$segmentDatabase.databaseTempPath/v.nhr").exists()
         assert new File("$segmentDatabase.databaseTempPath/d.nhr").exists()
-    }
-
-    @Test
-    void markupTest() {
-        //def segmentDatabase = new SegmentDatabase("data/", "human", ["IGH"], true, false)
-        //def segment = segmentDatabase.segments["IGHV1-18*01"]
-
-        //assert (segment as VSegment).cdr1start == 75
-        //assert (segment as VSegment).cdr1end == 99
-        //assert (segment as VSegment).cdr2start == 150
-        //assert (segment as VSegment).cdr2end == 174
+        assert new File("$segmentDatabase.databaseTempPath/j.nhr").exists()
     }
 
     @AfterClass
