@@ -22,7 +22,7 @@ import com.antigenomics.higblast.mapping.ReadMapping
 class ReadMappingOutput implements InputPort<ReadMapping> {
     final PlainTextOutput plainTextOutput
 
-    ReadMappingOutput(PlainTextOutput plainTextOutput = new StdOutput()) {
+    ReadMappingOutput(PlainTextOutput plainTextOutput = StdOutput.INSTANCE) {
         this.plainTextOutput = plainTextOutput
         plainTextOutput.println(ReadMapping.OUTPUT_HEADER)
     }

@@ -17,7 +17,9 @@
 package com.antigenomics.higblast.io
 
 class StdOutput extends PlainTextOutput {
-    StdOutput() {
+    static final StdOutput INSTANCE = new StdOutput()
+
+    private StdOutput() {
         super(System.out)
     }
 }

@@ -23,6 +23,7 @@ import com.antigenomics.higblast.io.Read
 import com.antigenomics.higblast.mapping.ReadMapping
 
 class BlastInstance implements OutputPort<ReadMapping>, InputPort<Read> {
+    final Queue<Read> reads = new LinkedList<>()
     final Process proc
     final BufferedReader reader
     final PrintWriter writer
@@ -37,16 +38,22 @@ class BlastInstance implements OutputPort<ReadMapping>, InputPort<Read> {
         this.parser = parser
     }
 
+    static String getHeader(String chunk) {
+        (chunk =~ /# Query: (.+)/)[0][1]
+    }
+
     static Read getRead(String chunk) {
         def header = (chunk =~ /# Query: (.+)\|(.+)\|(.+)/)[0]
         new Read(header[1], header[2], header[3])
     }
 
     ReadMapping parse(String chunk) {
-        new ReadMapping(parser.parse(chunk), getRead(chunk))
+        def read = reads.poll()
+        new ReadMapping(parser.parse(chunk), read)
+        //new ReadMapping(parser.parse(chunk), getRead(chunk))
     }
 
-    synchronized String nextChunk() {
+    String nextChunk() {
         if (last) {
             // finished
             return null
@@ -77,13 +84,20 @@ class BlastInstance implements OutputPort<ReadMapping>, InputPort<Read> {
     ReadMapping take() {
         String chunk = nextChunk()
 
-        chunk ? parse(chunk) : null
+        if (chunk) {
+            return parse(chunk)
+        } else {
+            close()
+            return null
+        }
     }
 
     @Override
     void put(Read input) {
         if (input) {
-            writer.println(">" + input.header + "|" + input.seq + "|" + input.qual + "\n" + input.seq)
+            //writer.println(">" + input.header + "|" + input.seq + "|" + input.qual + "\n" + input.seq)
+            reads.add(input)
+            writer.println(">" + input.header + "\n" + input.seq)
         } else {
             // no more reads
             writer.close()

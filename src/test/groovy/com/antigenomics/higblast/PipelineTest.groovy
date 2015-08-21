@@ -45,6 +45,4 @@ class PipelineTest {
     static void tearDown() {
         SegmentDatabase.clearTemporaryFiles()
     }
-
-
 }

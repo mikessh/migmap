@@ -64,8 +64,9 @@ class BlastInstanceTest {
 
         String chunk = instance.nextChunk()
 
-        def extractedRead = instance.getRead(chunk)
-        assert extractedRead.equals(read)
+        //def extractedRead = instance.getRead(chunk)
+        //assert extractedRead.equals(read)
+        assert instance.getHeader(chunk).equals(read.header)
 
         assert instance.nextChunk() == null
         assert chunk.contains("# V-(D)-J rearrangement summary")
@@ -89,7 +90,7 @@ class BlastInstanceTest {
         def readsIds = new HashSet<String>()
 
         (0..<nQueries).each {
-            def header = "@$it"
+            def header = "@$it".toString()
             readsIds.add(header)
             instance.put(new Read(header, seq, qual))
         }
@@ -98,10 +99,12 @@ class BlastInstanceTest {
 
         def extractedIds = new HashSet<String>((0..<nQueries).collect {
             def chunk = instance.nextChunk()
-            assert instance.parse(chunk).cdr3nt == "TGTGCGAGGTGGCTTGGGGAAGACATTCGGACCTTTGACTCCTGG"
-            BlastInstance.getRead(chunk).header
+            def mapping = instance.parse(chunk)
+            assert mapping.cdr3nt == "TGTGCGAGGTGGCTTGGGGAAGACATTCGGACCTTTGACTCCTGG"
+            //BlastInstance.getHeader(chunk)
+            mapping.header
         })
-
+        
         def intersection = extractedIds.intersect(readsIds)
 
         assert extractedIds.size() == nQueries

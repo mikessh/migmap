@@ -79,7 +79,7 @@ class Pipeline {
                 void run() {
                     def result
                     while ((result = instance.take()) != null) {
-                        if (result.mapping) {
+                        if (result.mapped) {
                             mappedCounter.incrementAndGet()
                             if (result.mapping.hasCdr3) {
                                 cdr3FoundCounter.incrementAndGet()
@@ -121,6 +121,12 @@ class Pipeline {
         Util.report("Finished analysis. Reads mapped $mappedCount (with CDR3 $cdr3FoundCount) of $processedCount", 2)
 
         output.close()
+    }
+
+    final Thread.UncaughtExceptionHandler h = new Thread.UncaughtExceptionHandler() {
+        void uncaughtException(Thread t, Throwable e) {
+            throw new RuntimeException("Error in pipeline", e)
+        }
     }
 
     long getInputCount() {

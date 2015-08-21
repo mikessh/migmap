@@ -34,7 +34,7 @@ class BlastInstanceFactory {
 
         def OPTS = ["SEGM_OPT"  :
                             ["v", "d", "j"].collect { segment ->
-                                "-germline_db_${segment.toUpperCase()} $segmentDatabase.databaseTempPath/$segment"
+                                "-germline_db_${segment.toUpperCase()} ${new File(segmentDatabase.databaseTempPath).absolutePath}/$segment"
                             },
 
                     "AUX_OPT"   :
@@ -57,7 +57,7 @@ class BlastInstanceFactory {
         ].flatten()
 
         this.env = ["IGDATA=\"$dataBundlePath\""]
-        this.dir = new File(dataBundlePath).parentFile
+        this.dir = new File(dataBundlePath)
 
         segmentDatabase.makeBlastDb()
     }
