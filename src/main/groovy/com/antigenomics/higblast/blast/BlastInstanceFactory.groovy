@@ -57,7 +57,7 @@ class BlastInstanceFactory {
         ].flatten()
 
         this.env = ["IGDATA=\"$dataBundlePath\""]
-        this.dir = new File(dataBundlePath)
+        this.dir = new File(dataBundlePath) // <- this is most crucial here. Blast will not find internal_data otherwise
 
         segmentDatabase.makeBlastDb()
     }
