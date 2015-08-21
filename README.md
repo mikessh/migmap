@@ -4,6 +4,8 @@ A wrapper for [IgBlast](http://www.ncbi.nlm.nih.gov/igblast/igblast.cgi) V-(D)-J
 
 The software is distributed as an executable JAR file and a data bundle.
 
+**NOTE** Last IgBlastWrp version is available [here](https://github.com/mikessh/higblast/releases/tag/v0.6), this is a completely re-written version of original software.
+
 ## Motivation
 
 While being a gold standard of V-(D)-J mapping, the following limitations apply to IgBlast:
