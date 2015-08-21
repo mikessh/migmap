@@ -29,8 +29,10 @@ class BlastInstanceFactory {
     BlastInstanceFactory(String dataBundlePath,
                          String species, List<String> genes,
                          boolean allAlleles, boolean useKabat) {
-        this.segmentDatabase = new SegmentDatabase(dataBundlePath, species, genes, allAlleles, useKabat)
+        this.segmentDatabase = new SegmentDatabase(dataBundlePath, species, genes, allAlleles)
         this.parser = new BlastParser(segmentDatabase)
+
+        def seqtype = genes[0].startsWith("TR") ? "TCR" : "Ig" // todo: restrict users from mixing TR/IG genes?
 
         def OPTS = ["SEGM_OPT"  :
                             ["v", "d", "j"].collect { segment ->
@@ -41,7 +43,7 @@ class BlastInstanceFactory {
                             "-auxiliary_data $dataBundlePath/optional_file/${species}_gl.aux",
 
                     "ORG_OPT"   :
-                            "-organism $species",
+                            "-organism $species -ig_seqtype $seqtype",
 
                     "DOMAIN_OPT":
                             "-domain_system ${useKabat ? "kabat" : "imgt"}"
