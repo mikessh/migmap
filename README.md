@@ -42,19 +42,19 @@ Present wrapper adds the following capabilities to IgBlast:
 To see the full list of HIgBlast options run 
 
 ```bash
-java -jar higblast-1.0.0.jar -h
+java -jar higblast.jar -h
 ```
 
 The following command will process ``sample.fastq.gz`` file, assemble clonotypes and store them in ``out.txt``:
 
 ```bash
-java -Xmx8G -jar higblast-1.0.0.jar -R IGH -S human sample.fastq.gz out.txt
+java -Xmx8G -jar higblast.jar -R IGH -S human sample.fastq.gz out.txt
 ```
 
 HIgBlast can be also run in per-read mode and allows piping results, e.g.:
 
 ```bash
-java -Xmx8G -jar higblast-1.0.0.jar --by-read -R IGH -S human sample.fastq.gz - | grep "IGHV1-8" > out.txt
+java -Xmx8G -jar higblast.jar --by-read -R IGH -S human sample.fastq.gz - | grep "IGHV1-8" > out.txt
 ```
 
 ## Output format
