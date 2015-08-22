@@ -17,6 +17,7 @@
 package com.antigenomics.higblast.blast
 
 import com.antigenomics.higblast.Util
+import com.antigenomics.higblast.genomic.SegmentDatabase
 import com.antigenomics.higblast.io.InputPort
 import com.antigenomics.higblast.io.OutputPort
 import com.antigenomics.higblast.io.Read
@@ -109,7 +110,7 @@ class BlastInstance implements OutputPort<ReadMapping>, InputPort<Read> {
         proc.waitFor()
 
         if (proc.exitValue() > 0) {
-            Util.report("[ERROR] IgBlast failed with CODE${proc.exitValue()}: ${proc.getErrorStream()}", 1)
+            Util.error("[ERROR] IgBlast failed with CODE${proc.exitValue()}: ${proc.getErrorStream()}", 2)
         }
     }
 }

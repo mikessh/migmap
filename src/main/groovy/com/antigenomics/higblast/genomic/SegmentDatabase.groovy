@@ -16,7 +16,7 @@
 
 package com.antigenomics.higblast.genomic
 
-import com.antigenomics.higblast.RuntimeInfo
+import com.antigenomics.higblast.ExecutionUtil
 import com.antigenomics.higblast.Util
 
 class SegmentDatabase {
@@ -114,7 +114,7 @@ class SegmentDatabase {
         }
 
         ["v", "d", "j"].each {
-            "$RuntimeInfo.makeDb -parse_seqids -dbtype nucl -in $databaseTempPath/${it}.fa -out $databaseTempPath/$it".execute().waitFor()
+            "$ExecutionUtil.makeDb -parse_seqids -dbtype nucl -in $databaseTempPath/${it}.fa -out $databaseTempPath/$it".execute().waitFor()
         }
     }
 

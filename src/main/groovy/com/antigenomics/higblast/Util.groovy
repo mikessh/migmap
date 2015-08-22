@@ -16,11 +16,14 @@
 
 package com.antigenomics.higblast
 
+import com.antigenomics.higblast.genomic.SegmentDatabase
+
 import java.util.regex.Matcher
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
 
 class Util {
+    static final int N_THREADS = Runtime.runtime.availableProcessors()
     static final String MY_NA = ".", BLAST_NA = "N/A"
     static final char GAP = '-'
     static final byte MAX_QUAL = 40, MIN_QUAL = 2
@@ -31,6 +34,16 @@ class Util {
         if (verbosity <= VERBOSITY_LEVEL) {
             System.err.println("[${new Date()} HIGBLAST] $message")
         }
+    }
+
+    static void error(String message, int code) {
+        // code
+        // 1 - runtime error in wrapper
+        // 2 - blast error
+        // 3 - error in main script
+        System.err.println("[${new Date()} HIGBLAST ERROR] $message")
+        SegmentDatabase.clearTemporaryFiles()
+        System.exit(code)
     }
 
     static String qualToString(byte[] qual) {

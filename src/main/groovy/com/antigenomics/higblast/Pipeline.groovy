@@ -37,7 +37,7 @@ class Pipeline {
     final InputPort<ReadMapping> output
 
     Pipeline(OutputPort<Read> input, BlastInstanceFactory blastInstanceFactory,
-             InputPort<ReadMapping> output, long limit = -1, int nThreads = RuntimeInfo.N_THREADS) {
+             InputPort<ReadMapping> output, long limit = -1, int nThreads = Util.N_THREADS) {
         this.input = input
         this.blastInstanceFactory = blastInstanceFactory
         this.output = output

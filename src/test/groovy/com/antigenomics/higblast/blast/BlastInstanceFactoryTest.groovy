@@ -16,7 +16,8 @@
 
 package com.antigenomics.higblast.blast
 
-import com.antigenomics.higblast.RuntimeInfo
+import com.antigenomics.higblast.ExecutionUtil
+import com.antigenomics.higblast.Util
 import com.antigenomics.higblast.genomic.SegmentDatabase
 import org.junit.AfterClass
 import org.junit.Test
@@ -25,14 +26,14 @@ class BlastInstanceFactoryTest {
     @Test
     void executeTest() {
         // Should fail with error = 2 if software is not present
-        println RuntimeInfo.makeDb.execute().text
-        println RuntimeInfo.igBlast.execute().text
+        println ExecutionUtil.makeDb.execute().text
+        println ExecutionUtil.igBlast.execute().text
     }
 
     @Test
     void createTest() {
         def factory = new BlastInstanceFactory("data/", "human", ["TRB"], true, false)
-        def instances = (1..RuntimeInfo.N_THREADS).collect { factory.create() }
+        def instances = (1..Util.N_THREADS).collect { factory.create() }
         instances.each { BlastInstance it -> it.put(null); it.close() }
     }
 

@@ -16,7 +16,7 @@
 
 package com.antigenomics.higblast.blast
 
-import com.antigenomics.higblast.RuntimeInfo
+import com.antigenomics.higblast.ExecutionUtil
 import com.antigenomics.higblast.genomic.SegmentDatabase
 
 class BlastInstanceFactory {
@@ -53,7 +53,7 @@ class BlastInstanceFactory {
             OUTFMT_OPT = ["-outfmt", "7 qseqid qstart qseq sstart sseq"],
             OUTPUT_OPT = "-out -"
 
-        this.cmdLine = [[RuntimeInfo.igBlast, OPTS.values(), REPORT_OPT, OUTPUT_OPT].
+        this.cmdLine = [[ExecutionUtil.igBlast, OPTS.values(), REPORT_OPT, OUTPUT_OPT].
                                 flatten().join(" ").split(" "),
                         OUTFMT_OPT
         ].flatten()
