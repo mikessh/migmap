@@ -152,8 +152,6 @@ try {
 
     new File("$ERROR_LOG").withPrintWriter { writer ->
         writer.println("[${new Date()} BEGIN]")
-        writer.println("[Script]")
-        writer.println(args[0])
         writer.println("[CommandLine]")
         writer.println("executing higblast.jar ${args.join(" ")}")
         writer.println("[Message]")
