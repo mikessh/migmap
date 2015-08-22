@@ -17,7 +17,6 @@
 package com.antigenomics.higblast.blast
 
 import com.antigenomics.higblast.Util
-import com.antigenomics.higblast.genomic.SegmentDatabase
 import com.antigenomics.higblast.io.InputPort
 import com.antigenomics.higblast.io.OutputPort
 import com.antigenomics.higblast.io.Read
@@ -41,17 +40,6 @@ class BlastInstance implements OutputPort<ReadMapping>, InputPort<Read> {
 
     static String getHeader(String chunk) {
         (chunk =~ /# Query: (.+)/)[0][1]
-    }
-
-    static Read getRead(String chunk) {
-        def header = (chunk =~ /# Query: (.+)\|(.+)\|(.+)/)[0]
-        new Read(header[1], header[2], header[3])
-    }
-
-    ReadMapping parse(String chunk) {
-        def read = reads.poll()
-        new ReadMapping(parser.parse(chunk), read)
-        //new ReadMapping(parser.parse(chunk), getRead(chunk))
     }
 
     String nextChunk() {
@@ -83,10 +71,10 @@ class BlastInstance implements OutputPort<ReadMapping>, InputPort<Read> {
 
     @Override
     ReadMapping take() {
-        String chunk = nextChunk()
+        def chunk = nextChunk(), read
 
-        if (chunk) {
-            return parse(chunk)
+        if (chunk && (read = reads.poll())) { // second condition protects from empty input
+            return new ReadMapping(parser.parse(chunk), read)
         } else {
             close()
             return null
@@ -96,7 +84,6 @@ class BlastInstance implements OutputPort<ReadMapping>, InputPort<Read> {
     @Override
     void put(Read input) {
         if (input) {
-            //writer.println(">" + input.header + "|" + input.seq + "|" + input.qual + "\n" + input.seq)
             reads.add(input)
             writer.println(">" + input.header + "\n" + input.seq)
         } else {

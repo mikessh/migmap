@@ -77,8 +77,6 @@ class BlastInstanceTest {
         println chunk
 
         assert instance.proc.exitValue() == 0
-
-        assert instance.parse(chunk).cdr3nt == "TGTGCGAGGTGGCTTGGGGAAGACATTCGGACCTTTGACTCCTGG"
     }
 
     @Test
@@ -98,13 +96,11 @@ class BlastInstanceTest {
         instance.put(null)
 
         def extractedIds = new HashSet<String>((0..<nQueries).collect {
-            def chunk = instance.nextChunk()
-            def mapping = instance.parse(chunk)
+            def mapping = instance.take()
             assert mapping.cdr3nt == "TGTGCGAGGTGGCTTGGGGAAGACATTCGGACCTTTGACTCCTGG"
-            //BlastInstance.getHeader(chunk)
             mapping.header
         })
-        
+
         def intersection = extractedIds.intersect(readsIds)
 
         assert extractedIds.size() == nQueries
