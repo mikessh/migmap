@@ -1,4 +1,4 @@
-#  HIgBlast
+#  HIgBlast aka IgBlastWrapper
 
 A wrapper for [IgBlast](http://www.ncbi.nlm.nih.gov/igblast/igblast.cgi) V-(D)-J mapping tool designed to facilitate analysis immune receptor libraries profiled using high-throughput sequencing.
 
