@@ -73,7 +73,7 @@ cli.h("Display this help message")
 
 def opt = cli.parse(args)
 
-if (opt.h || opt == null || opt.arguments().size() < 2 || !opt.R || !opt.S) {
+if (opt.h || opt == null || opt.arguments().size() != 2 || !opt.R || !opt.S) {
     cli.usage()
     System.exit(3)
 }
