@@ -16,6 +16,7 @@
 
 package com.antigenomics.higblast.mapping
 
+import com.antigenomics.higblast.mutation.Mutation
 import com.antigenomics.higblast.mutation.SubRegion
 
 class RegionMarkup {
@@ -30,6 +31,10 @@ class RegionMarkup {
         this.cdr2End = cdr2End
         this.cdr3Start = cdr3Start
         this.cdr3End = cdr3End
+    }
+
+    SubRegion getSubRegion(Mutation mutation) {
+        getSubRegion(mutation.posInRead)
     }
 
     SubRegion getSubRegion(int pos) {

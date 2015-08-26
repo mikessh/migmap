@@ -35,7 +35,7 @@ class MutationExtractor {
 
         vResult.mutations.each {
             it.parent = segment
-            it.subRegion = regionMarkup.getSubRegion(it.startInRead)
+            it.subRegion = regionMarkup.getSubRegion(it)
         }
 
         // This will be used later to recompute J and D mutations to V segment germline coords
