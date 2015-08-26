@@ -18,13 +18,11 @@ package com.antigenomics.higblast.clonotype
 
 class ClonotypeFilter {
     final boolean allowNoCdr3, allowIncomplete, allowNonCoding
-    final byte qualityThreshold
 
-    ClonotypeFilter(boolean allowNoCdr3, boolean allowIncomplete, boolean allowNonCoding, byte qualityThreshold) {
+    ClonotypeFilter(boolean allowNoCdr3, boolean allowIncomplete, boolean allowNonCoding) {
         this.allowNoCdr3 = allowNoCdr3
         this.allowIncomplete = allowIncomplete
         this.allowNonCoding = allowNonCoding
-        this.qualityThreshold = qualityThreshold
     }
 
     ClonotypeFilter() {
@@ -34,7 +32,6 @@ class ClonotypeFilter {
     boolean pass(Clonotype clonotype) {
         (allowNoCdr3 || clonotype.hasCdr3) &&
                 (allowIncomplete || clonotype.complete) &&
-                (allowNonCoding || (clonotype.inFrame && clonotype.noStop)) &&
-                clonotype.minQual >= qualityThreshold
+                (allowNonCoding || (clonotype.inFrame && clonotype.noStop))
     }
 }

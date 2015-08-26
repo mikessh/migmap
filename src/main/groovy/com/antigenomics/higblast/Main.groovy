@@ -24,7 +24,7 @@ import com.antigenomics.higblast.io.*
 def ALLOWED_CHAINS = ["TRA", "TRB", "TRG", "TRG", "IGH", "IGL", "IGK"],
     ALLOWED_SPECIES = ["human", "mouse", "rat", "rabbit", "rhesus_monkey"],
     HOME = new File(this.class.protectionDomain.codeSource.location.path).parent.replaceAll("%20", " "),
-    DEFAULT_Q = "30", ERROR_LOG = "_higblast_error.log"
+    DEFAULT_Q = "25", ERROR_LOG = "_higblast_error.log"
 
 def cli = new CliBuilder(usage: "higblast [options] input.(fa/fastq)[.gz] (output_file/- for stdout)")
 
@@ -133,13 +133,13 @@ genes.each { gene ->
 
 def allowIncomplete = (boolean) opt.'allow-incomplete',
     allowNoCdr3 = (boolean) opt.'allow-no-cdr3', allowNoncoding = (boolean) opt.'allow-noncoding',
-    q = Byte.parseByte((String) (opt.q ?: DEFAULT_Q))
+    qualityThreshold = Byte.parseByte((String) (opt.q ?: DEFAULT_Q))
 
 // RUNNING THE PIPELINE
 def inputPort = fastaFile ? new FastaReader(inputFileName) : new FastqReader(inputFileName)
 def outputPort = stdOutput ? StdOutput.INSTANCE : new FileOutput(outputFileName)
-def clonotypeFilter = new ClonotypeFilter(allowNoCdr3, allowIncomplete, allowNoncoding, q)
-outputPort = byRead ? new ReadMappingOutput(outputPort) : new ClonotypeOutput(outputPort, clonotypeFilter)
+def clonotypeFilter = new ClonotypeFilter(allowNoCdr3, allowIncomplete, allowNoncoding)
+outputPort = byRead ? new ReadMappingOutput(outputPort) : new ClonotypeOutput(outputPort, qualityThreshold, clonotypeFilter)
 def blastInstanceFactory = new BlastInstanceFactory(dataDir, species, genes, allAlleles, useKabat)
 
 try {

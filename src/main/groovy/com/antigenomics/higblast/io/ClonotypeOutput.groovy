@@ -23,13 +23,15 @@ import com.antigenomics.higblast.clonotype.ClonotypeFilter
 import com.antigenomics.higblast.mapping.ReadMapping
 
 class ClonotypeOutput implements InputPort<ReadMapping> {
-    final ClonotypeAccumulator clonotypeAccumulator = new ClonotypeAccumulator()
+    final ClonotypeAccumulator clonotypeAccumulator
     final PlainTextOutput plainTextOutput
     final ClonotypeFilter clonotypeFilter
 
     ClonotypeOutput(PlainTextOutput plainTextOutput = StdOutput.INSTANCE,
+                    byte qualityThreshold,
                     ClonotypeFilter clonotypeFilter = new ClonotypeFilter()) {
         this.plainTextOutput = plainTextOutput
+        this.clonotypeAccumulator = new ClonotypeAccumulator(qualityThreshold)
         this.clonotypeFilter = clonotypeFilter
         if (plainTextOutput != StdOutput.INSTANCE)
             plainTextOutput.put(Clonotype.OUTPUT_HEADER)

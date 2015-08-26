@@ -23,18 +23,29 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
 
 class ClonotypeAccumulator implements InputPort<ReadMapping> {
-    def total = new AtomicLong()
-    def clonotypeMap = new ConcurrentHashMap<ClonotypeKey, ClonotypeData>()
+    final AtomicLong total = new AtomicLong(),
+                     mapped = new AtomicLong(),
+                     good = new AtomicLong()
+    final ConcurrentHashMap<ClonotypeKey, ClonotypeData> clonotypeMap = new ConcurrentHashMap<>()
+    final byte qualityThreshold
+
+    ClonotypeAccumulator(byte qualityThreshold) {
+        this.qualityThreshold = qualityThreshold
+    }
 
     @Override
     void put(ReadMapping readMapping) {
-        if(readMapping.mapped) {
-            ClonotypeData clonotypeData = clonotypeMap.putIfAbsent(new ClonotypeKey(readMapping),
-                    new ClonotypeData(readMapping))
-            if (clonotypeData) {
-                clonotypeData.update(readMapping)
+        total.incrementAndGet()
+        if (readMapping.mapped) {
+            mapped.incrementAndGet()
+            if (readMapping.cdrInsertQual >= qualityThreshold && readMapping.mutationQual >= qualityThreshold) {
+                good.incrementAndGet()
+                ClonotypeData clonotypeData = clonotypeMap.putIfAbsent(new ClonotypeKey(readMapping),
+                        new ClonotypeData(readMapping))
+                if (clonotypeData) {
+                    clonotypeData.update(readMapping)
+                }
             }
-            total.incrementAndGet()
         }
     }
 
@@ -45,5 +56,13 @@ class ClonotypeAccumulator implements InputPort<ReadMapping> {
 
     long getTotal() {
         total.get()
+    }
+
+    long getGood() {
+        good.get()
+    }
+
+    long getMapped() {
+        mapped.get()
     }
 }
