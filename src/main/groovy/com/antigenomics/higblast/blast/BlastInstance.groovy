@@ -97,7 +97,7 @@ class BlastInstance implements OutputPort<ReadMapping>, InputPort<Read> {
         proc.waitFor()
 
         if (proc.exitValue() > 0) {
-            Util.error("[ERROR] IgBlast failed with CODE${proc.exitValue()}: ${proc.getErrorStream()}", 2)
+            Util.error("IgBlast failed with CODE${proc.exitValue()}: ${proc.getErrorStream()}", 2)
         }
     }
 }
