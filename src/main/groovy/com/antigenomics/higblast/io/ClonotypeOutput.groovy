@@ -28,7 +28,7 @@ class ClonotypeOutput implements InputPort<ReadMapping> {
     final ClonotypeFilter clonotypeFilter
 
     ClonotypeOutput(PlainTextOutput plainTextOutput = StdOutput.INSTANCE,
-                    byte qualityThreshold,
+                    byte qualityThreshold = (byte) 25,
                     ClonotypeFilter clonotypeFilter = new ClonotypeFilter()) {
         this.plainTextOutput = plainTextOutput
         this.clonotypeAccumulator = new ClonotypeAccumulator(qualityThreshold)

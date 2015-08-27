@@ -94,6 +94,18 @@ class ReadMapping {
         }
     }
 
+    byte getMinCdrInsertQual() {
+        def min = Util.MAX_QUAL
+        cdrInsertQual.each { min = Math.min(it, min) }
+        min
+    }
+
+    byte getMinMutationQual() {
+        def min = Util.MAX_QUAL
+        mutationQual.each { min = Math.min(it, min) }
+        min
+    }
+
     boolean isMapped() {
         mapping != null
     }

@@ -38,7 +38,7 @@ class ClonotypeAccumulator implements InputPort<ReadMapping> {
         total.incrementAndGet()
         if (readMapping.mapped) {
             mapped.incrementAndGet()
-            if (readMapping.cdrInsertQual >= qualityThreshold && readMapping.mutationQual >= qualityThreshold) {
+            if (readMapping.minCdrInsertQual >= qualityThreshold && readMapping.minMutationQual >= qualityThreshold) {
                 good.incrementAndGet()
                 ClonotypeData clonotypeData = clonotypeMap.putIfAbsent(new ClonotypeKey(readMapping),
                         new ClonotypeData(readMapping))

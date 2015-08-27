@@ -26,7 +26,7 @@ class ClonotypeFilter {
     }
 
     ClonotypeFilter() {
-        this(false, false, true, (byte) 30)
+        this(false, false, true)
     }
 
     boolean pass(Clonotype clonotype) {
