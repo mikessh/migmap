@@ -88,6 +88,14 @@ mutations.CDR3   | Mutations in V/D/J germline sequence in CDR3 region
 mutations.FR4    | 
 cdr.insert.qual  | quality string N-nucleotides in CDR3 region
 mutations.qual   | mutation quality string
+v.end.in.cdr3    | V segment end (exclusive) in CDR3 region
+d.start.in.cdr3  | D segment start in CDR3 region or -1 if D segment not defined
+d.end.in.cdr3    | D segment end (exclusive) in CDR3 region or -1 if D segment not defined
+j.start.in.cdr3  | J segment start in CDR3 region or -1 if J segment not defined
+v.del            | Number of nucleotides deleted from V segment 3' end
+d.del.5          | Number of nucleotides deleted from D segment 5' end or -1 if D segment not defined
+d.del.3          | Number of nucleotides deleted from D segment 3' end or -1 if D segment not defined
+j.del            | Number of nucleotides deleted from J segment 5' end or -1 if J segment not defined
  
 ## Installation
 
