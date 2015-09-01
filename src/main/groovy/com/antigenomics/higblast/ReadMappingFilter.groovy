@@ -127,7 +127,8 @@ class ReadMappingFilter {
     }
 
     public String toProgressString() {
-        "Processed $total reads, of them ${Util.toPercent(mappedRatio)}% mapped " +
+        "Processed $total reads, of them ${Util.toPercent(mappedRatio)}% mapped, " +
+                "${Util.toPercent(goodRatio)}% passed quality filter, " +
                 "and ${Util.toPercent(passedRatio)}% passed all filters."
     }
 }
