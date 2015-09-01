@@ -36,6 +36,10 @@ class Util {
         }
     }
 
+    static double toPercent(double ratio) {
+        ((int) (ratio * 10000)) / 100
+    }
+
     static void error(String message, int code) {
         // code
         // 1 - runtime error in wrapper

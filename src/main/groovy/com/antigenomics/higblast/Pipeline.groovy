@@ -26,21 +26,21 @@ import com.antigenomics.higblast.mapping.ReadMapping
 import java.util.concurrent.atomic.AtomicLong
 
 class Pipeline {
-    private final AtomicLong inputCounter = new AtomicLong(),
-                             processedCounter = new AtomicLong(),
-                             mappedCounter = new AtomicLong(),
-                             cdr3FoundCounter = new AtomicLong()
+    private final AtomicLong inputCounter = new AtomicLong()
     final long limit
     final int nThreads
     final OutputPort<Read> input
     final BlastInstanceFactory blastInstanceFactory
     final InputPort<ReadMapping> output
+    final ReadMappingFilter readMappingFilter
 
     Pipeline(OutputPort<Read> input, BlastInstanceFactory blastInstanceFactory,
-             InputPort<ReadMapping> output, long limit = -1, int nThreads = Util.N_THREADS) {
+             InputPort<ReadMapping> output, ReadMappingFilter readMappingFilter,
+             long limit = -1, int nThreads = Util.N_THREADS) {
         this.input = input
         this.blastInstanceFactory = blastInstanceFactory
         this.output = output
+        this.readMappingFilter = readMappingFilter
         this.limit = limit < 0 ? Long.MAX_VALUE : limit
         this.nThreads = nThreads
     }
@@ -79,14 +79,9 @@ class Pipeline {
                 void run() {
                     def result
                     while ((result = instance.take()) != null) {
-                        if (result.mapped) {
-                            mappedCounter.incrementAndGet()
-                            if (result.mapping.hasCdr3) {
-                                cdr3FoundCounter.incrementAndGet()
-                            }
+                        if (readMappingFilter.pass(result)) {
+                            output.put(result)
                         }
-                        processedCounter.incrementAndGet()
-                        output.put(result)
                     }
                 }
             })
@@ -97,11 +92,8 @@ class Pipeline {
             void run() {
                 try {
                     while (!Thread.currentThread().isInterrupted()) {
-                        Util.report("Loaded $inputCount reads, processed $processedCount. " +
-                                (processedCount > 0L ?
-                                        ("Mapping efficincy ${(int) (mappedRatio * 10000) / 100}% " +
-                                                "(with CDR3 ${(int) (cdr3FoundRatio * 10000) / 100}%)") :
-                                        ""), 2)
+                        Util.report("Loaded $inputCount reads, processed ${readMappingFilter.total}. " +
+                                (readMappingFilter.total > 0L ? readMappingFilter.toProgressString() : ""), 2)
                         Thread.sleep(10000)
                     }
                 } catch (InterruptedException e) {
@@ -118,7 +110,7 @@ class Pipeline {
 
         reporter.interrupt()
 
-        Util.report("Finished analysis. Reads mapped $mappedCount (with CDR3 $cdr3FoundCount) of $processedCount", 2)
+        Util.report("Finished analysis. ${readMappingFilter.toProgressString()}", 2)
 
         output.close()
     }
@@ -131,25 +123,5 @@ class Pipeline {
 
     long getInputCount() {
         inputCounter.get()
-    }
-
-    long getProcessedCount() {
-        processedCounter.get()
-    }
-
-    long getMappedCount() {
-        mappedCounter.get()
-    }
-
-    long getCdr3FoundCount() {
-        cdr3FoundCounter.get()
-    }
-
-    double getMappedRatio() {
-        (double) mappedCount / processedCount
-    }
-
-    double getCdr3FoundRatio() {
-        (double) cdr3FoundCount / processedCount
     }
 }

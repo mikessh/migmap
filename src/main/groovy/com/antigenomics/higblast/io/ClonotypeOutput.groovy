@@ -19,20 +19,15 @@ package com.antigenomics.higblast.io
 import com.antigenomics.higblast.Util
 import com.antigenomics.higblast.clonotype.Clonotype
 import com.antigenomics.higblast.clonotype.ClonotypeAccumulator
-import com.antigenomics.higblast.clonotype.ClonotypeFilter
 import com.antigenomics.higblast.mapping.ReadMapping
 
 class ClonotypeOutput implements InputPort<ReadMapping> {
     final ClonotypeAccumulator clonotypeAccumulator
     final PlainTextOutput plainTextOutput
-    final ClonotypeFilter clonotypeFilter
 
-    ClonotypeOutput(PlainTextOutput plainTextOutput = StdOutput.INSTANCE,
-                    byte qualityThreshold = (byte) 25,
-                    ClonotypeFilter clonotypeFilter = new ClonotypeFilter()) {
+    ClonotypeOutput(PlainTextOutput plainTextOutput = StdOutput.INSTANCE) {
         this.plainTextOutput = plainTextOutput
-        this.clonotypeAccumulator = new ClonotypeAccumulator(qualityThreshold)
-        this.clonotypeFilter = clonotypeFilter
+        this.clonotypeAccumulator = new ClonotypeAccumulator()
         if (plainTextOutput != StdOutput.INSTANCE)
             plainTextOutput.put(Clonotype.OUTPUT_HEADER)
     }
@@ -44,18 +39,16 @@ class ClonotypeOutput implements InputPort<ReadMapping> {
 
     @Override
     void close() {
-        Util.report("Sorting and filtering ${clonotypeAccumulator.clonotypeMap.size()} clonotype entries, " +
+        Util.report("Sorting ${clonotypeAccumulator.clonotypeMap.size()} clonotype entries, " +
                 "writing output.", 2)
-        
+
         clonotypeAccumulator.clonotypeMap.collect {
             new Clonotype(it.key, it.value, clonotypeAccumulator.total)
         }.sort().each {
-            if (clonotypeFilter.pass(it)) {
-                plainTextOutput.put(it.toString())
-            }
+            plainTextOutput.put(it.toString())
         }
         plainTextOutput.close()
 
-        Util.report("Finished. ${clonotypeFilter.passed} clonotypes passed filter.", 2)
+        Util.report("Finished.", 2)
     }
 }

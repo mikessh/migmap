@@ -32,13 +32,14 @@ class PipelineTest {
         def factory = new BlastInstanceFactory("data/", "human", ["IGH"], true, false)
 
         def pipeline = new Pipeline(reader, factory,
-                new InputPortMerge(new ReadMappingOutput(), new ClonotypeOutput()))
+                new InputPortMerge(new ReadMappingOutput(), new ClonotypeOutput()),
+                new ReadMappingFilter())
 
         pipeline.run()
 
         assert pipeline.inputCount == 1000
-        assert pipeline.mappedRatio > 0.95
-        assert pipeline.cdr3FoundRatio > 0.90
+        assert pipeline.readMappingFilter.mappedRatio >= 0.95
+        assert pipeline.readMappingFilter.noCdr3Ratio <= 0.1
     }
 
     @AfterClass

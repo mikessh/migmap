@@ -23,29 +23,19 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
 
 class ClonotypeAccumulator implements InputPort<ReadMapping> {
-    final AtomicLong totalCounter = new AtomicLong(),
-                     mappedCounter = new AtomicLong(),
-                     goodCounter = new AtomicLong()
+    final AtomicLong totalCounter = new AtomicLong()
     final ConcurrentHashMap<ClonotypeKey, ClonotypeData> clonotypeMap = new ConcurrentHashMap<>()
-    final byte qualityThreshold
 
-    ClonotypeAccumulator(byte qualityThreshold) {
-        this.qualityThreshold = qualityThreshold
+    ClonotypeAccumulator() {
     }
 
     @Override
     void put(ReadMapping readMapping) {
         totalCounter.incrementAndGet()
-        if (readMapping.mapped) {
-            mappedCounter.incrementAndGet()
-            if (readMapping.minCdrInsertQual >= qualityThreshold && readMapping.minMutationQual >= qualityThreshold) {
-                goodCounter.incrementAndGet()
-                ClonotypeData clonotypeData = clonotypeMap.putIfAbsent(new ClonotypeKey(readMapping),
-                        new ClonotypeData(readMapping))
-                if (clonotypeData) {
-                    clonotypeData.update(readMapping)
-                }
-            }
+        ClonotypeData clonotypeData = clonotypeMap.putIfAbsent(new ClonotypeKey(readMapping),
+                new ClonotypeData(readMapping))
+        if (clonotypeData) {
+            clonotypeData.update(readMapping)
         }
     }
 
@@ -56,22 +46,5 @@ class ClonotypeAccumulator implements InputPort<ReadMapping> {
 
     long getTotal() {
         totalCounter.get()
-    }
-
-    long getGood() {
-        goodCounter.get()
-    }
-
-    long getMapped() {
-        mappedCounter.get()
-    }
-
-    static
-    final String OUTPUT_HEADER = "total\tmapped\tgood"
-
-
-    @Override
-    public String toString() {
-        [total, mapped, good].join("\t")
     }
 }
