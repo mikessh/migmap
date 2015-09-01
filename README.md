@@ -85,7 +85,7 @@ mutations.FR2    | Mutations in FR2 region
 mutations.CDR2   | Mutations in CDR2 region
 mutations.FR3    | Mutations in FR3 region
 mutations.CDR3   | Mutations in V/D/J germline sequence in CDR3 region
-mutations.FR4    | 
+mutations.FR4    | Mutations in FR4 region
 cdr.insert.qual  | quality string N-nucleotides in CDR3 region
 mutations.qual   | mutation quality string
 v.end.in.cdr3    | V segment end (exclusive) in CDR3 region
