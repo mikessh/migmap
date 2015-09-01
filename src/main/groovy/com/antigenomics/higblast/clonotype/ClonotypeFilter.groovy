@@ -17,14 +17,15 @@
 package com.antigenomics.higblast.clonotype
 
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicLong
 
 class ClonotypeFilter {
     final boolean allowNoCdr3, allowIncomplete, allowNonCoding
-    private final AtomicInteger totalCounter = new AtomicInteger(),
-                                noCdr3Counter = new AtomicInteger(),
-                                incompleteCounter = new AtomicInteger(),
-                                nonCodingCounter = new AtomicInteger(),
-                                passedCounter = new AtomicInteger()
+    private final AtomicLong totalCounter = new AtomicLong(),
+                                noCdr3Counter = new AtomicLong(),
+                                incompleteCounter = new AtomicLong(),
+                                nonCodingCounter = new AtomicLong(),
+                                passedCounter = new AtomicLong()
 
     ClonotypeFilter(boolean allowNoCdr3, boolean allowIncomplete, boolean allowNonCoding) {
         this.allowNoCdr3 = allowNoCdr3
