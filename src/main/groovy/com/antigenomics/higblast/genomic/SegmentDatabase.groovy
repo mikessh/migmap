@@ -72,7 +72,8 @@ class SegmentDatabase {
             }
         }
 
-        Util.report("Loaded database for $species:${genes.join(",")}. #v=$vSegments,#d=$dSegments,#j=$jSegments.", 2)
+        Util.report("Loaded database for $speciesAlias ${genes.join(",")} gene(s): " +
+                "$vSegments Variable, $dSegments Diversity and $jSegments segments.", 2)
 
         if (!hasD) {
             segments.put(Segment.DUMMY_D.name, Segment.DUMMY_D)

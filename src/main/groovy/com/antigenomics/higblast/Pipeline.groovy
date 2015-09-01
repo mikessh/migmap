@@ -92,7 +92,7 @@ class Pipeline {
             void run() {
                 try {
                     while (!Thread.currentThread().isInterrupted()) {
-                        Util.report("Loaded $inputCount reads, processed ${readMappingFilter.total}. " +
+                        Util.report("Loaded $inputCount reads. " +
                                 (readMappingFilter.total > 0L ? readMappingFilter.toProgressString() : ""), 2)
                         Thread.sleep(10000)
                     }

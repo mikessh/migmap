@@ -118,7 +118,7 @@ class ReadMappingFilter {
     }
 
     static
-    final String OUTPUT_HEADER = "total\tpassed\tmapped\tgood\tno.cdr3\tincomplete\tnon.coding"
+    final String OUTPUT_HEADER = "total\tpassed\tmapped\tgood.of.mapped\tno.cdr3.of.mapped\tincomplete.of.mapped\tnon.coding.of.mapped"
 
 
     @Override
