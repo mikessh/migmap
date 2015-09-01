@@ -16,8 +16,15 @@
 
 package com.antigenomics.higblast.clonotype
 
+import java.util.concurrent.atomic.AtomicInteger
+
 class ClonotypeFilter {
     final boolean allowNoCdr3, allowIncomplete, allowNonCoding
+    private final AtomicInteger totalCounter = new AtomicInteger(),
+                                noCdr3Counter = new AtomicInteger(),
+                                incompleteCounter = new AtomicInteger(),
+                                nonCodingCounter = new AtomicInteger(),
+                                passedCounter = new AtomicInteger()
 
     ClonotypeFilter(boolean allowNoCdr3, boolean allowIncomplete, boolean allowNonCoding) {
         this.allowNoCdr3 = allowNoCdr3
@@ -30,8 +37,39 @@ class ClonotypeFilter {
     }
 
     boolean pass(Clonotype clonotype) {
-        (allowNoCdr3 || clonotype.hasCdr3) &&
-                (allowIncomplete || clonotype.complete) &&
-                (allowNonCoding || (clonotype.inFrame && clonotype.noStop))
+        totalCounter.incrementAndGet()
+        boolean passCdr3 = (clonotype.hasCdr3 || noCdr3Counter.incrementAndGet() < 0 || allowNoCdr3),
+                passIncomplete = (clonotype.complete || incompleteCounter.incrementAndGet() < 0 || allowIncomplete),
+                passNonCoding = ((clonotype.inFrame && clonotype.noStop) || nonCodingCounter.incrementAndGet() < 0 || allowNonCoding)
+        passCdr3 && passIncomplete && passNonCoding && passedCounter.incrementAndGet() > 0
+    }
+
+    long getTotal() {
+        totalCounter.get()
+    }
+
+    long getNoCdr3() {
+        noCdr3Counter.get()
+    }
+
+    long getIncomplete() {
+        incompleteCounter.get()
+    }
+
+    long getNonCoding() {
+        nonCodingCounter.get()
+    }
+
+    long getPassed() {
+        passedCounter.get()
+    }
+
+    static
+    final String OUTPUT_HEADER = "total\tpassed\tno.cdr3\tincomplete\tnon.coding"
+
+
+    @Override
+    public String toString() {
+        [total, passed, noCdr3, incomplete, nonCoding].join("\t")
     }
 }
