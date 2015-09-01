@@ -17,7 +17,6 @@
 package com.antigenomics.higblast.blast
 
 import com.antigenomics.higblast.genomic.SegmentDatabase
-import com.antigenomics.higblast.io.Read
 import com.antigenomics.higblast.mutation.SubRegion
 import org.junit.AfterClass
 import org.junit.Test
@@ -136,7 +135,7 @@ class BlastParserTest {
         // def seq = "ATCCACTTGGTGATCAGCACTGAGCACCGAGGATTCACCATGGAACTGGGGCTCCGCTGGGTTTTCCTTGTTGCTATTTTAGAAGGTGTCCAGTGTGAGGTGCAGCTGGTGGAGTCTGGGGGAGGCCTGGTCAAGCCTGGGGGGTCCCTGAGACTCTCCTGTGCAGCCTCTGGATTCACCTTCAGTAGCTATAGCATGAACTGGGTCCGCCAGGCTCCAGGGAAGGGGCTGGAGTGGGTCTCATCCATTAGTAGTACTAGTTACATATACTACGCAGACTCAGTGAAGGGCCGATTCACCATCTCCAGAGACAACGCCAAGAACTCACTGTATCTGCAAATGAACAGCCTGAGAGCCGAGGACACGGCTGTGTATTACTGTGCGAGCGATCGGAACGGTATGGACGTCTGGGGCCAAGGGACCACGGTCACCGTCTCCTCAGGGAGTGCATCCGCCCCAACCCTTTTCCCCCTCTCTGCGTTGATACCACTG"
         // def factory = new BlastInstanceFactory("data/", "human", ["IGH"], true, false)
         // def instance = factory.create()
- 
+
         // def read = new Read(
         //        "@",
         //        seq,
@@ -146,7 +145,7 @@ class BlastParserTest {
         // instance.put(read)
         // instance.put(null)
         // println instance.nextChunk()
-        
+
         def chunk = "# IGBLASTN 2.2.29+\n" +
                 "# Query: @\n" +
                 "# Database: /Users/mikesh/Programming/higblast/data/database-1d3a6a74-3b2d-413f-b443-dd0f7e9e058f/v /Users/mikesh/Programming/higblast/data/database-1d3a6a74-3b2d-413f-b443-dd0f7e9e058f/d /Users/mikesh/Programming/higblast/data/database-1d3a6a74-3b2d-413f-b443-dd0f7e9e058f/j\n" +
@@ -182,6 +181,46 @@ class BlastParserTest {
         def mutations = mapping.mutations
 
         assert mutations[0].subRegion == SubRegion.CDR2
+    }
+
+    @Test
+    void truncationTest() {
+        def segmentDatabase = new SegmentDatabase("data/", "human", ["IGH"])
+        def parser = new BlastParser(segmentDatabase)
+
+        def chunk = "# IGBLASTN 2.2.29+\n" +
+                "# Query: @MIG UMI:GGATATGCCGCTC:8|TAAGAGGGCAGTGGTATCAACGCAGAGTACGGATATTCTGAGGTCCGCTCTCTTGGGGGGCTTTCTGAGAGTCGTGGATCTCATGTGCAAGAAAATGAAGCACCTGTGGTTCTTCCTCCTGCTGGTGGCGGCTCCCAGATGGGTCCTGTCCCAGCTGCAGCTGCAGGAGTCGGGCCCAGGACTGGTGAAGCCCTCGGAGACCCTGTCCCTCAGGTGCACTGTCTCTGGGGGCTCCATGACAAGAACTACTGACTACTGGGGCTGGGTCCGCCAGCCCCCAGGGAAGGGACTGGAGTGGATTGCAAGTGTCTCTTATAGTGGGAGCACCACCTACAACCCGTCCCGGAAGAGTCGAGTCACAATCTCCCTAGACCCGTCCAGGAACGAACTCTCCCTGGAACTGAGGTCCATGACCGCCGCAGACACGGCTGTGTATTTCTGTGCGAGGTGGCTTGGGGAAGACATTCGGACCTTTGACTCCTGGGGCCAGGGAACCCTGGTCACCGTCTCTAA|#'.IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIBIBIIIIIIIIIIIIIIIIIIIIIBIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIBIIBIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIBIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIBIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIBIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIB;IIIIIIIIIIII.''\n" +
+                "# Database: data//database-66ede6f0-a68a-4931-bd32-5cabd404d955/v data//database-66ede6f0-a68a-4931-bd32-5cabd404d955/d data//database-66ede6f0-a68a-4931-bd32-5cabd404d955/j\n" +
+                "# Domain classification requested: imgt\n" +
+                "\n" +
+                "# V-(D)-J rearrangement summary for query sequence (Top V gene match, Top D gene match, Top J gene match, Chain type, stop codon, V-J frame, Productive, Strand).  Multiple equivalent top matches having the same score and percent identity, if present, are separated by a comma.\n" +
+                "IGHV4-39*01\tIGHD6-19*01\tIGHJ4*02\tVH\tNo\tN/A\tN/A\t+\n" +
+                "\n" +
+                "# V-(D)-J junction details based on top germline gene matches (V end, V-D junction, D region, D-J junction, J start).  Note that possible overlapping nucleotides at VDJ junction (i.e, nucleotides that could be assigned to either rearranging gene) are indicated in parentheses (i.e., (TACT)) but are not included under the V, D, or J gene itself\n" +
+                "GCGAG\tN/A\tGTGGCT\tTGGGGAAGACATTCGGAC\tCTTTG\t\n" +
+                "\n" +
+                "# Alignment summary between query and top germline V gene hit (from, to, length, matches, mismatches, gaps, percent identity)\n" +
+                "FR1-IMGT\t152\t226\t75\t72\t3\t0\t96\n" +
+                "CDR1-IMGT\t227\t256\t30\t22\t8\t0\t73.3\n" +
+                "FR2-IMGT\t257\t307\t51\t47\t4\t0\t92.2\n" +
+                "CDR2-IMGT\t308\t328\t21\t19\t2\t0\t90.5\n" +
+                "FR3-IMGT\t329\t442\t114\t96\t18\t0\t84.2\n" +
+                "CDR3-IMGT (germline)\t443\t447\t5\t5\t0\t0\t100\n" +
+                "Total\tN/A\tN/A\t296\t261\t35\t0\t88.2\n" +
+                "\n" +
+                "# Hit table (the first field indicates the chain type of the hit)\n" +
+                "# Fields: query id, q. start, query seq, s. start, subject seq\n" +
+                "# 3 hits found\n" +
+                "V\t@MIG\t152\tCAGCTGCAGCTGCAGGAGTCGGGCCCAGGACTGGTGAAGCCCTCGGAGACCCTGTCCCTCAGGTGCACTGTCTCTGGGGGCTCCATGACAAGAACTACTGACTACTGGGGCTGGGTCCGCCAGCCCCCAGGGAAGGGACTGGAGTGGATTGCAAGTGTCTCTTATAGTGGGAGCACCACCTACAACCCGTCCCGGAAGAGTCGAGTCACAATCTCCCTAGACCCGTCCAGGAACGAACTCTCCCTGGAACTGAGGTCCATGACCGCCGCAGACACGGCTGTGTATTTCTGTGCGAG\t1\tCAGCTGCAGCTGCAGGAGTCGGGCCCAGGACTGGTGAAGCCTTCGGAGACCCTGTCCCTCACCTGCACTGTCTCTGGTGGCTCCATCAGCAGTAGTAGTTACTACTGGGGCTGGATCCGCCAGCCCCCAGGGAAGGGGCTGGAGTGGATTGGGAGTATCTATTATAGTGGGAGCACCTACTACAACCCGTCCCTCAAGAGTCGAGTCACCATATCCGTAGACACGTCCAAGAACCAGTTCTCCCTGAAGCTGAGCTCTGTGACCGCCGCAGACACGGCTGTGTATTACTGTGCGAG\n" +
+                "D\t@MIG\t448\tGTGGCT\t11\tGTGGCT\n" +
+                "J\t@MIG\t472\tCTTTGACTCCTGGGGCCAGGGAACCCTGGTCACCGTCTC\t5\tCTTTGACTACTGGGGCCAGGGAACCCTGGTCACCGTCTC"
+
+        def mapping = parser.parse(chunk)
+
+        assert mapping.truncations.vDel == 3
+        assert mapping.truncations.dDel5 == 10
+        assert mapping.truncations.dDel3 == 5
+        assert mapping.truncations.jDel == 4
     }
 
     @AfterClass
