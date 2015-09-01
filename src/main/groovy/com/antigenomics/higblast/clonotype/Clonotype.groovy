@@ -18,8 +18,10 @@ package com.antigenomics.higblast.clonotype
 
 import com.antigenomics.higblast.Util
 import com.antigenomics.higblast.genomic.Segment
-import com.antigenomics.higblast.mutation.MutationStringifier
+import com.antigenomics.higblast.mapping.Cdr3Markup
+import com.antigenomics.higblast.mapping.Truncations
 import com.antigenomics.higblast.mutation.Mutation
+import com.antigenomics.higblast.mutation.MutationStringifier
 
 class Clonotype implements Comparable<Clonotype> {
     final String cdr3nt, cdr3aa
@@ -30,6 +32,8 @@ class Clonotype implements Comparable<Clonotype> {
     final byte minQual
     final byte[] cdrInsertQual, mutationQual
     final boolean hasCdr3, complete, inFrame, noStop
+    final Cdr3Markup cdr3Markup
+    final Truncations truncations
 
     Clonotype(ClonotypeKey key, ClonotypeData data, long total) {
         this.cdr3nt = key.cdr3nt
@@ -53,8 +57,14 @@ class Clonotype implements Comparable<Clonotype> {
             minQual = Math.min(qual, minQual)
         }
         this.minQual = minQual
-        this.hasCdr3 = key.representativeMapping.hasCdr3
-        this.complete = key.representativeMapping.complete
+
+        def representativeMapping = key.representativeMapping
+
+        this.cdr3Markup = representativeMapping.cdr3Markup
+        this.truncations = representativeMapping.truncations
+
+        this.hasCdr3 = representativeMapping.hasCdr3
+        this.complete = representativeMapping.complete
 
         boolean inFrame, noStop
 
@@ -66,8 +76,8 @@ class Clonotype implements Comparable<Clonotype> {
             this.cdr3aa = Util.MY_NA
         }
 
-        this.inFrame = key.representativeMapping.inFrame && inFrame
-        this.noStop = key.representativeMapping.noStop && noStop
+        this.inFrame = representativeMapping.inFrame && inFrame
+        this.noStop = representativeMapping.noStop && noStop
     }
 
     @Override
@@ -76,7 +86,8 @@ class Clonotype implements Comparable<Clonotype> {
     }
 
     static
-    final String OUTPUT_HEADER = "freq\tcount\tv\td\tj\tcdr3nt\tcdr3aa\t" + MutationStringifier.OUTPUT_HEADER + "\tcdr.insert.qual\tmutations.qual"
+    final String OUTPUT_HEADER = "freq\tcount\tv\td\tj\tcdr3nt\tcdr3aa\t" + MutationStringifier.OUTPUT_HEADER +
+            "\tcdr.insert.qual\tmutations.qual\t" + Cdr3Markup.OUTPUT_HEADER + "\t" + Truncations.OUTPUT_HEADER
 
     @Override
     String toString() {
@@ -84,6 +95,7 @@ class Clonotype implements Comparable<Clonotype> {
          vSegment.toString(), dSegment.toString(), jSegment.toString(),
          cdr3nt, cdr3aa,
          MutationStringifier.toString(mutations),
-         Util.qualToString(cdrInsertQual), Util.qualToString(mutationQual)].join("\t")
+         Util.qualToString(cdrInsertQual), Util.qualToString(mutationQual),
+         cdr3Markup, truncations].join("\t")
     }
 }
