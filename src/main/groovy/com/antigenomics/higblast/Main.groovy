@@ -17,7 +17,6 @@
 package com.antigenomics.higblast
 
 import com.antigenomics.higblast.blast.BlastInstanceFactory
-import com.antigenomics.higblast.clonotype.ClonotypeFilter
 import com.antigenomics.higblast.genomic.SegmentDatabase
 import com.antigenomics.higblast.io.*
 
@@ -39,6 +38,9 @@ cli.n(args: 1, argName: "int",
         "Number of reads to take. [default = all]")
 cli.p(args: 1, argName: "int",
         "Number of cores to use. [default = all available processors]")
+
+cli._(longOpt: "report", argName: "file",
+        "File to store HigBlast report. Will append report line if file exists.")
 
 // Mapping
 cli.R(args: 1, argName: "chain1,...",
@@ -80,7 +82,8 @@ if (opt.h || opt == null || opt.arguments().size() != 2 || !opt.R || !opt.S) {
 
 // I/O
 
-def inputFileName = opt.arguments()[0], outputFileName = opt.arguments()[1]
+String inputFileName = opt.arguments()[0], outputFileName = opt.arguments()[1], reportFileName = opt.'report'
+
 def fastaFile = ["fasta", "fa", "fasta.gz", "fa.gz"].any { inputFileName.endsWith(it) },
     stdOutput = outputFileName == "-", byRead = (boolean) opt.'by-read'
 
@@ -138,15 +141,32 @@ def allowIncomplete = (boolean) opt.'allow-incomplete',
 // RUNNING THE PIPELINE
 def inputPort = fastaFile ? new FastaReader(inputFileName) : new FastqReader(inputFileName)
 def outputPort = stdOutput ? StdOutput.INSTANCE : new FileOutput(outputFileName)
-def clonotypeFilter = new ClonotypeFilter(allowNoCdr3, allowIncomplete, allowNoncoding)
-outputPort = byRead ? new ReadMappingOutput(outputPort) : new ClonotypeOutput(outputPort, qualityThreshold, clonotypeFilter)
+outputPort = byRead ? new ReadMappingOutput(outputPort) : new ClonotypeOutput(outputPort)
 def blastInstanceFactory = new BlastInstanceFactory(dataDir, species, genes, allAlleles, useKabat)
 
 try {
 
-    def pipeline = new Pipeline(inputPort, blastInstanceFactory, outputPort, limit, threads)
+    def filter = new ReadMappingFilter(qualityThreshold, allowNoCdr3, allowIncomplete, allowNoncoding)
+
+    def pipeline = new Pipeline(inputPort, blastInstanceFactory, outputPort,
+            filter,
+            limit, threads)
 
     pipeline.run()
+
+    if (reportFileName) {
+        def reportFile = new File(reportFileName)
+
+        if (!reportFile.exists()) {
+            reportFile.withPrintWriter { pw ->
+                pw.println(ReadMappingFilter.OUTPUT_HEADER)
+            }
+        }
+
+        reportFile.withWriterAppend { pw ->
+            pw.println(filter.toString())
+        }
+    }
 
 } catch (Exception e) {
 
