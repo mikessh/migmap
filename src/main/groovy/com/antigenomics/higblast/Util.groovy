@@ -37,7 +37,7 @@ class Util {
     }
 
     static double toPercent(double ratio) {
-        ((int) (ratio * 10000)) / 100
+        (int) (ratio * 100)
     }
 
     static void error(String message, int code) {

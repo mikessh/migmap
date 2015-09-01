@@ -89,13 +89,17 @@ mutations.FR4    | Mutations in FR4 region
 cdr.insert.qual  | quality string N-nucleotides in CDR3 region
 mutations.qual   | mutation quality string
 v.end.in.cdr3    | V segment end (exclusive) in CDR3 region
-d.start.in.cdr3  | D segment start in CDR3 region or -1 if D segment is not defined
-d.end.in.cdr3    | D segment end (exclusive) in CDR3 region or -1 if D segment is not defined
-j.start.in.cdr3  | J segment start in CDR3 region or -1 if J segment is not defined
+d.start.in.cdr3  | D segment start in CDR3 region or *-1* if D segment is not defined
+d.end.in.cdr3    | D segment end (exclusive) in CDR3 region or *-1* if D segment is not defined
+j.start.in.cdr3  | J segment start in CDR3 region or *-1* if J segment is not defined
 v.del            | Number of nucleotides deleted from V segment 3' end
-d.del.5          | Number of nucleotides deleted from D segment 5' end or -1 if D segment is not defined
-d.del.3          | Number of nucleotides deleted from D segment 3' end or -1 if D segment is not defined
-j.del            | Number of nucleotides deleted from J segment 5' end or -1 if J segment is not defined
+d.del.5          | Number of nucleotides deleted from D segment 5' end or *-1* if D segment is not defined
+d.del.3          | Number of nucleotides deleted from D segment 3' end or *-1* if D segment is not defined
+j.del            | Number of nucleotides deleted from J segment 5' end or *-1* if J segment is not defined
+has.cdr3         | *true* if CDR3 region is present (both V segment conserved residue is present)
+in.frame         | *true* if receptor has no frameshifts
+no.stop          | *true* if receptor contains no stop codons
+complete         | *true* if CDR3 region is fully defined (both V and J conserved residues are present)
  
 ## Installation
 
