@@ -87,7 +87,8 @@ class Clonotype implements Comparable<Clonotype> {
 
     static
     final String OUTPUT_HEADER = "freq\tcount\tv\td\tj\tcdr3nt\tcdr3aa\t" + MutationStringifier.OUTPUT_HEADER +
-            "\tcdr.insert.qual\tmutations.qual\t" + Cdr3Markup.OUTPUT_HEADER + "\t" + Truncations.OUTPUT_HEADER
+            "\tcdr.insert.qual\tmutations.qual\t" + Cdr3Markup.OUTPUT_HEADER + "\t" + Truncations.OUTPUT_HEADER +
+            "\thas.cdr3\tin.frame\tno.stop\tcomplete"
 
     @Override
     String toString() {
@@ -96,6 +97,7 @@ class Clonotype implements Comparable<Clonotype> {
          cdr3nt, cdr3aa,
          MutationStringifier.toString(mutations),
          Util.qualToString(cdrInsertQual), Util.qualToString(mutationQual),
-         cdr3Markup, truncations].join("\t")
+         cdr3Markup, truncations,
+         hasCdr3, inFrame, noStop, complete].join("\t")
     }
 }
