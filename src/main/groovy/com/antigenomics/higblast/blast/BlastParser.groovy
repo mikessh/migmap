@@ -21,6 +21,7 @@ import com.antigenomics.higblast.genomic.SegmentDatabase
 import com.antigenomics.higblast.mapping.Cdr3Markup
 import com.antigenomics.higblast.mapping.Mapping
 import com.antigenomics.higblast.mapping.RegionMarkup
+import com.antigenomics.higblast.mapping.Truncations
 import com.antigenomics.higblast.mutation.MutationExtractor
 
 import java.util.concurrent.atomic.AtomicInteger
@@ -131,23 +132,30 @@ class BlastParser {
         def hasCdr3 = cdr3Start >= 0, complete = cdr3End >= 0 && hasCdr3
 
         // - Markup of V/D/J within CDR3
-        int vCdr3End = -1,
-            dCdr3Start = -1,
-            dCdr3End = -1,
-            jCdr3Start = -1
+        int vCdr3End = -1, dCdr3Start = -1, dCdr3End = -1, jCdr3Start = -1,
+            vDel = -1, dDel5 = -1, dDel3 = -1, jDel = -1
 
         if (hasCdr3) {
             vCdr3End = alignments[0].qstart + alignments[0].qseq.length() - cdr3Start
-            jCdr3Start = alignments[2].qstart - cdr3Start
+            vDel = vSegment.sequence.length() - alignments[0].send
+
             if (dFound) {
                 dCdr3Start = alignments[1].qstart - cdr3Start
                 dCdr3End = dCdr3Start + alignments[1].qseq.length()
+                dDel5 = alignments[1].sstart
+                dDel3 = dSegment.sequence.length() - alignments[1].send
+            }
+
+            if (jFound) {
+                jCdr3Start = alignments[2].qstart - cdr3Start
+                jDel = alignments[2].sstart
             }
         } else {
             noCdr3.incrementAndGet()
         }
 
         def cdr3Markup = new Cdr3Markup(vCdr3End, dCdr3Start, dCdr3End, jCdr3Start)
+        def truncations = new Truncations(vDel, dDel5, dDel3, jDel)
 
         // Finally, deal with hypermutations
         // offset for converting coordinate in read to coordinate in germline V
@@ -161,7 +169,7 @@ class BlastParser {
         }
 
         return new Mapping(vSegment, dSegment, jSegment,
-                regionMarkup, cdr3Markup,
+                regionMarkup, cdr3Markup, truncations,
                 rc, complete, hasCdr3, inFrame, noStop, dFound,
                 mutationExtractor.mutations)
     }

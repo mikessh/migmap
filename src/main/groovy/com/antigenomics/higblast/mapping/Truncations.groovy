@@ -14,20 +14,22 @@
  * limitations under the License.
  */
 
-package com.antigenomics.higblast.blast
+package com.antigenomics.higblast.mapping
 
-class Alignment {
-    final int qstart, sstart
-    final String sseq, qseq
+class Truncations {
+    final int vDel, dDel5, dDel3, jDel
 
-    Alignment(int qstart, String qseq, int sstart, String sseq) {
-        this.qstart = qstart
-        this.sstart = sstart
-        this.sseq = sseq
-        this.qseq = qseq
+    Truncations(int vDel, int dDel5, int dDel3, int jDel) {
+        this.vDel = vDel
+        this.dDel5 = dDel5
+        this.dDel3 = dDel3
+        this.jDel = jDel
     }
-    
-    int getSend() {
-        sstart + sseq.length()
+
+    static final String OUTPUT_HEADER = "v.del\td.del.5\td.del.3\tj.del"
+
+    @Override
+    public String toString() {
+        [vDel, dDel5, dDel3, jDel].join("\t")
     }
 }

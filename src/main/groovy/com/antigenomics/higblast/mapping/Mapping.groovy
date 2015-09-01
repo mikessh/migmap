@@ -24,11 +24,12 @@ class Mapping {
     final Segment vSegment, dSegment, jSegment
     final RegionMarkup regionMarkup
     final Cdr3Markup cdr3Markup
+    final Truncations truncations
     final List<Mutation> mutations
     final boolean rc, complete, hasCdr3, inFrame, noStop, hasD
 
     Mapping(Segment vSegment, Segment dSegment, Segment jSegment,
-            RegionMarkup regionMarkup, Cdr3Markup cdr3Markup,
+            RegionMarkup regionMarkup, Cdr3Markup cdr3Markup, Truncations truncations,
             boolean rc, boolean complete, boolean hasCdr3, boolean inFrame, boolean noStop, hasD,
             List<Mutation> mutations) {
         // needed to extract CDR3 sequence
@@ -41,6 +42,8 @@ class Mapping {
         this.jSegment = jSegment
 
         this.cdr3Markup = cdr3Markup
+        this.truncations = truncations
+
         this.mutations = mutations
 
         // misc
@@ -54,6 +57,7 @@ class Mapping {
     static final String OUTPUT_HEADER = "v.segment\td.segment\tj.segment\t" +
             RegionMarkup.OUTPUT_HEADER + "\t" +
             Cdr3Markup.OUTPUT_HEADER + "\t" +
+            Truncations.OUTPUT_HEADER + "\t" +
             MutationStringifier.OUTPUT_HEADER + "\t" +
             "rc\tcomplete\thas.cdr3\tin.frame\tno.stop"
 
@@ -63,6 +67,7 @@ class Mapping {
         [vSegment.toString(), dSegment.toString(), jSegment.toString(),
          regionMarkup.toString(),
          cdr3Markup.toString(),
+         truncations.toString(),
          MutationStringifier.toString(mutations),
          rc, complete, hasCdr3, inFrame, noStop].join("\t")
     }
