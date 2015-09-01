@@ -39,7 +39,7 @@ cli.n(args: 1, argName: "int",
 cli.p(args: 1, argName: "int",
         "Number of cores to use. [default = all available processors]")
 
-cli._(longOpt: "report", argName: "file",
+cli._(longOpt: "report", args: 1, argName: "file",
         "File to store HigBlast report. Will append report line if file exists.")
 
 // Mapping
