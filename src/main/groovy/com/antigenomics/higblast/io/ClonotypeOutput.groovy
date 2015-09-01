@@ -46,18 +46,16 @@ class ClonotypeOutput implements InputPort<ReadMapping> {
     void close() {
         Util.report("Sorting and filtering ${clonotypeAccumulator.clonotypeMap.size()} clonotype entries, " +
                 "writing output.", 2)
-
-        int nPassed = 0
+        
         clonotypeAccumulator.clonotypeMap.collect {
             new Clonotype(it.key, it.value, clonotypeAccumulator.total)
         }.sort().each {
             if (clonotypeFilter.pass(it)) {
                 plainTextOutput.put(it.toString())
-                nPassed++
             }
         }
         plainTextOutput.close()
 
-        Util.report("Finished. $nPassed clonotypes passed filter.", 2)
+        Util.report("Finished. ${clonotypeFilter.passed} clonotypes passed filter.", 2)
     }
 }
