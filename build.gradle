@@ -10,7 +10,7 @@ repositories {
 
 jar {
     baseName = 'higblast'
-    version = '0.9.1-SNAPSHOT'
+    version = '0.9.1'
 
     manifest {
         attributes "Main-Class": "$mainClassName"
