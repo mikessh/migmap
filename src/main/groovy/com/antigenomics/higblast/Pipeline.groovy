@@ -112,6 +112,9 @@ class Pipeline {
 
         Util.report("Finished analysis. ${readMappingFilter.toProgressString()}", 2)
 
+        // Close all ports
+
+        readMappingFilter.unmappedInputPort.close()
         output.close()
     }
 

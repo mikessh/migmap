@@ -98,7 +98,7 @@ class BlastInstanceTest {
         def extractedIds = new HashSet<String>((0..<nQueries).collect {
             def mapping = instance.take()
             assert mapping.cdr3nt == "TGTGCGAGGTGGCTTGGGGAAGACATTCGGACCTTTGACTCCTGG"
-            mapping.header
+            mapping.read.header
         })
 
         def intersection = extractedIds.intersect(readsIds)

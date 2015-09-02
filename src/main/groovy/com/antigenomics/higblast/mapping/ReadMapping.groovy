@@ -21,13 +21,14 @@ import com.antigenomics.higblast.io.Read
 import com.antigenomics.higblast.mutation.MutationType
 
 class ReadMapping {
+    final Read read
     final Mapping mapping
-    final String header, cdr3nt
+    final String cdr3nt
     final byte[] mutationQual, cdrInsertQual
 
     ReadMapping(Mapping mapping, Read read) {
         this.mapping = mapping
-        this.header = read.header
+        this.read = read
 
         if (mapping) {
             if (mapping.rc) {
@@ -114,6 +115,6 @@ class ReadMapping {
 
     @Override
     String toString() {
-        [header, cdr3nt, Util.qualToString(cdrInsertQual), Util.qualToString(mutationQual), mapping.toString()].join("\t")
+        [read.header, cdr3nt, Util.qualToString(cdrInsertQual), Util.qualToString(mutationQual), mapping.toString()].join("\t")
     }
 }

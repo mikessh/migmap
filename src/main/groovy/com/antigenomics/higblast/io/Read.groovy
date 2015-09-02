@@ -37,12 +37,7 @@ class Read {
 
     @Override
     String toString() {
-        def sb = new StringBuilder(header).append('\n').append(seq)
-
-        if (qual)
-            sb.append('\n+\n').append(qual)
-
-        sb.toString()
+        header + "\n" + seq + "\n+\n" + qual
     }
 
     @Override

@@ -38,7 +38,6 @@ cli.n(args: 1, argName: "int",
         "Number of reads to take. [default = all]")
 cli.p(args: 1, argName: "int",
         "Number of cores to use. [default = all available processors]")
-
 cli._(longOpt: "report", args: 1, argName: "file",
         "File to store HigBlast report. Will append report line if file exists.")
 
@@ -67,6 +66,8 @@ cli.q(args: 1, argName: "2..40",
 cli._(longOpt: "by-read",
         "Will output mapping details for each read. " +
                 "[default = assemble clonotypes and output clonotype abundance table]")
+cli._(longOpt: "unmapped", args: 1, argName: "fastq[.gz]",
+        "Output unmapped reads in specified file.")
 
 // Misc
 cli.h("Display this help message")
@@ -82,7 +83,8 @@ if (opt.h || opt == null || opt.arguments().size() != 2 || !opt.R || !opt.S) {
 
 // I/O
 
-String inputFileName = opt.arguments()[0], outputFileName = opt.arguments()[1], reportFileName = opt.'report'
+String inputFileName = opt.arguments()[0], outputFileName = opt.arguments()[1],
+       reportFileName = opt.'report', unmappedFileName = opt.'unmapped'
 
 def fastaFile = ["fasta", "fa", "fasta.gz", "fa.gz"].any { inputFileName.endsWith(it) },
     stdOutput = outputFileName == "-", byRead = (boolean) opt.'by-read'
@@ -91,11 +93,21 @@ if (!new File(inputFileName).exists()) {
     Util.error("Input file $inputFileName does not exist.", 3)
 }
 
-if (!stdOutput) {
+if (stdOutput) {
+    outputFileName = null
+}
+
+def ensureDirCreated = { String fileName ->
     // Ensure all subdirs are created for output
-    def parentFolder = new File(outputFileName).absoluteFile.parentFile
+    def parentFolder = new File(fileName).absoluteFile.parentFile
     if (parentFolder) {
         parentFolder.mkdirs()
+    }
+}
+
+[outputFileName, unmappedFileName, reportFileName].each {
+    if (it) {
+        ensureDirCreated(it)
     }
 }
 
@@ -146,7 +158,8 @@ def blastInstanceFactory = new BlastInstanceFactory(dataDir, species, genes, all
 
 try {
 
-    def filter = new ReadMappingFilter(qualityThreshold, allowNoCdr3, allowIncomplete, allowNoncoding)
+    def filter = new ReadMappingFilter(qualityThreshold, allowNoCdr3, allowIncomplete, allowNoncoding,
+            unmappedFileName ? new FastqWriter(unmappedFileName) : DummyInputPort.INSTANCE)
 
     def pipeline = new Pipeline(inputPort, blastInstanceFactory, outputPort,
             filter,

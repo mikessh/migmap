@@ -17,6 +17,9 @@
 
 package com.antigenomics.higblast
 
+import com.antigenomics.higblast.io.DummyInputPort
+import com.antigenomics.higblast.io.InputPort
+import com.antigenomics.higblast.io.Read
 import com.antigenomics.higblast.mapping.ReadMapping
 
 import java.util.concurrent.atomic.AtomicLong
@@ -24,6 +27,7 @@ import java.util.concurrent.atomic.AtomicLong
 class ReadMappingFilter {
     final boolean allowNoCdr3, allowIncomplete, allowNonCoding
     final byte qualityThreshold
+    final InputPort<Read> unmappedInputPort
 
     private final AtomicLong totalCounter = new AtomicLong(),
                              mappedCounter = new AtomicLong(),
@@ -33,11 +37,13 @@ class ReadMappingFilter {
                              nonCodingCounter = new AtomicLong(),
                              passedCounter = new AtomicLong()
 
-    ReadMappingFilter(byte qualityThreshold, boolean allowNoCdr3, boolean allowIncomplete, boolean allowNonCoding) {
+    ReadMappingFilter(byte qualityThreshold, boolean allowNoCdr3, boolean allowIncomplete, boolean allowNonCoding,
+                      InputPort<Read> unmappedInputPort = DummyInputPort.INSTANCE) {
         this.qualityThreshold = qualityThreshold
         this.allowNoCdr3 = allowNoCdr3
         this.allowIncomplete = allowIncomplete
         this.allowNonCoding = allowNonCoding
+        this.unmappedInputPort = unmappedInputPort
     }
 
     ReadMappingFilter() {
@@ -59,6 +65,8 @@ class ReadMappingFilter {
                     passNonCoding = ((mapping.inFrame && mapping.noStop) || nonCodingCounter.incrementAndGet() < 0 || allowNonCoding)
 
             return passQuality && passCdr3 && passIncomplete && passNonCoding && passedCounter.incrementAndGet() > 0
+        } else {
+            unmappedInputPort.put(readMapping.read)
         }
 
         false
