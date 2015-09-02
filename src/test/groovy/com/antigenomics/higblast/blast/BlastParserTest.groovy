@@ -17,6 +17,7 @@
 package com.antigenomics.higblast.blast
 
 import com.antigenomics.higblast.genomic.SegmentDatabase
+import com.antigenomics.higblast.mutation.MutationType
 import com.antigenomics.higblast.mutation.SubRegion
 import org.junit.AfterClass
 import org.junit.Test
@@ -181,6 +182,62 @@ class BlastParserTest {
         def mutations = mapping.mutations
 
         assert mutations[0].subRegion == SubRegion.CDR2
+    }
+
+    @Test
+    void subRegionTest() {
+        /*def seq = "GAGGTGCAATTGGTGGAGTCTGGGGGAACCTTGGTGCAGCCGGGGGGGTCCCTGACACTCTCCTGTGTAGTCTCTGGATTCACCTTTGACACTTATGCCATAAGCTGGGTCCGCCTGGCTCCAGGGAAGGGGCTGGAATGGGTCTCAAGTACTGGTGATAGAACCTTTGCAAACTCCGTGAAGGGCCGCTTCACCATCTCCAAAGACAAGTCCAAGAACACCGTGTATCTGCAAATGAACAGCCTGAGAGCCGAGGACACGGCCATTTATTATTGTGCGAAATGTGACTTTGGAGTCAGTGGCTGGTGTAACTGGCTCGACCCCTGGGGCCAGGGAACCCTGGTCACTGTCTCCTCA"
+        def factory = new BlastInstanceFactory("data/", "human", ["IGH"], true, false)
+        def instance = factory.create()
+
+        def read = new Read(
+               "@",
+               seq,
+               "I" * seq.length()
+        )
+
+        instance.put(read)
+        instance.put(null)
+        println instance.nextChunk()*/
+
+        def chunk = "# IGBLASTN 2.2.29+\n" +
+                "# Query: @\n" +
+                "# Database: /Users/mikesh/Programming/higblast/data/database-e94a78dd-2068-4f1a-b8d9-088c1b06dc2d/v /Users/mikesh/Programming/higblast/data/database-e94a78dd-2068-4f1a-b8d9-088c1b06dc2d/d /Users/mikesh/Programming/higblast/data/database-e94a78dd-2068-4f1a-b8d9-088c1b06dc2d/j\n" +
+                "# Domain classification requested: imgt\n" +
+                "\n" +
+                "# V-(D)-J rearrangement summary for query sequence (Top V gene match, Top D gene match, Top J gene match, Chain type, stop codon, V-J frame, Productive, Strand).  Multiple equivalent top matches having the same score and percent identity, if present, are separated by a comma.\n" +
+                "IGHV3-23*04\tIGHD6-19*01\tIGHJ5*02\tVH\tNo\tN/A\tN/A\t+\n" +
+                "\n" +
+                "# V-(D)-J junction details based on top germline gene matches (V end, V-D junction, D region, D-J junction, J start).  Note that possible overlapping nucleotides at VDJ junction (i.e, nucleotides that could be assigned to either rearranging gene) are indicated in parentheses (i.e., (TACT)) but are not included under the V, D, or J gene itself\n" +
+                "CGAAA\tTGTGACTTTGGAGT\tCAGTGGCTGGT\tGT\tAACTG\t\n" +
+                "\n" +
+                "# Alignment summary between query and top germline V gene hit (from, to, length, matches, mismatches, gaps, percent identity)\n" +
+                "FR1-IMGT\t1\t75\t75\t66\t9\t0\t88\n" +
+                "CDR1-IMGT\t76\t99\t24\t20\t4\t0\t83.3\n" +
+                "FR2-IMGT\t100\t147\t51\t45\t3\t3\t88.2\n" +
+                "CDR2-IMGT\t148\t164\t24\t13\t4\t7\t54.2\n" +
+                "FR3-IMGT\t165\t276\t114\t101\t11\t2\t88.6\n" +
+                "CDR3-IMGT (germline)\t277\t282\t6\t6\t0\t0\t100\n" +
+                "Total\tN/A\tN/A\t294\t251\t31\t12\t85.4\n" +
+                "\n" +
+                "# Hit table (the first field indicates the chain type of the hit)\n" +
+                "# Fields: query id, q. start, query seq, s. start, subject seq\n" +
+                "# 3 hits found\n" +
+                "V\t@\t1\tGAGGTGCAATTGGTGGAGTCTGGGGGAACCTTGGTGCAGCCGGGGGGGTCCCTGACACTCTCCTGTGTAGTCTCTGGATTCACCTTTGACACTTATGCCATAAGCTGGGTCCGCCTGGCTCCAGGGAAGGGGCTGGAATGGGTCTCA---------AGTACTGGTGATAGAAC---CTTTGCAAACTCCGTGAAGGGCCGCTTCACCATCTCCAAAGACAAGTCCAAGAACACCGTGTATCTGCAAATGAACAGCCTGAGAGCCGAGGACACGGCCATTTATTATTGTGCGAAA\t1\tGAGGTGCAGCTGGTGGAGTCTGGGGGAGGCTTGGTACAGCCTGGGGGGTCCCTGAGACTCTCCTGTGCAGCCTCTGGATTCACCTTTAGCAGCTATGCCATGAGCTGGGTCCGCCAGGCTCCAGGGAAGGGGCTGGAGTGGGTCTCAGCTATTAGTGGTAGTGGTGGTAGCACATACTACGCAGACTCCGTGAAGGGCCGGTTCACCATCTCCAGAGACAATTCCAAGAACACGCTGTATCTGCAAATGAACAGCCTGAGAGCCGAGGACACGGCCGTATATTACTGTGCGAAA\n" +
+                "D\t@\t297\tCAGTGGCTGGT\t9\tCAGTGGCTGGT\n" +
+                "J\t@\t310\tAACTGGCTCGACCCCTGGGGCCAGGGAACCCTGGTCACTGTCTCCTCA\t3\tAACTGGTTCGACCCCTGGGGCCAGGGAACCCTGGTCACCGTCTCCTCA\n" +
+                "# BLAST processed 1 queries"
+
+        def segmentDatabase = new SegmentDatabase("data/", "human", ["IGH"])
+        def parser = new BlastParser(segmentDatabase)
+
+        def mapping = parser.parse(chunk)
+        def mutations = mapping.mutations
+
+        def dels = mutations.findAll { it.type == MutationType.Deletion }
+
+        assert dels[0].subRegion == SubRegion.FR2
+        assert dels[1].subRegion == SubRegion.CDR2
     }
 
     @Test

@@ -17,6 +17,7 @@
 package com.antigenomics.higblast.mapping
 
 import com.antigenomics.higblast.mutation.Mutation
+import com.antigenomics.higblast.mutation.MutationType
 import com.antigenomics.higblast.mutation.SubRegion
 
 class RegionMarkup {
@@ -34,7 +35,7 @@ class RegionMarkup {
     }
 
     SubRegion getSubRegion(Mutation mutation) {
-        getSubRegion(mutation.posInRead)
+        getSubRegion(mutation.type == MutationType.Deletion ? mutation.posInRead - 1 : mutation.posInRead)
     }
 
     SubRegion getSubRegion(int pos) {
