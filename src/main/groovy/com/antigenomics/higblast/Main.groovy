@@ -159,12 +159,13 @@ try {
 
         if (!reportFile.exists()) {
             reportFile.withPrintWriter { pw ->
-                pw.println(ReadMappingFilter.OUTPUT_HEADER)
+                pw.println("input.file\toutput.file\targuments\t" + ReadMappingFilter.OUTPUT_HEADER)
             }
         }
 
         reportFile.withWriterAppend { pw ->
-            pw.println(filter.toString())
+            pw.println(inputFileName + "\t" + outputFileName + "\t" + args.join(" ") + "\t" +
+                    filter.toString())
         }
     }
 
