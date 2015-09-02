@@ -160,10 +160,12 @@ try {
 
     def filter = new ReadMappingFilter(qualityThreshold, allowNoCdr3, allowIncomplete, allowNoncoding,
             unmappedFileName ? new FastqWriter(unmappedFileName) : DummyInputPort.INSTANCE)
-
+    
     def pipeline = new Pipeline(inputPort, blastInstanceFactory, outputPort,
             filter,
             limit, threads)
+
+    Util.report("Analyzing sample $inputFileName", 2)
 
     pipeline.run()
 
