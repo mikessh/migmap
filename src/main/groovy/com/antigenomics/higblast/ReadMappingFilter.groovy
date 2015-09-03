@@ -122,7 +122,7 @@ class ReadMappingFilter {
     }
 
     double getPassedRatio() {
-        (double) passed / total
+        (double) passed / mapped
     }
 
     static
