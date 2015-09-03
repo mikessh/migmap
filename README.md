@@ -71,9 +71,8 @@ Output format for assembled clonotypes is the following:
 
 Column           | Definition
 -----------------|------------------------------------------------------------------------
-freq             | clonotype frequency (0..1)
+freq             | clonotype frequency in (0,1]
 count            | number of reads
-mig_freq         | share of MIGs
 v                | Variable segment (top hit only)
 d                | Diversity segment (top hit only)
 j                | Joining segment (top hit only)
