@@ -37,7 +37,7 @@ class Util {
     }
 
     static double toPercent(double ratio) {
-        (int) (ratio * 100)
+        ((int) (ratio * 10000) / 100)
     }
 
     static void error(String message, int code) {
@@ -48,6 +48,14 @@ class Util {
         System.err.println("[${new Date()} HIGBLAST ERROR] $message")
         SegmentDatabase.clearTemporaryFiles()
         System.exit(code)
+    }
+
+    static byte minQual(byte[] qual) {
+        byte min = MAX_QUAL
+        for (byte q : qual) {
+            min = Math.min(q, min)
+        }
+        min
     }
 
     static String qualToString(byte[] qual) {
