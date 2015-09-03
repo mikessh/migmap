@@ -17,16 +17,14 @@
 
 package com.antigenomics.higblast.mapping
 
-import com.antigenomics.higblast.Filter
 import com.antigenomics.higblast.Util
 import com.antigenomics.higblast.io.DummyInputPort
 import com.antigenomics.higblast.io.InputPort
 import com.antigenomics.higblast.io.Read
-import com.antigenomics.higblast.mapping.ReadMapping
 
 import java.util.concurrent.atomic.AtomicLong
 
-class ReadMappingFilter implements Filter<ReadMapping> {
+class ReadMappingFilter {
     final boolean allowNoCdr3, allowIncomplete, allowNonCoding
     final byte qualityThreshold
     final InputPort<Read> unmappedInputPort
@@ -52,7 +50,6 @@ class ReadMappingFilter implements Filter<ReadMapping> {
         this((byte) 25, false, false, true)
     }
 
-    @Override
     boolean pass(ReadMapping readMapping) {
         totalCounter.incrementAndGet()
 

@@ -19,6 +19,7 @@ package com.antigenomics.higblast
 import com.antigenomics.higblast.blast.BlastInstanceFactory
 import com.antigenomics.higblast.genomic.SegmentDatabase
 import com.antigenomics.higblast.io.*
+import com.antigenomics.higblast.mapping.ReadMappingFilter
 
 def ALLOWED_CHAINS = ["TRA", "TRB", "TRG", "TRG", "IGH", "IGL", "IGK"],
     ALLOWED_SPECIES = ["human", "mouse", "rat", "rabbit", "rhesus_monkey"],
@@ -160,7 +161,7 @@ try {
 
     def filter = new ReadMappingFilter(qualityThreshold, allowNoCdr3, allowIncomplete, allowNoncoding,
             unmappedFileName ? new FastqWriter(unmappedFileName) : DummyInputPort.INSTANCE)
-    
+
     def pipeline = new Pipeline(inputPort, blastInstanceFactory, outputPort,
             filter,
             limit, threads)
