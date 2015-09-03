@@ -22,6 +22,7 @@ import com.antigenomics.higblast.io.InputPort
 import com.antigenomics.higblast.io.OutputPort
 import com.antigenomics.higblast.io.Read
 import com.antigenomics.higblast.mapping.ReadMapping
+import com.antigenomics.higblast.mapping.ReadMappingFilter
 
 import java.util.concurrent.atomic.AtomicLong
 
