@@ -18,10 +18,8 @@ package com.antigenomics.higblast
 
 import com.antigenomics.higblast.blast.BlastInstanceFactory
 import com.antigenomics.higblast.genomic.SegmentDatabase
-import com.antigenomics.higblast.io.ClonotypeOutput
-import com.antigenomics.higblast.io.FastqReader
-import com.antigenomics.higblast.io.InputPortMerge
-import com.antigenomics.higblast.io.ReadMappingOutput
+import com.antigenomics.higblast.io.*
+import com.antigenomics.higblast.mapping.ReadMappingFilter
 import org.junit.AfterClass
 import org.junit.Test
 
@@ -40,6 +38,22 @@ class PipelineTest {
         assert pipeline.inputCount == 1000
         assert pipeline.readMappingFilter.mappedRatio >= 0.95
         assert pipeline.readMappingFilter.noCdr3Ratio <= 0.1
+    }
+
+    @Test
+    void statTest() {
+        def reader = new FastqReader("bad_sample.fastq.gz", true)
+        def factory = new BlastInstanceFactory("data/", "human", ["IGH"], true, false)
+
+        def filter = new ReadMappingFilter((byte) 20, true, true, true)
+
+        def pipeline = new Pipeline(reader, factory, DummyInputPort.INSTANCE,
+                filter)
+
+        pipeline.run()
+
+        assert filter.passed == filter.good
+        assert pipeline.readMappingFilter.mappedRatio >= 0.05
     }
 
     @AfterClass
