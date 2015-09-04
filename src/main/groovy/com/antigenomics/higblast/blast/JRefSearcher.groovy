@@ -30,10 +30,10 @@ class JRefSearcher {
     }
 
     static int getCdr3End(int jRef, int qstart, String qseq, int sstart, String sseq) {
-        if (jRef + 4 > sseq.replaceAll("-", "").length() + sstart) // incomplete
+        if (jRef + 4 > sseq.replaceAll("-", "").length() + sstart) // incomplete, F/W out of scope
             return -1
 
-        if (sstart > jRef + 4) // conserved residue truncated
+        if (sstart >= jRef + 4) // conserved residue truncated, alignment starts after F/W
             return qstart
 
         int jRefRel = jRef - sstart, jRefDelta = 0 // normal, count deletions
