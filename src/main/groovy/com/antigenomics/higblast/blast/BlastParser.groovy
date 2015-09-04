@@ -35,11 +35,9 @@ class BlastParser {
                         vNotFound = new AtomicInteger(),
                         noCdr3 = new AtomicInteger()
     final SegmentDatabase segmentDatabase
-    final JRefSearcher jRefSearcher
 
     public BlastParser(SegmentDatabase segmentDatabase) {
         this.segmentDatabase = segmentDatabase
-        this.jRefSearcher = new JRefSearcher()
     }
 
     Mapping parse(String chunk) {
@@ -122,9 +120,15 @@ class BlastParser {
         }
 
         // - Find CDR3 end using J reference point manually
-        if (cdrBounds[2] && jFound) {
-            cdr3Start = cdrBounds[2][0].toInteger() - 4
-            cdr3End = jFound ? jRefSearcher.getCdr3End(jSegment, alignments[2]) : -1
+        if (jFound) {
+            if (cdrBounds[2]) {
+                cdr3Start = cdrBounds[2][0].toInteger() - 4
+            } else if (alignments[0]) {
+                // try rescue CDR3
+                cdr3Start = RefPointSearcher.getCdr3Start(vSegment, alignments[0])
+            }
+            if (cdr3Start >= 0)
+                cdr3End = RefPointSearcher.getCdr3End(jSegment, alignments[2])
         }
 
         def regionMarkup = new RegionMarkup(cdr1Start, cdr1End, cdr2Start, cdr2End, cdr3Start, cdr3End)
@@ -135,12 +139,12 @@ class BlastParser {
             vDel = -1, dDel5 = -1, dDel3 = -1, jDel = -1
 
         if (hasCdr3) {
-            vCdr3End = alignments[0].qstart + alignments[0].qseq.length() - cdr3Start
+            vCdr3End = alignments[0].qend - cdr3Start
             vDel = vSegment.sequence.length() - alignments[0].send
 
             if (dFound) {
                 dCdr3Start = alignments[1].qstart - cdr3Start
-                dCdr3End = dCdr3Start + alignments[1].qseq.length()
+                dCdr3End = dCdr3Start + alignments[1].qLength
                 dDel5 = alignments[1].sstart
                 dDel3 = dSegment.sequence.length() - alignments[1].send
             }
