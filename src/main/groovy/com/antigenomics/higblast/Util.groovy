@@ -235,6 +235,10 @@ class Util {
         aaSeq + seq.substring(leftEnd, rightEnd).toLowerCase() + aaRight.reverse()
     }
 
+    static String removeGaps(String seq) {
+        seq.replaceAll("-", "")
+    }
+
     static String translateLinear(String seq) {
         def aaSeq = ""
 
