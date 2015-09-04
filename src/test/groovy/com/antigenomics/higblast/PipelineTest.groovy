@@ -28,20 +28,25 @@ class PipelineTest {
     void sampleTest() {
         def reader = new FastqReader("sample.fastq.gz", true)
         def factory = new BlastInstanceFactory("data/", "human", ["IGH"], true, false)
+        def filter = new ReadMappingFilter()
 
         def pipeline = new Pipeline(reader, factory,
                 new InputPortMerge(new ReadMappingOutput(), new ClonotypeOutput()),
-                new ReadMappingFilter())
+                filter)
 
         pipeline.run()
 
         assert pipeline.inputCount == 1000
         assert pipeline.readMappingFilter.mappedRatio >= 0.95
         assert pipeline.readMappingFilter.noCdr3Ratio <= 0.1
+        assert pipeline.readMappingFilter.incompleteRatio <= 0.1
+        assert pipeline.readMappingFilter.nonCanonicalRatio <= 0.1
+
+        println filter.toProgressString()
     }
 
     @Test
-    void statTest() {
+    void badDataTest() {
         def reader = new FastqReader("bad_sample.fastq.gz", true)
         def factory = new BlastInstanceFactory("data/", "human", ["IGH"], true, false)
 
@@ -54,6 +59,8 @@ class PipelineTest {
 
         assert filter.passed == filter.good
         assert pipeline.readMappingFilter.mappedRatio >= 0.05
+
+        println filter.toProgressString()
     }
 
     @AfterClass

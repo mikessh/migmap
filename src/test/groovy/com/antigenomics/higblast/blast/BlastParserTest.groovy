@@ -17,10 +17,14 @@
 package com.antigenomics.higblast.blast
 
 import com.antigenomics.higblast.genomic.SegmentDatabase
+import com.antigenomics.higblast.mapping.ReadMapping
 import com.antigenomics.higblast.mutation.MutationType
 import com.antigenomics.higblast.mutation.SubRegion
 import org.junit.AfterClass
+import org.junit.Ignore
 import org.junit.Test
+
+import static com.antigenomics.higblast.blast.BlastTestUtil.*
 
 class BlastParserTest {
     @Test
@@ -278,6 +282,21 @@ class BlastParserTest {
         assert mapping.truncations.dDel5 == 10
         assert mapping.truncations.dDel3 == 5
         assert mapping.truncations.jDel == 4
+    }
+
+    @Ignore
+    @Test
+    void outOfFrameTest() {
+        def seq = "CAGGTGCAGCTGGCGGAGTCTGGGGGAGGCGTGGTCCAGCCCGGGAAGTCCCTGACACTCTCCTGTGCAGCCTCTGGATTCACCTTCAGTGACTTTTCTGTGCACTGGGTCCGCCAGGCTCCAGGCATGGGCCTAGAGTGGGTGGCGGCCATCTCACTTGATGGAAAGAACAAATTCTACGCAGACTCTGTGAAGGGCCGATTCACCATCTCCAGAGACGGTTCCCAGAACATCGTTTCTCTGCAGATGAACAGCCTGAGAGGAGACGACTCGGCTGTCTACTTCTGTGTGAGAGGCGGCATAGCAACTCGTCTCGCGCTCCGTGGTTCCGAGAAAAAAAAATTTGGACCATTGGGGCCAGGGAACCCGGGTCACCGTCTCCTCA"
+        def read = toRead(seq)
+        def chunk = toChunk(read)
+
+        println chunk
+
+        def mapping = parser.parse(chunk)
+
+        def readMapping = new ReadMapping(mapping, read)
+        println readMapping
     }
 
     @AfterClass
