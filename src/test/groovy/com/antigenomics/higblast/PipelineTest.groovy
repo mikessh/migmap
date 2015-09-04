@@ -45,7 +45,7 @@ class PipelineTest {
         def reader = new FastqReader("bad_sample.fastq.gz", true)
         def factory = new BlastInstanceFactory("data/", "human", ["IGH"], true, false)
 
-        def filter = new ReadMappingFilter((byte) 20, true, true, true)
+        def filter = new ReadMappingFilter((byte) 20, true, true, true, true)
 
         def pipeline = new Pipeline(reader, factory, DummyInputPort.INSTANCE,
                 filter)
