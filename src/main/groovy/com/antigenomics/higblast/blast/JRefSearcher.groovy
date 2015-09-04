@@ -25,15 +25,18 @@ class JRefSearcher {
     JRefSearcher() {
     }
 
-    static int getJRefPoint(Segment jSegment, Alignment alignment) {
-        getJRefPointInner(jSegment.referencePoint, alignment.qstart, alignment.qseq, alignment.sstart, alignment.sseq)
+    static int getCdr3End(Segment jSegment, Alignment alignment) {
+        getCdr3End(jSegment.referencePoint, alignment.qstart, alignment.qseq, alignment.sstart, alignment.sseq)
     }
 
-    private static int getJRefPointInner(int jRef, int qstart, String qseq, int sstart, String sseq) {
-        if (sstart > jRef || jRef + 4 > sseq.replaceAll("-", "").length() + sstart)
+    static int getCdr3End(int jRef, int qstart, String qseq, int sstart, String sseq) {
+        if (jRef + 4 > sseq.replaceAll("-", "").length() + sstart) // incomplete
             return -1
 
-        int jRefRel = jRef - sstart, jRefDelta = 0
+        if (sstart > jRef + 4) // conserved residue truncated
+            return qstart
+
+        int jRefRel = jRef - sstart, jRefDelta = 0 // normal, count deletions
         for (int i = 0; i < jRefRel; i++) {
             if (qseq[i] == GAP)
                 jRefDelta--
@@ -43,6 +46,6 @@ class JRefSearcher {
             }
         }
 
-        jRefRel + jRefDelta + qstart
+        jRefRel + jRefDelta + qstart + 4
     }
 }

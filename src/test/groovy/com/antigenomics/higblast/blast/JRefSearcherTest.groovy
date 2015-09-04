@@ -22,6 +22,60 @@ import org.junit.Test
 
 class JRefSearcherTest {
     @Test
+    void cdr3EndTest() {
+        /*
+         def seq = "CAGGTGCAGCTGCAGGAGTCGGGCCCAGGACTGGTAAAGCCTTCGGAGACCCTGTCCCTCACCTGCGGTGTCTCTGGTTACTCCATAAGCAGTGGTTACTACTGGGCCTGGATCCGGCAGCCCCCAGGGAAGGGGCTGGAGTGGGTTGCGACTATCTATCATGATGGAAGATCCTACTACAACCCGTCCCTGGAAAGTCGAGTCACCATATCAGTAGACACGTCCAAGAACCAGTTCTCCCTGAGGCTGACTTCTGTGACCGCCGCAGACACGGCCGTATATTTCTGTGCGAGGGATCAGGGGCCACGAGACCACCCCAGTTCATCGTTTTGGGGCCAGGGAACCCTGGTCACCGTCTCCTCA"
+         def factory = new BlastInstanceFactory("data/", "human", ["IGH"], true, false)
+         def instance = factory.create()
+
+         def read = new Read(
+                "@",
+                seq,
+                "I" * seq.length()
+         )
+
+         instance.put(read)
+         instance.put(null)
+         println instance.nextChunk()*/
+
+        def chunk = "# IGBLASTN 2.2.29+\n" +
+                "# Query: @\n" +
+                "# Database: /Users/mikesh/Programming/higblast/data/database-7bdae913-9f92-478c-ba1c-47d9d33676be/v /Users/mikesh/Programming/higblast/data/database-7bdae913-9f92-478c-ba1c-47d9d33676be/d /Users/mikesh/Programming/higblast/data/database-7bdae913-9f92-478c-ba1c-47d9d33676be/j\n" +
+                "# Domain classification requested: imgt\n" +
+                "\n" +
+                "# V-(D)-J rearrangement summary for query sequence (Top V gene match, Top D gene match, Top J gene match, Chain type, stop codon, V-J frame, Productive, Strand).  Multiple equivalent top matches having the same score and percent identity, if present, are separated by a comma.\n" +
+                "IGHV4-38-2*01\tIGHD3-3*02\tIGHJ4*02\tVH\tNo\tN/A\tN/A\t+\n" +
+                "\n" +
+                "# V-(D)-J junction details based on top germline gene matches (V end, V-D junction, D region, D-J junction, J start).  Note that possible overlapping nucleotides at VDJ junction (i.e, nucleotides that could be assigned to either rearranging gene) are indicated in parentheses (i.e., (TACT)) but are not included under the V, D, or J gene itself\n" +
+                "GCGAG\tGGATCAGGGGCCACGAGACCACCCCAGTTCATCG\tTTT\t(TGG)\tGGCCA\t\n" +
+                "\n" +
+                "# Alignment summary between query and top germline V gene hit (from, to, length, matches, mismatches, gaps, percent identity)\n" +
+                "FR1-IMGT\t1\t75\t75\t73\t2\t0\t97.3\n" +
+                "CDR1-IMGT\t76\t102\t27\t26\t1\t0\t96.3\n" +
+                "FR2-IMGT\t103\t153\t51\t47\t4\t0\t92.2\n" +
+                "CDR2-IMGT\t154\t174\t21\t16\t5\t0\t76.2\n" +
+                "FR3-IMGT\t175\t288\t114\t106\t8\t0\t93\n" +
+                "CDR3-IMGT (germline)\t289\t293\t5\t5\t0\t0\t100\n" +
+                "Total\tN/A\tN/A\t293\t273\t20\t0\t93.2\n" +
+                "\n" +
+                "# Hit table (the first field indicates the chain type of the hit)\n" +
+                "# Fields: query id, q. start, query seq, s. start, subject seq\n" +
+                "# 3 hits found\n" +
+                "V\t@\t1\tCAGGTGCAGCTGCAGGAGTCGGGCCCAGGACTGGTAAAGCCTTCGGAGACCCTGTCCCTCACCTGCGGTGTCTCTGGTTACTCCATAAGCAGTGGTTACTACTGGGCCTGGATCCGGCAGCCCCCAGGGAAGGGGCTGGAGTGGGTTGCGACTATCTATCATGATGGAAGATCCTACTACAACCCGTCCCTGGAAAGTCGAGTCACCATATCAGTAGACACGTCCAAGAACCAGTTCTCCCTGAGGCTGACTTCTGTGACCGCCGCAGACACGGCCGTATATTTCTGTGCGAG\t1\tCAGGTGCAGCTGCAGGAGTCGGGCCCAGGACTGGTGAAGCCTTCGGAGACCCTGTCCCTCACCTGCGCTGTCTCTGGTTACTCCATCAGCAGTGGTTACTACTGGGGCTGGATCCGGCAGCCCCCAGGGAAGGGGCTGGAGTGGATTGGGAGTATCTATCATAGTGGGAGCACCTACTACAACCCGTCCCTCAAGAGTCGAGTCACCATATCAGTAGACACGTCCAAGAACCAGTTCTCCCTGAAGCTGAGCTCTGTGACCGCCGCAGACACGGCCGTGTATTACTGTGCGAG\n" +
+                "D\t@\t328\tTTTTGG\t11\tTTTTGG\n" +
+                "J\t@\t331\tTGGGGCCAGGGAACCCTGGTCACCGTCTCCTCA\t15\tTGGGGCCAGGGAACCCTGGTCACCGTCTCCTCA\n" +
+                "# BLAST processed 1 queries"
+
+        def segmentDatabase = new SegmentDatabase("data/", "human", ["IGH"])
+        def parser = new BlastParser(segmentDatabase)
+
+        def mapping = parser.parse(chunk)
+        assert mapping.hasCdr3
+        assert mapping.complete
+        assert mapping.regionMarkup.cdr3End == 333
+    }
+    
+    @Test
     void borderlineCase() {
         def chunk = "# IGBLASTN 2.2.29+\n" +
                 "# Query: @M01691:112:000000000-AFF3F:1:1106:14463:20458 2:N:0:1 UMI:ATGTGTACCGGG:GGGGGGGGGGGG\n" +

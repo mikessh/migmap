@@ -124,8 +124,7 @@ class BlastParser {
         // - Find CDR3 end using J reference point manually
         if (cdrBounds[2] && jFound) {
             cdr3Start = cdrBounds[2][0].toInteger() - 4
-            def jRef = jFound ? jRefSearcher.getJRefPoint(jSegment, alignments[2]) : -1
-            cdr3End = jRef < 0 ? -1 : jRef + 4
+            cdr3End = jFound ? jRefSearcher.getCdr3End(jSegment, alignments[2]) : -1
         }
 
         def regionMarkup = new RegionMarkup(cdr1Start, cdr1End, cdr2Start, cdr2End, cdr3Start, cdr3End)
