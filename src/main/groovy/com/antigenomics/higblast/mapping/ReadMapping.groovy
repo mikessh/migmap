@@ -25,6 +25,7 @@ class ReadMapping {
     final Mapping mapping
     final String cdr3nt
     final byte[] mutationQual, cdrInsertQual
+    final boolean canonical
 
     ReadMapping(Mapping mapping, Read read) {
         this.mapping = mapping
@@ -79,19 +80,23 @@ class ReadMapping {
                             }
                         }
                     }
+                    this.canonical = Util.isCanonical(cdr3nt)
                 } else {
                     this.cdrInsertQual = new byte[cdr3nt.length()]
                     (0..<cdr3nt.length()).each {
                         cdrInsertQual[it] = read.qualAt(regionMarkup.cdr3Start + it)
                     }
+                    this.canonical = false
                 }
             } else {
                 this.cdrInsertQual = new byte[0]
+                this.canonical = false
             }
         } else {
             this.cdr3nt = null
             this.mutationQual = null
             this.cdrInsertQual = null
+            this.canonical = false
         }
     }
 
@@ -107,10 +112,11 @@ class ReadMapping {
         mapping != null
     }
 
-    static final String OUTPUT_HEADER = "read.header\tcdr3nt\tcdr.insert.qual\tmutations.qual\t" + Mapping.OUTPUT_HEADER
+    static
+    final String OUTPUT_HEADER = "read.header\tcdr3nt\tcdr.insert.qual\tmutations.qual\t" + Mapping.OUTPUT_HEADER + "\tcanonical"
 
     @Override
     String toString() {
-        [read.header, cdr3nt, Util.qualToString(cdrInsertQual), Util.qualToString(mutationQual), mapping.toString()].join("\t")
+        [read.header, cdr3nt, Util.qualToString(cdrInsertQual), Util.qualToString(mutationQual), mapping.toString(), canonical].join("\t")
     }
 }

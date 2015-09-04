@@ -245,4 +245,8 @@ class Util {
 
         aaSeq
     }
+
+    static boolean isCanonical(String cdr3) {
+        cdr3 =~ /^TG[TC].+(?:TGG|TT[TC])$/
+    }
 }

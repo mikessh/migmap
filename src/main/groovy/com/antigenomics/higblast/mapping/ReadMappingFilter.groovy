@@ -25,7 +25,7 @@ import com.antigenomics.higblast.io.Read
 import java.util.concurrent.atomic.AtomicLong
 
 class ReadMappingFilter {
-    final boolean allowNoCdr3, allowIncomplete, allowNonCoding
+    final boolean allowNoCdr3, allowIncomplete, allowNonCoding, allowNonCanonical
     final byte qualityThreshold
     final InputPort<Read> unmappedInputPort
 
@@ -35,19 +35,22 @@ class ReadMappingFilter {
                              noCdr3Counter = new AtomicLong(),
                              incompleteCounter = new AtomicLong(),
                              nonCodingCounter = new AtomicLong(),
+                             nonCanonicalCounter = new AtomicLong(),
                              passedCounter = new AtomicLong()
 
     ReadMappingFilter(byte qualityThreshold, boolean allowNoCdr3, boolean allowIncomplete, boolean allowNonCoding,
+                      boolean allowNonCanonical,
                       InputPort<Read> unmappedInputPort = DummyInputPort.INSTANCE) {
         this.qualityThreshold = qualityThreshold
         this.allowNoCdr3 = allowNoCdr3
         this.allowIncomplete = allowIncomplete
         this.allowNonCoding = allowNonCoding
+        this.allowNonCanonical = allowNonCanonical
         this.unmappedInputPort = unmappedInputPort
     }
 
     ReadMappingFilter() {
-        this((byte) 25, false, false, true)
+        this((byte) 25, false, false, true, false)
     }
 
     boolean pass(ReadMapping readMapping) {
@@ -62,9 +65,10 @@ class ReadMappingFilter {
                     readMapping.minMutationQual >= qualityThreshold) && goodCounter.incrementAndGet() > 0),
                     passCdr3 = (mapping.hasCdr3 || noCdr3Counter.incrementAndGet() < 0 || allowNoCdr3),
                     passIncomplete = (mapping.complete || incompleteCounter.incrementAndGet() < 0 || allowIncomplete),
-                    passNonCoding = ((mapping.inFrame && mapping.noStop) || nonCodingCounter.incrementAndGet() < 0 || allowNonCoding)
+                    passNonCoding = ((mapping.inFrame && mapping.noStop) || nonCodingCounter.incrementAndGet() < 0 || allowNonCoding),
+                    passNonCanonical = (readMapping.canonical || nonCanonicalCounter.incrementAndGet() < 0 || allowNonCanonical)
 
-            return passQuality && passCdr3 && passIncomplete && passNonCoding && passedCounter.incrementAndGet() > 0
+            return passQuality && passCdr3 && passIncomplete && passNonCoding && passNonCanonical && passedCounter.incrementAndGet() > 0
         } else {
             unmappedInputPort.put(readMapping.read)
         }
@@ -117,6 +121,14 @@ class ReadMappingFilter {
         (double) nonCoding / mapped
     }
 
+    long getNonCanonical() {
+        nonCanonicalCounter.get()
+    }
+
+    double getNonCanonicalRatio() {
+        (double) nonCanonical / mapped
+    }
+
     long getPassed() {
         passedCounter.get()
     }
@@ -126,12 +138,13 @@ class ReadMappingFilter {
     }
 
     static
-    final String OUTPUT_HEADER = "total\tpassed\tmapped\tgood.of.mapped\tno.cdr3.of.mapped\tincomplete.of.mapped\tnon.coding.of.mapped"
+    final String OUTPUT_HEADER = "total\tpassed\tmapped\tgood.of.mapped\t" +
+            "no.cdr3.of.mapped\tincomplete.of.mapped\tnon.coding.of.mapped\tnon.canonical.of.mapped"
 
 
     @Override
     public String toString() {
-        [total, passed, mapped, good, noCdr3, incomplete, nonCoding].join("\t")
+        [total, passed, mapped, good, noCdr3, incomplete, nonCoding, nonCanonical].join("\t")
     }
 
     public String toProgressString() {

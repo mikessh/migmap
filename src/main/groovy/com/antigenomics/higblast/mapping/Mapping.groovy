@@ -30,7 +30,7 @@ class Mapping {
 
     Mapping(Segment vSegment, Segment dSegment, Segment jSegment,
             RegionMarkup regionMarkup, Cdr3Markup cdr3Markup, Truncations truncations,
-            boolean rc, boolean complete, boolean hasCdr3, boolean inFrame, boolean noStop, hasD,
+            boolean rc, boolean complete, boolean hasCdr3, boolean inFrame, boolean noStop, boolean hasD,
             List<Mutation> mutations) {
         // needed to extract CDR3 sequence
         this.regionMarkup = regionMarkup

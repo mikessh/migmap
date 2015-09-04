@@ -17,28 +17,29 @@
 package com.antigenomics.higblast.blast
 
 import com.antigenomics.higblast.genomic.SegmentDatabase
+import com.antigenomics.higblast.io.Read
+import com.antigenomics.higblast.mapping.ReadMapping
 import org.junit.AfterClass
 import org.junit.Test
 
 class JRefSearcherTest {
     @Test
     void cdr3EndTest() {
-        /*
-         def seq = "CAGGTGCAGCTGCAGGAGTCGGGCCCAGGACTGGTAAAGCCTTCGGAGACCCTGTCCCTCACCTGCGGTGTCTCTGGTTACTCCATAAGCAGTGGTTACTACTGGGCCTGGATCCGGCAGCCCCCAGGGAAGGGGCTGGAGTGGGTTGCGACTATCTATCATGATGGAAGATCCTACTACAACCCGTCCCTGGAAAGTCGAGTCACCATATCAGTAGACACGTCCAAGAACCAGTTCTCCCTGAGGCTGACTTCTGTGACCGCCGCAGACACGGCCGTATATTTCTGTGCGAGGGATCAGGGGCCACGAGACCACCCCAGTTCATCGTTTTGGGGCCAGGGAACCCTGGTCACCGTCTCCTCA"
-         def factory = new BlastInstanceFactory("data/", "human", ["IGH"], true, false)
-         def instance = factory.create()
 
-         def read = new Read(
+        def seq = "CAGGTGCAGCTGCAGGAGTCGGGCCCAGGACTGGTAAAGCCTTCGGAGACCCTGTCCCTCACCTGCGGTGTCTCTGGTTACTCCATAAGCAGTGGTTACTACTGGGCCTGGATCCGGCAGCCCCCAGGGAAGGGGCTGGAGTGGGTTGCGACTATCTATCATGATGGAAGATCCTACTACAACCCGTCCCTGGAAAGTCGAGTCACCATATCAGTAGACACGTCCAAGAACCAGTTCTCCCTGAGGCTGACTTCTGTGACCGCCGCAGACACGGCCGTATATTTCTGTGCGAGGGATCAGGGGCCACGAGACCACCCCAGTTCATCGTTTTGGGGCCAGGGAACCCTGGTCACCGTCTCCTCA"
+        def factory = new BlastInstanceFactory("data/", "human", ["IGH"], true, false)
+        def instance = factory.create()
+
+        def read = new Read(
                 "@",
                 seq,
                 "I" * seq.length()
-         )
+        )
 
-         instance.put(read)
-         instance.put(null)
-         println instance.nextChunk()*/
+        instance.put(read)
+        instance.put(null)
 
-        def chunk = "# IGBLASTN 2.2.29+\n" +
+        /*def chunk = "# IGBLASTN 2.2.29+\n" +
                 "# Query: @\n" +
                 "# Database: /Users/mikesh/Programming/higblast/data/database-7bdae913-9f92-478c-ba1c-47d9d33676be/v /Users/mikesh/Programming/higblast/data/database-7bdae913-9f92-478c-ba1c-47d9d33676be/d /Users/mikesh/Programming/higblast/data/database-7bdae913-9f92-478c-ba1c-47d9d33676be/j\n" +
                 "# Domain classification requested: imgt\n" +
@@ -64,17 +65,20 @@ class JRefSearcherTest {
                 "V\t@\t1\tCAGGTGCAGCTGCAGGAGTCGGGCCCAGGACTGGTAAAGCCTTCGGAGACCCTGTCCCTCACCTGCGGTGTCTCTGGTTACTCCATAAGCAGTGGTTACTACTGGGCCTGGATCCGGCAGCCCCCAGGGAAGGGGCTGGAGTGGGTTGCGACTATCTATCATGATGGAAGATCCTACTACAACCCGTCCCTGGAAAGTCGAGTCACCATATCAGTAGACACGTCCAAGAACCAGTTCTCCCTGAGGCTGACTTCTGTGACCGCCGCAGACACGGCCGTATATTTCTGTGCGAG\t1\tCAGGTGCAGCTGCAGGAGTCGGGCCCAGGACTGGTGAAGCCTTCGGAGACCCTGTCCCTCACCTGCGCTGTCTCTGGTTACTCCATCAGCAGTGGTTACTACTGGGGCTGGATCCGGCAGCCCCCAGGGAAGGGGCTGGAGTGGATTGGGAGTATCTATCATAGTGGGAGCACCTACTACAACCCGTCCCTCAAGAGTCGAGTCACCATATCAGTAGACACGTCCAAGAACCAGTTCTCCCTGAAGCTGAGCTCTGTGACCGCCGCAGACACGGCCGTGTATTACTGTGCGAG\n" +
                 "D\t@\t328\tTTTTGG\t11\tTTTTGG\n" +
                 "J\t@\t331\tTGGGGCCAGGGAACCCTGGTCACCGTCTCCTCA\t15\tTGGGGCCAGGGAACCCTGGTCACCGTCTCCTCA\n" +
-                "# BLAST processed 1 queries"
+                "# BLAST processed 1 queries"*/
 
         def segmentDatabase = new SegmentDatabase("data/", "human", ["IGH"])
         def parser = new BlastParser(segmentDatabase)
 
-        def mapping = parser.parse(chunk)
+        def mapping = parser.parse(instance.nextChunk())
         assert mapping.hasCdr3
         assert mapping.complete
         assert mapping.regionMarkup.cdr3End == 333
+
+        def readMapping = new ReadMapping(mapping, read)
+        assert readMapping.canonical
     }
-    
+
     @Test
     void borderlineCase() {
         def chunk = "# IGBLASTN 2.2.29+\n" +
@@ -113,7 +117,7 @@ class JRefSearcherTest {
 
         assert mapping.complete
     }
-    
+
     @AfterClass
     static void tearDown() {
         SegmentDatabase.clearTemporaryFiles()

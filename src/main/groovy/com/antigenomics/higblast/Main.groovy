@@ -62,6 +62,8 @@ cli._(longOpt: "allow-no-cdr3",
         "Report clonotypes with no CDR3 mapping.")
 cli._(longOpt: "allow-noncoding",
         "Report clonotypes that have either stop codon or frameshift in their receptor sequence.")
+cli._(longOpt: "allow-noncanonical",
+        "Report clonotypes that have non-canonical CDR3 (do not start with C or end with F/W residues).")
 cli.q(args: 1, argName: "2..40",
         "Threshold for average quality of mutations and N-regions of CDR3 [default = $DEFAULT_Q]")
 cli._(longOpt: "by-read",
@@ -149,6 +151,7 @@ genes.each { gene ->
 
 def allowIncomplete = (boolean) opt.'allow-incomplete',
     allowNoCdr3 = (boolean) opt.'allow-no-cdr3', allowNoncoding = (boolean) opt.'allow-noncoding',
+    allowNonCanonical = (boolean) opt.'allow-noncanonical',
     qualityThreshold = Byte.parseByte((String) (opt.q ?: DEFAULT_Q))
 
 // RUNNING THE PIPELINE
@@ -159,11 +162,10 @@ def blastInstanceFactory = new BlastInstanceFactory(dataDir, species, genes, all
 
 try {
 
-    def filter = new ReadMappingFilter(qualityThreshold, allowNoCdr3, allowIncomplete, allowNoncoding,
+    def filter = new ReadMappingFilter(qualityThreshold, allowNoCdr3, allowIncomplete, allowNoncoding, allowNonCanonical,
             unmappedFileName ? new FastqWriter(unmappedFileName) : DummyInputPort.INSTANCE)
 
-    def pipeline = new Pipeline(inputPort, blastInstanceFactory, outputPort,
-            filter,
+    def pipeline = new Pipeline(inputPort, blastInstanceFactory, outputPort, filter,
             limit, threads)
 
     Util.report("Analyzing sample $inputFileName", 2)
