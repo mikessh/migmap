@@ -30,6 +30,7 @@ import static com.antigenomics.higblast.Util.BLAST_NA
 import static com.antigenomics.higblast.Util.groomMatch
 
 class BlastParser {
+    final static int MIN_CDR3_LEN = 6
     final AtomicInteger total = new AtomicInteger(),
                         noMatch = new AtomicInteger(),
                         vNotFound = new AtomicInteger(),
@@ -127,12 +128,14 @@ class BlastParser {
                 // try rescue CDR3
                 cdr3Start = RefPointSearcher.getCdr3Start(vSegment, alignments[0])
             }
-            if (cdr3Start >= 0)
+            if (cdr3Start >= 0) {
                 cdr3End = RefPointSearcher.getCdr3End(jSegment, alignments[2])
+            }
         }
 
         def regionMarkup = new RegionMarkup(cdr1Start, cdr1End, cdr2Start, cdr2End, cdr3Start, cdr3End)
-        def hasCdr3 = cdr3Start >= 0, complete = cdr3End >= 0 && hasCdr3
+        def hasCdr3 = cdr3Start >= 0 && (cdr3End < 0 || cdr3End - cdr3Start >= MIN_CDR3_LEN),
+            complete = cdr3End >= 0 && hasCdr3
 
         // - Markup of V/D/J within CDR3
         int vCdr3End = -1, dCdr3Start = -1, dCdr3End = -1, jCdr3Start = -1,
