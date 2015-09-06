@@ -99,6 +99,7 @@ has.cdr3         | *true* if CDR3 region is present (both V segment conserved re
 in.frame         | *true* if receptor has no frameshifts
 no.stop          | *true* if receptor contains no stop codons
 complete         | *true* if CDR3 region is fully defined (both V and J conserved residues are present)
+canonical        | *true* if CDR3 region starts with C residue and ends with F/W residue
  
 ## Installation
 
