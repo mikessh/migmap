@@ -67,7 +67,7 @@ class MutationExtractor {
     }
 
     static MutationExtractorResult extract(Alignment alignment) {
-        def mutations = new LinkedList<Mutation>()
+        def mutations = new ArrayList<Mutation>()
         int start = -1, end = -1
         int qdelta = 0, sdelta = 0
         def type = None
