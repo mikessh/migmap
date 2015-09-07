@@ -18,6 +18,7 @@ package com.antigenomics.higblast
 
 import com.antigenomics.higblast.genomic.SegmentDatabase
 
+import java.util.concurrent.TimeUnit
 import java.util.regex.Matcher
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
@@ -30,9 +31,22 @@ class Util {
     static final int QUAL_OFFSET = 33
     static int VERBOSITY_LEVEL = 2
 
+    private static Date start = null
+
+    private static String timePassed(long millis) {
+        String.format("%02dm%02ds",
+                TimeUnit.MILLISECONDS.toMinutes(millis),
+                TimeUnit.MILLISECONDS.toSeconds(millis) -
+                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis))
+        )
+    }
+
     static void report(String message, int verbosity = 1) {
         if (verbosity <= VERBOSITY_LEVEL) {
-            System.err.println("[${new Date()} HIGBLAST] $message")
+            if (start == null)
+                start = new Date()
+
+            System.err.println("[${new Date()} HIGBLAST +" + timePassed(new Date().time - start.time) + "] $message")
         }
     }
 
