@@ -31,6 +31,9 @@ class FastqReader implements OutputPort<Read> {
         if (!header) {
             return null
         }
+        if (!header.startsWith("@")) {
+            throw new RuntimeException("Bad FASTQ header")
+        }
 
         def seq = reader.readLine()
         reader.readLine()

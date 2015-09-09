@@ -26,8 +26,9 @@ import java.util.zip.GZIPOutputStream
 class Util {
     static final int N_THREADS = Runtime.runtime.availableProcessors()
     static final String MY_NA = ".", BLAST_NA = "N/A"
-    static final char GAP = '-'
     static final byte MAX_QUAL = 40, MIN_QUAL = 2
+    static final char GAP = '-'
+    static final String MAX_QUAL_SYMBOL = (char) (MAX_QUAL + 33)
     static final int QUAL_OFFSET = 33
     static int VERBOSITY_LEVEL = 2
 

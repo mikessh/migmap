@@ -47,6 +47,21 @@ class PipelineTest {
     }
 
     @Test
+    void fastaTest() {
+        def reader = new FastaReader("sample.fasta.gz", true)
+        def factory = new BlastInstanceFactory("data/", "human", ["IGH"], true, false)
+
+        def pipeline = new Pipeline(reader, factory,
+                DummyInputPort.INSTANCE,
+                ReadMappingFilter.None)
+
+        pipeline.run()
+
+        assert pipeline.readMappingFilter.total == 100
+        assert pipeline.readMappingFilter.goodRatio == 1.0
+    }
+
+    @Test
     void dAssignmentTest() {
         def reader = new FastqReader("ambiguous_d.fastq.gz", true)
         def factory = new BlastInstanceFactory("data/", "human", ["IGH"], true, false)

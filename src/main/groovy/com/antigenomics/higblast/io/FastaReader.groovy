@@ -28,11 +28,19 @@ class FastaReader implements OutputPort<Read> {
 
     @Override
     synchronized Read take() {
-        if (header == "") // first sequence
+        if (header == "") {
+            // first sequence
             header = reader.readLine()
+        }
 
-        if (!header) // EOF
+        if (!header) {
+            // EOF
             return null
+        }
+
+        if (!header.startsWith(">")) {
+            throw new RuntimeException("Bad FASTA header")
+        }
 
         def seq = ""
         while (true) {
@@ -41,14 +49,16 @@ class FastaReader implements OutputPort<Read> {
                 // EOF next read, return last sequence
                 def _header = header
                 header = null
-                return new Read(_header, seq, null)
+                return new Read(_header, seq, Util.MAX_QUAL_SYMBOL * seq.length())
             } else if (line.startsWith(">")) {
                 // reset header and return current read
                 def _header = header
                 header = line
-                return new Read(_header, seq, null)
-            } else // sequence line
+                return new Read(_header, seq, Util.MAX_QUAL_SYMBOL * seq.length())
+            } else {
+                // sequence line
                 seq += line
+            }
         }
     }
 }
