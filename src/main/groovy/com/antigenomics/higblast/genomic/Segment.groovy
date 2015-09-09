@@ -22,13 +22,14 @@ class Segment {
     static final Segment DUMMY_J = new Segment(SegmentType.J, Util.MY_NA, "AAAAAAAAAAAAAAAAAAAAAAAAA", -1),
                          DUMMY_D = new Segment(SegmentType.D, Util.MY_NA, "AAAAAAAAAAAAAAAAAAAAAAAAA", -1)
 
-    final String name, sequence
+    final String name, sequence, regexName
     final int referencePoint
     final SegmentType type
 
     Segment(SegmentType type, String name, String sequence, int referencePoint) {
         this.type = type
         this.name = name
+        this.regexName = name.replace(".", "\\.").replace("*", "\\*")
         this.sequence = sequence
         this.referencePoint = referencePoint
     }

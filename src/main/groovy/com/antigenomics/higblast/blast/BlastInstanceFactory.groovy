@@ -49,8 +49,8 @@ class BlastInstanceFactory {
                             "-domain_system ${useKabat ? "kabat" : "imgt"}"
         ]
 
-        def REPORT_OPT = ["-num_alignments_V 1", "-num_alignments_D 1", "-num_alignments_J 1"],
-            OUTFMT_OPT = ["-outfmt", "7 qseqid qstart qseq sstart sseq"],
+        def REPORT_OPT = ["-num_alignments_V 3", "-num_alignments_D 3", "-num_alignments_J 3"],
+            OUTFMT_OPT = ["-outfmt", "7 sseqid qstart qseq sstart sseq"],
             OUTPUT_OPT = "-out -"
 
         this.cmdLine = [[ExecutionUtil.igBlast, OPTS.values(), REPORT_OPT, OUTPUT_OPT].

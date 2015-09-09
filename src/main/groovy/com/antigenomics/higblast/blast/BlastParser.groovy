@@ -78,19 +78,19 @@ class BlastParser {
             return null
         }
 
-        def vSegment = segmentDatabase.segments[vSegmentNames.split(",")[0]],
-            dSegment = dFound ? segmentDatabase.segments[dSegmentNames.split(",")[0]] : Segment.DUMMY_D,
-            jSegment = jFound ? segmentDatabase.segments[jSegmentNames.split(",")[0]] : Segment.DUMMY_J
+        def vSegment = segmentDatabase.segments[vSegmentNames.split(",").sort()[0]],
+            dSegment = dFound ? segmentDatabase.segments[dSegmentNames.split(",").sort()[0]] : Segment.DUMMY_D,
+            jSegment = jFound ? segmentDatabase.segments[jSegmentNames.split(",").sort()[0]] : Segment.DUMMY_J
 
         // - Alignments for V, D and J segments, remember here and further BLAST coordinates are 1-based
         alignments = [
                 groomMatch(chunk =~
-                        //                          qstart     qseq        sstart     sseq
-                        /# Hit table(?:.+\n)+V\t.+\t([0-9]+)\t([ATGCN-]+)\t([0-9]+)\t([ATGCN-]+)/),
+                        //                                            qstart     qseq        sstart     sseq
+                        /# Hit table(?:.+\n)+V\t$vSegment.regexName\t([0-9]+)\t([ATGCN-]+)\t([0-9]+)\t([ATGCN-]+)/),
                 dFound ? groomMatch(chunk =~
-                        /# Hit table(?:.+\n)+D\t.+\t([0-9]+)\t([ATGCN-]+)\t([0-9]+)\t([ATGCN-]+)/) : null,
-                groomMatch(chunk =~
-                        /# Hit table(?:.+\n)+J\t.+\t([0-9]+)\t([ATGCN-]+)\t([0-9]+)\t([ATGCN-]+)/)
+                        /# Hit table(?:.+\n)+D\t$dSegment.regexName\t([0-9]+)\t([ATGCN-]+)\t([0-9]+)\t([ATGCN-]+)/) : null,
+                jFound ? groomMatch(chunk =~
+                        /# Hit table(?:.+\n)+J\t$jSegment.regexName\t([0-9]+)\t([ATGCN-]+)\t([0-9]+)\t([ATGCN-]+)/) : null
         ].collect {
             it ? new Alignment(it[0].toInteger() - 1, it[1], it[2].toInteger() - 1, it[3]) : null
         }

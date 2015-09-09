@@ -19,6 +19,7 @@ package com.antigenomics.higblast
 import com.antigenomics.higblast.blast.BlastInstanceFactory
 import com.antigenomics.higblast.genomic.SegmentDatabase
 import com.antigenomics.higblast.io.*
+import com.antigenomics.higblast.mapping.ReadMapping
 import com.antigenomics.higblast.mapping.ReadMappingFilter
 import org.junit.AfterClass
 import org.junit.Test
@@ -43,6 +44,29 @@ class PipelineTest {
         assert pipeline.readMappingFilter.nonCanonicalRatio <= 0.1
 
         println filter.toProgressString()
+    }
+
+    @Test
+    void dAssignmentTest() {
+        def reader = new FastqReader("ambiguous_d.fastq.gz", true)
+        def factory = new BlastInstanceFactory("data/", "human", ["IGH"], true, false)
+
+        def pipeline = new Pipeline(reader, factory,
+                new InputPort<ReadMapping>() {
+                    @Override
+                    void put(ReadMapping obj) {
+                        assert obj.mapped
+                        assert obj.mapping.dSegment.name == "IGHD1-1*01"
+                    }
+
+                    @Override
+                    void close() {
+
+                    }
+                },
+                ReadMappingFilter.None)
+
+        pipeline.run()
     }
 
     @Test
