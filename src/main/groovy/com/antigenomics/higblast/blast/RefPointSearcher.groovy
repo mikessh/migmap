@@ -21,6 +21,7 @@ import com.antigenomics.higblast.genomic.Segment
 import static com.antigenomics.higblast.Util.GAP
 
 class RefPointSearcher {
+    final static int MAX_J_FR4_TRUNCATIONS = 5, MAX_V_FR4_TRUNCATIONS = 5
 
     RefPointSearcher() {
     }
@@ -41,18 +42,20 @@ class RefPointSearcher {
         if (pos > send) // incomplete, F/W out of scope
             return -1
 
-        if (sstart >= pos) // conserved residue truncated, alignment starts after F/W
-            return qstart
+        def truncations = sstart - pos
+        if (truncations >= 0) // conserved residue truncated, alignment starts after F/W
+            return truncations >= MAX_J_FR4_TRUNCATIONS ? -1 : qstart
 
         convertPosition(pos, qstart, qseq, sstart, sseq)
     }
 
     static int convertPositionV(int pos, int qstart, String qseq, int sstart, String sseq, int send, int qend) {
-        if (pos >= send) // conserved residue truncated, alignment starts after F/W
-            return qend
-
         if (sstart > pos)  // incomplete, C out of scope
             return -1
+
+        def truncations = pos - send
+        if (truncations >= 0) // conserved residue truncated, alignment ends before C
+            return truncations >= MAX_V_FR4_TRUNCATIONS ? -1 : qend
 
         convertPosition(pos, qstart, qseq, sstart, sseq)
     }
