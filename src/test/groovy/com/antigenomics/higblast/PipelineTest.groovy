@@ -24,6 +24,8 @@ import com.antigenomics.higblast.mapping.ReadMappingFilter
 import org.junit.AfterClass
 import org.junit.Test
 
+import java.util.concurrent.atomic.AtomicInteger
+
 class PipelineTest {
     @Test
     void sampleTest() {
@@ -53,7 +55,7 @@ class PipelineTest {
 
         def pipeline = new Pipeline(reader, factory,
                 DummyInputPort.INSTANCE,
-                ReadMappingFilter.None)
+                ReadMappingFilter.createDummy())
 
         pipeline.run()
 
@@ -66,12 +68,19 @@ class PipelineTest {
         def reader = new FastqReader("ambiguous_d.fastq.gz", true)
         def factory = new BlastInstanceFactory("data/", "human", ["IGH"], true, false)
 
+        def badDCount = new AtomicInteger(),
+                wrongMappingCount = new AtomicInteger()
+
         def pipeline = new Pipeline(reader, factory,
                 new InputPort<ReadMapping>() {
                     @Override
                     void put(ReadMapping obj) {
-                        assert obj.mapped
-                        assert obj.mapping.dSegment.name == "IGHD1-1*01"
+                        if (obj.mapped && obj.cdr3nt == "TGTGCGAGCGATCGGAACGGTATGGACGTCTGG") {
+                            if (!obj.mapping.dSegment.name == "IGHD1-1*01")
+                                badDCount.incrementAndGet()
+                        } else {
+                            wrongMappingCount.incrementAndGet()
+                        }
                     }
 
                     @Override
@@ -79,9 +88,12 @@ class PipelineTest {
 
                     }
                 },
-                ReadMappingFilter.None)
+                ReadMappingFilter.createDummy())
 
         pipeline.run()
+        
+        assert badDCount.get() == 0
+        assert wrongMappingCount.get() == 0
     }
 
     @Test

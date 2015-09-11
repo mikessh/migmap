@@ -29,7 +29,7 @@ class ReadMappingFilter {
     final byte qualityThreshold
     final InputPort<Read> unmappedInputPort
 
-    final static ReadMappingFilter None = new ReadMappingFilter((byte) 0, true, true, true, true)
+    final static ReadMappingFilter createDummy() { new ReadMappingFilter((byte) 0, true, true, true, true) }
 
     private final AtomicLong totalCounter = new AtomicLong(),
                              mappedCounter = new AtomicLong(),
