@@ -299,6 +299,27 @@ class BlastParserTest {
         println readMapping
     }
 
+    @Test
+    void tooMuchTruncationsTest() {
+        def seq = "AAGTAGTCCTTGACCAGGCACGTGATGGTGGCCGACTCCCGCAGGTTCAGCTGCTCCC" +
+                "GGGCTGGTGGCAGCAAGTAGACATCGGGCCTGTGCAGGGCCACCCCCTTGGGCCGGGA" +
+                "GATGGTCTGCTTCAGTGGCGAGGGCAGGTCTGTGTGGGTCACGGTGCACGTGAACCTC" +
+                "TCCCCGGAATTCCAGTCATCCTCGCAGATGCTGGCCTCACCCACGGCGCTGAAAGTGG" +
+                "CATTGGGGTGGCTCTCGGAGATGTTGGTGTGGGTTTTCACAGCTTCGCCATTCTTGGC" +
+                "GTTGTCTCTGGAGATGGTGAATCGGCCCTTCACTGAGTCTGCGTAGTATATGTAACTA" +
+                "GTACTACTAATGGATGAGACCCACTCCAGAGACAACGCCAAGAACTCACTGTATCTGC" +
+                "AAATGAACAGCCTGAGAGCCGAGGACACGGCTGTGTATTACTGTGCGAGCGATCGGAA" +
+                "CGGTATGGACGTCTGGGGCCAAGGGACCACGGTCACCGTCTCCTCAGGGAGTGCATCC" +
+                "GCCCCAACCCTTTTCCCCCTCTCTGCGTTGATACCACTG"
+        def read = toRead(seq)
+        def chunk = toChunk(read)
+
+        def mapping = parser.parse(chunk)
+
+        assert !mapping.hasCdr3
+        assert !mapping.complete
+    }
+
     @AfterClass
     static void tearDown() {
         SegmentDatabase.clearTemporaryFiles()
