@@ -49,12 +49,12 @@ class FastaReader implements OutputPort<Read> {
                 // EOF next read, return last sequence
                 def _header = header
                 header = null
-                return new Read(_header, seq, Util.MAX_QUAL_SYMBOL * seq.length())
+                return new Read(_header, seq)
             } else if (line.startsWith(">")) {
                 // reset header and return current read
                 def _header = header
                 header = line
-                return new Read(_header, seq, Util.MAX_QUAL_SYMBOL * seq.length())
+                return new Read(_header, seq)
             } else {
                 // sequence line
                 seq += line

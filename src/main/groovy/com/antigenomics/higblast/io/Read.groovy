@@ -27,6 +27,10 @@ class Read {
         this.qual = qual
     }
 
+    Read(String header, String seq) {
+        this(header, seq, Util.MAX_QUAL_SYMBOL * seq.length())
+    }
+
     Read getRc() {
         new Read(header, Util.revCompl(seq), qual.reverse())
     }
