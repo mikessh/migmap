@@ -27,14 +27,23 @@ import org.junit.Test
 import java.util.concurrent.atomic.AtomicInteger
 
 class PipelineTest {
+    private final BlastInstanceFactory factory = new BlastInstanceFactory("data/", "human", ["IGH"], true, false)
+    private static class NullOutputStream extends OutputStream {
+        static final NullOutputStream INSTANCE = new NullOutputStream()
+        @Override
+        void write(int b) throws IOException {
+        }
+    }
+
     @Test
     void sampleTest() {
         def reader = new FastqReader("sample.fastq.gz", true)
-        def factory = new BlastInstanceFactory("data/", "human", ["IGH"], true, false)
         def filter = new ReadMappingFilter()
 
         def pipeline = new Pipeline(reader, factory,
-                new InputPortMerge(new ReadMappingOutput(), new ClonotypeOutput()),
+                new InputPortMerge(
+                        new ReadMappingOutput(new PlainTextOutput(NullOutputStream.INSTANCE)),
+                        new ClonotypeOutput(new PlainTextOutput(NullOutputStream.INSTANCE))),
                 filter)
 
         pipeline.run()
@@ -44,14 +53,11 @@ class PipelineTest {
         assert pipeline.readMappingFilter.noCdr3Ratio <= 0.1
         assert pipeline.readMappingFilter.incompleteRatio <= 0.1
         assert pipeline.readMappingFilter.nonCanonicalRatio <= 0.1
-
-        println filter.toProgressString()
     }
 
     @Test
     void fastaTest() {
         def reader = new FastaReader("sample.fasta.gz", true)
-        def factory = new BlastInstanceFactory("data/", "human", ["IGH"], true, false)
 
         def pipeline = new Pipeline(reader, factory,
                 DummyInputPort.INSTANCE,
@@ -66,10 +72,9 @@ class PipelineTest {
     @Test
     void dAssignmentTest() {
         def reader = new FastqReader("ambiguous_d.fastq.gz", true)
-        def factory = new BlastInstanceFactory("data/", "human", ["IGH"], true, false)
 
         def badDCount = new AtomicInteger(),
-                wrongMappingCount = new AtomicInteger()
+            wrongMappingCount = new AtomicInteger()
 
         def pipeline = new Pipeline(reader, factory,
                 new InputPort<ReadMapping>() {
@@ -91,7 +96,7 @@ class PipelineTest {
                 ReadMappingFilter.createDummy())
 
         pipeline.run()
-        
+
         assert badDCount.get() == 0
         assert wrongMappingCount.get() == 0
     }
@@ -99,7 +104,6 @@ class PipelineTest {
     @Test
     void badDataTest() {
         def reader = new FastqReader("bad_sample.fastq.gz", true)
-        def factory = new BlastInstanceFactory("data/", "human", ["IGH"], true, false)
 
         def filter = new ReadMappingFilter((byte) 20, true, true, true, true)
 
@@ -110,8 +114,6 @@ class PipelineTest {
 
         assert filter.passed == filter.good
         assert pipeline.readMappingFilter.mappedRatio >= 0.05
-
-        println filter.toProgressString()
     }
 
     @AfterClass
