@@ -16,6 +16,7 @@
 
 package com.antigenomics.higblast.genomic
 
+import com.antigenomics.higblast.blast.BlastInstanceFactory
 import org.junit.AfterClass
 import org.junit.Test
 
@@ -62,6 +63,22 @@ class SegmentDatabaseTest {
         assert new File("$segmentDatabase.databaseTempPath/v.nhr").exists()
         assert new File("$segmentDatabase.databaseTempPath/d.nhr").exists()
         assert new File("$segmentDatabase.databaseTempPath/j.nhr").exists()
+    }
+
+    @Test
+    void annotationTestIG() {
+        def factory = new BlastInstanceFactory("data/", "human", ["IGH", "IGK", "IGL"], true, false)
+        factory.annotateV()
+
+        assert factory.segmentDatabase.annotatedV == factory.segmentDatabase.vSegments
+    }
+
+    @Test
+    void annotationTestTR() {
+        def factory = new BlastInstanceFactory("data/", "human", ["TRA", "TRB", "TRG", "TRD"], true, false)
+        factory.annotateV()
+
+        assert factory.segmentDatabase.annotatedV + 2 == factory.segmentDatabase.vSegments // known 2 unannotateable cases
     }
 
     @AfterClass

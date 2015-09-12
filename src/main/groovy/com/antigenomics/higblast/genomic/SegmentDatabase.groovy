@@ -18,6 +18,9 @@ package com.antigenomics.higblast.genomic
 
 import com.antigenomics.higblast.ExecutionUtil
 import com.antigenomics.higblast.Util
+import com.antigenomics.higblast.blast.BlastInstanceFactory
+import com.antigenomics.higblast.io.Read
+import com.antigenomics.higblast.mapping.RegionMarkup
 
 class SegmentDatabase {
     private static final List<SegmentDatabase> DB_CACHE = new LinkedList<>()
@@ -25,6 +28,7 @@ class SegmentDatabase {
     final Map<String, Segment> segments = new HashMap<>()
     final boolean hasD
     final int vSegments, dSegments, jSegments, vSegmentsNoMarkup
+    private int annotatedV =0
 
     static final SPECIES_ALIAS =
             ["human"        : "HomoSapiens",
@@ -90,6 +94,8 @@ class SegmentDatabase {
     }
 
     void makeBlastDb() {
+        Util.report("Creating temporary blast database at $databaseTempPath.", 2)
+
         new File(databaseTempPath).mkdir()
 
         new File("$databaseTempPath/v.fa").withPrintWriter { pwV ->
@@ -117,6 +123,45 @@ class SegmentDatabase {
         ["v", "d", "j"].each {
             "$ExecutionUtil.makeDb -parse_seqids -dbtype nucl -in $databaseTempPath/${it}.fa -out $databaseTempPath/$it".execute().waitFor()
         }
+    }
+
+    void annotateV(BlastInstanceFactory blastInstanceFactory) {
+        Util.report("Annotating variable segments.", 2)
+
+        def instance = blastInstanceFactory.create()
+
+        def readThread = new Thread(new Runnable() {
+            @Override
+            void run() {
+                def readMapping
+                while ((readMapping = instance.take()) != null) {
+                    def markup = readMapping.mapped ?
+                            readMapping.mapping.regionMarkup : RegionMarkup.DUMMY
+                    segments[readMapping.read.header].regionMarkup = markup
+                    if (markup.complete) {
+                        annotatedV++
+                    }
+                }
+            }
+        })
+
+        readThread.start()
+
+        segments.values()
+                .findAll { it.type == SegmentType.V }
+                .each {
+            instance.put(new Read(it.name, it.sequence))
+        }
+
+        instance.put(null)
+
+        readThread.join()
+
+        Util.report("Fully annotated $annotatedV of $vSegments segments.", 2)
+    }
+
+    int getAnnotatedV() {
+        return annotatedV
     }
 
     static void clearTemporaryFiles() {

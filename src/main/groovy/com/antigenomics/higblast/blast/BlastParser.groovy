@@ -129,16 +129,15 @@ class BlastParser {
         }
 
         // - Find CDR3 end using J reference point manually
-        if (jFound) {
-            if (cdrBounds[2]) {
-                cdr3Start = cdrBounds[2][0].toInteger() - 4
-            } else if (alignments[0]) {
-                // try rescue CDR3
-                cdr3Start = RefPointSearcher.getCdr3Start(vSegment, alignments[0])
-            }
-            if (cdr3Start >= 0) {
-                cdr3End = RefPointSearcher.getCdr3End(jSegment, alignments[2])
-            }
+        if (cdrBounds[2]) {
+            cdr3Start = cdrBounds[2][0].toInteger() - 4
+        } else if (alignments[0]) {
+            // try rescue CDR3
+            cdr3Start = RefPointSearcher.getCdr3Start(vSegment, alignments[0])
+        }
+
+        if (jFound && cdr3Start >= 0) {
+            cdr3End = RefPointSearcher.getCdr3End(jSegment, alignments[2])
         }
 
         def regionMarkup = new RegionMarkup(cdr1Start, cdr1End, cdr2Start, cdr2End, cdr3Start, cdr3End)

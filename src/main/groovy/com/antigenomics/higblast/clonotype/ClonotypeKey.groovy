@@ -23,27 +23,27 @@ import com.antigenomics.higblast.mutation.Mutation
 
 class ClonotypeKey {
     final String cdr3nt
-    protected final Mapping representativeMapping
+    protected final ReadMapping representativeMapping
 
     ClonotypeKey(ReadMapping readMapping) {
         this.cdr3nt = readMapping.cdr3nt
-        this.representativeMapping = readMapping.mapping
+        this.representativeMapping = readMapping
     }
 
     Segment getvSegment() {
-        representativeMapping.vSegment
+        representativeMapping.mapping.vSegment
     }
 
     Segment getdSegment() {
-        representativeMapping.dSegment
+        representativeMapping.mapping.dSegment
     }
 
     Segment getjSegment() {
-        representativeMapping.jSegment
+        representativeMapping.mapping.jSegment
     }
 
     List<Mutation> getMutations() {
-        representativeMapping.mutations
+        representativeMapping.mapping.mutations
     }
 
     @Override

@@ -19,6 +19,7 @@ package com.antigenomics.higblast.clonotype
 import com.antigenomics.higblast.Util
 import com.antigenomics.higblast.genomic.Segment
 import com.antigenomics.higblast.mapping.Cdr3Markup
+import com.antigenomics.higblast.mapping.ReadMapping
 import com.antigenomics.higblast.mapping.Truncations
 import com.antigenomics.higblast.mutation.Mutation
 import com.antigenomics.higblast.mutation.MutationStringifier
@@ -34,8 +35,10 @@ class Clonotype implements Comparable<Clonotype> {
     final boolean hasCdr3, complete, inFrame, noStop
     final Cdr3Markup cdr3Markup
     final Truncations truncations
+    final ReadMapping representativeMapping
 
     Clonotype(ClonotypeKey key, ClonotypeData data, long total) {
+        this.representativeMapping = key.representativeMapping
         this.cdr3nt = key.cdr3nt
         this.vSegment = key.vSegment
         this.dSegment = key.dSegment
@@ -60,11 +63,11 @@ class Clonotype implements Comparable<Clonotype> {
 
         def representativeMapping = key.representativeMapping
 
-        this.cdr3Markup = representativeMapping.cdr3Markup
-        this.truncations = representativeMapping.truncations
+        this.cdr3Markup = representativeMapping.mapping.cdr3Markup
+        this.truncations = representativeMapping.mapping.truncations
 
-        this.hasCdr3 = representativeMapping.hasCdr3
-        this.complete = representativeMapping.complete
+        this.hasCdr3 = representativeMapping.mapping.hasCdr3
+        this.complete = representativeMapping.mapping.complete
 
         boolean inFrame, noStop
 
@@ -76,8 +79,8 @@ class Clonotype implements Comparable<Clonotype> {
             this.cdr3aa = Util.MY_NA
         }
 
-        this.inFrame = representativeMapping.inFrame && inFrame
-        this.noStop = representativeMapping.noStop && noStop
+        this.inFrame = representativeMapping.mapping.inFrame && inFrame
+        this.noStop = representativeMapping.mapping.noStop && noStop
     }
 
     @Override

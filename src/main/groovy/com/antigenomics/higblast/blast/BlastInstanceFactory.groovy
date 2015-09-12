@@ -64,6 +64,10 @@ class BlastInstanceFactory {
         segmentDatabase.makeBlastDb()
     }
 
+    void annotateV() {
+        segmentDatabase.annotateV(this)
+    }
+
     BlastInstance create() {
         new BlastInstance(cmdLine.execute(env, dir), parser)
     }
