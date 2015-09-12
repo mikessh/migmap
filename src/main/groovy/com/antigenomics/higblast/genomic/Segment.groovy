@@ -17,6 +17,7 @@
 package com.antigenomics.higblast.genomic
 
 import com.antigenomics.higblast.Util
+import com.antigenomics.higblast.mapping.RegionMarkup
 
 class Segment {
     static final Segment DUMMY_J = new Segment(SegmentType.J, Util.MY_NA, "AAAAAAAAAAAAAAAAAAAAAAAAA", -1),
@@ -25,6 +26,8 @@ class Segment {
     final String name, sequence, regexName
     final int referencePoint
     final SegmentType type
+    
+    RegionMarkup regionMarkup = null
 
     Segment(SegmentType type, String name, String sequence, int referencePoint) {
         this.type = type

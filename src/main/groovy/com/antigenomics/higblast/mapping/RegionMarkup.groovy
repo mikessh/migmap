@@ -21,6 +21,8 @@ import com.antigenomics.higblast.mutation.MutationType
 import com.antigenomics.higblast.mutation.SubRegion
 
 class RegionMarkup {
+    final static RegionMarkup DUMMY = new RegionMarkup(-1, -1, -1, -1, -1, -1)
+
     final int cdr1Start, cdr1End, cdr2Start, cdr2End, cdr3Start, cdr3End // in read, used for extraction
 
     RegionMarkup(int cdr1Start, int cdr1End,
@@ -52,6 +54,12 @@ class RegionMarkup {
         } else {
             return SubRegion.CDR3
         }
+    }
+
+    boolean isComplete() {
+        cdr1Start >= 0 && cdr1End >= 0 &&
+                cdr2Start >= 0 && cdr2End >= 0 &&
+                cdr3Start >= 0
     }
 
     static final String OUTPUT_HEADER = "cdr1.start.in.read\tcdr1.end.in.read\t" +
