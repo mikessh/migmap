@@ -105,6 +105,7 @@ class Pipeline {
 
         threads.each { it.start() }
 
+        reporter.daemon = true
         reporter.start()
 
         threads.each { it.join() }
