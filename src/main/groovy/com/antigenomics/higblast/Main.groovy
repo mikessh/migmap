@@ -141,10 +141,21 @@ if (!ALLOWED_SPECIES.contains(species)) {
     Util.error("Unknown species $species.", 3)
 }
 
+boolean tr = false, ig = false
 genes.each { gene ->
     if (!ALLOWED_CHAINS.contains(gene)) {
         Util.error("Unknown gene $gene.", 3)
     }
+    if (gene.toUpperCase().startsWith("TR")) {
+        tr = true
+    }
+    if (gene.toUpperCase().startsWith("IG")) {
+        ig = true
+    }
+}
+
+if (tr && ig) {
+    Util.error("Mixing TCR and IG genes is not allowed.", 3)
 }
 
 // Output

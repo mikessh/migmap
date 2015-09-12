@@ -47,18 +47,26 @@ class BlastParser {
         def summary, alignments, cdrBounds
 
         // Rearrangement summary
-        summary = segmentDatabase.hasD ?
-                groomMatch(chunk =~
-                        //         V     D     J  chain stop frame (prod) strand
-                        /# V-.+\n(.+)\t(.+)\t(.+)\tV.\t(.+)\t(.+)\t.+\t(.+)/) :
-
-                groomMatch(chunk =~
+        boolean hasD = segmentDatabase.hasD
+        if (hasD) {
+            summary = groomMatch(chunk =~
+                    //         V     D     J  chain stop frame (prod) strand
+                    /# V-.+\n(.+)\t(.+)\t(.+)\tV.\t(.+)\t(.+)\t.+\t(.+)\n/)
+            if (summary == null) {
+                hasD = false
+                summary = groomMatch(chunk =~
                         //         V     J    chain   stop frame (prod)  strand
-                        /# V-.+\n(.+)\t(.+)\tV.\t(.+)\t(.+)\t.+\t(.+)/)
+                        /# V-.+\n(.+)\t(.+)\tV.\t(.+)\t(.+)\t.+\t(.+)\n/)
+            }
+        } else {
+            summary = groomMatch(chunk =~
+                    //         V     J    chain   stop frame (prod)  strand
+                    /# V-.+\n(.+)\t(.+)\tV.\t(.+)\t(.+)\t.+\t(.+)\n/)
+        }
 
         if (summary == null) {
             noMatch.incrementAndGet()
-            return
+            return null
         }
 
         def rc = summary[-1] != "+", inFrame = summary[-2] != "Out-of-frame", noStop = summary[-3] != "Yes"
@@ -66,8 +74,8 @@ class BlastParser {
         // Information on segments mapped
         // - Segment names, can be multiple of them
         def vSegmentNames = summary[0],
-            jSegmentNames = segmentDatabase.hasD ? summary[2] : summary[1],
-            dSegmentNames = segmentDatabase.hasD ? summary[1] : BLAST_NA
+            jSegmentNames = hasD ? summary[2] : summary[1],
+            dSegmentNames = hasD ? summary[1] : BLAST_NA
 
         def dFound = dSegmentNames != BLAST_NA,
             vFound = vSegmentNames != BLAST_NA,

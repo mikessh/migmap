@@ -32,7 +32,7 @@ class BlastInstanceFactory {
         this.segmentDatabase = new SegmentDatabase(dataBundlePath, species, genes, allAlleles)
         this.parser = new BlastParser(segmentDatabase)
 
-        def seqtype = genes[0].startsWith("TR") ? "TCR" : "Ig" // todo: restrict users from mixing TR/IG genes?
+        def seqtype = genes[0].startsWith("TR") ? "TCR" : "Ig"
 
         def OPTS = ["SEGM_OPT"  :
                             ["v", "d", "j"].collect { segment ->
