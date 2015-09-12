@@ -26,13 +26,15 @@ class Mapping {
     final Cdr3Markup cdr3Markup
     final Truncations truncations
     final List<Mutation> mutations
+    final int vStartInRef
     final boolean rc, complete, hasCdr3, inFrame, noStop, hasD
 
-    Mapping(Segment vSegment, Segment dSegment, Segment jSegment,
+    Mapping(Segment vSegment, Segment dSegment, Segment jSegment, int vStartInRef,
             RegionMarkup regionMarkup, Cdr3Markup cdr3Markup, Truncations truncations,
             boolean rc, boolean complete, boolean hasCdr3, boolean inFrame, boolean noStop, boolean hasD,
             List<Mutation> mutations) {
         // needed to extract CDR3 sequence
+        this.vStartInRef = vStartInRef
         this.regionMarkup = regionMarkup
         this.rc = rc
 

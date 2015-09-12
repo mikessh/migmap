@@ -171,10 +171,12 @@ class BlastParser {
             if (dFound) {
                 mutationExtractor.extractD(dSegment, alignments[1])
             }
-            mutationExtractor.extractJ(jSegment, alignments[2])
+            if (jFound) {
+                mutationExtractor.extractJ(jSegment, alignments[2])
+            }
         }
 
-        return new Mapping(vSegment, dSegment, jSegment,
+        return new Mapping(vSegment, dSegment, jSegment, alignments[0].sstart,
                 regionMarkup, cdr3Markup, truncations,
                 rc, complete, hasCdr3, inFrame, noStop, dFound,
                 mutationExtractor.mutations)
