@@ -41,18 +41,22 @@ class ReadMappingDetailsProvider {
         sep + fields.join("\t")
     }
 
-    String getDetails(ReadMapping readMapping) {
-        def details = readMapping.mapped ?
-                new ReadMappingDetails(readMapping.read, readMapping.mapping) :
-                ReadMappingDetails.DUMMY
+    String getDetailsString(ReadMapping readMapping) {
+        def details = getDetails(readMapping)
 
         sep + fields.collect { details."$it" }.join("\t")
     }
 
-    private static class ReadMappingDetails {
+    static ReadMappingDetails getDetails(ReadMapping readMapping) {
+        readMapping.mapped ?
+                new ReadMappingDetails(readMapping.read, readMapping.mapping) :
+                ReadMappingDetails.DUMMY
+    }
+
+    static class ReadMappingDetails {
         final String seq
         final RegionMarkup readMarkup, referenceMarkup
-        final int vStartInRef
+        final int vStartInRef, vStartInQuery
 
         static final ReadMappingDetails DUMMY = new ReadMappingDetails()
 
@@ -60,6 +64,7 @@ class ReadMappingDetailsProvider {
             this.seq = read.seq
             this.readMarkup = mapping.regionMarkup
             this.vStartInRef = mapping.vStartInRef
+            this.vStartInQuery = mapping.vStartInQuery
             this.referenceMarkup = mapping.vSegment.regionMarkup
         }
 
@@ -70,33 +75,41 @@ class ReadMappingDetailsProvider {
             this.readMarkup = RegionMarkup.DUMMY
         }
 
+        int nCount(int pos) {
+            Math.max(vStartInRef - pos, 0)
+        }
+
+        int sCount(int pos) {
+            Math.max(vStartInQuery, pos)
+        }
+
         String getFr1() {
             vStartInRef < referenceMarkup.cdr1Start ?
-                    'N' * vStartInRef + seq.substring(0, readMarkup.cdr1Start) :
+                    'N' * nCount(0) + seq.substring(sCount(0), readMarkup.cdr1Start) :
                     'N' * referenceMarkup.cdr1Start
         }
 
         String getCdr1() {
             vStartInRef < referenceMarkup.cdr1End ?
-                    'N' * (vStartInRef - referenceMarkup.cdr1Start) + seq.substring(readMarkup.cdr1Start, readMarkup.cdr1End) :
+                    'N' * nCount(referenceMarkup.cdr1Start) + seq.substring(sCount(readMarkup.cdr1Start), readMarkup.cdr1End) :
                     'N' * (referenceMarkup.cdr1End - referenceMarkup.cdr1Start)
         }
 
         String getFr2() {
             vStartInRef < referenceMarkup.cdr2Start ?
-                    'N' * (vStartInRef - referenceMarkup.cdr1End) + seq.substring(readMarkup.cdr1End, readMarkup.cdr2Start) :
+                    'N' * nCount(referenceMarkup.cdr1End) + seq.substring(sCount(readMarkup.cdr1End), readMarkup.cdr2Start) :
                     'N' * (referenceMarkup.cdr2Start - referenceMarkup.cdr1End)
         }
 
         String getCdr2() {
             vStartInRef < referenceMarkup.cdr2End ?
-                    'N' * (vStartInRef - referenceMarkup.cdr2Start) + seq.substring(readMarkup.cdr2Start, readMarkup.cdr2End) :
+                    'N' * nCount(referenceMarkup.cdr2Start) + seq.substring(sCount(readMarkup.cdr2Start), readMarkup.cdr2End) :
                     'N' * (referenceMarkup.cdr2End - referenceMarkup.cdr2Start)
         }
 
         String getFr3() {
             vStartInRef < referenceMarkup.cdr3Start ?
-                    'N' * (vStartInRef - referenceMarkup.cdr2End) + seq.substring(readMarkup.cdr2End, readMarkup.cdr3Start) :
+                    'N' * nCount(referenceMarkup.cdr2End) + seq.substring(sCount(readMarkup.cdr2End), readMarkup.cdr3Start) :
                     'N' * (referenceMarkup.cdr3Start - referenceMarkup.cdr2End)
         }
 

@@ -49,7 +49,7 @@ class ClonotypeOutput implements InputPort<ReadMapping> {
         clonotypeAccumulator.clonotypeMap.collect {
             new Clonotype(it.key, it.value, clonotypeAccumulator.total)
         }.sort().each {
-            plainTextOutput.put(it.toString() + readMappingDetailsProvider.getDetails(it.representativeMapping))
+            plainTextOutput.put(it.toString() + readMappingDetailsProvider.getDetailsString(it.representativeMapping))
         }
         plainTextOutput.close()
 

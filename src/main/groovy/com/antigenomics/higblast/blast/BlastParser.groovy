@@ -183,7 +183,7 @@ class BlastParser {
             }
         }
 
-        return new Mapping(vSegment, dSegment, jSegment, alignments[0].sstart,
+        return new Mapping(vSegment, dSegment, jSegment, alignments[0].sstart, alignments[0].qstart,
                 regionMarkup, cdr3Markup, truncations,
                 rc, complete, hasCdr3, inFrame, noStop, dFound,
                 mutationExtractor.mutations)

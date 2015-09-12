@@ -35,7 +35,7 @@ class ReadMappingOutput implements InputPort<ReadMapping> {
     @Override
     void put(ReadMapping readMapping) {
         if (readMapping.mapped) {
-            plainTextOutput.put(readMapping.toString() + readMappingDetailsProvider.getDetails(readMapping))
+            plainTextOutput.put(readMapping.toString() + readMappingDetailsProvider.getDetailsString(readMapping))
         }
     }
 
