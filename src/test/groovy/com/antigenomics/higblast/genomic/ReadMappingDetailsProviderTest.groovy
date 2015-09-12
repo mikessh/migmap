@@ -19,13 +19,19 @@ package com.antigenomics.higblast.genomic
 import com.antigenomics.higblast.blast.BlastInstanceFactory
 import com.antigenomics.higblast.io.Read
 import com.antigenomics.higblast.mapping.ReadMappingDetailsProvider
+import org.junit.AfterClass
 import org.junit.Test
 
 class ReadMappingDetailsProviderTest {
+    private final BlastInstanceFactory factory
+
+    ReadMappingDetailsProviderTest() {
+        factory = new BlastInstanceFactory("data/", "human", ["IGH"], true, false)
+        factory.annotateV()
+    }
+
     @Test
     void fullLengthTest() {
-        def factory = new BlastInstanceFactory("data/", "human", ["IGH"], true, false)
-        factory.annotateV()
         def instance = factory.create()
 
         def seq = "TAAGAGGGCAGTGGTATCAACGCAGAGTACGGATATTCTGAGGTCCGCTC" +
@@ -60,12 +66,12 @@ class ReadMappingDetailsProviderTest {
                 "TGAGGTCCATGACCGCCGCAGACACGGCTGTGTATTTCTGTGCGAGGTGG" +
                 "CTTGGGGAAGACATTCGGACCTTTGACTCCTGGGGCCAGGGAACCCTGGT" +
                 "CACCGTCTCTAA"
+        
+        instance.close()
     }
 
     @Test
     void partialTest() {
-        def factory = new BlastInstanceFactory("data/", "human", ["IGH"], true, false)
-        factory.annotateV()
         def instance = factory.create()
 
         def seq = "CTGGGTCCGCCAGCCCCCAGGGAAGGGACTGGAGTGGATTGCAAGTGTCT" +
@@ -95,12 +101,12 @@ class ReadMappingDetailsProviderTest {
                 "TGAGGTCCATGACCGCCGCAGACACGGCTGTGTATTTCTGTGCGAGGTGG" +
                 "CTTGGGGAAGACATTCGGACCTTTGACTCCTGGGGCCAGGGAACCCTGGT" +
                 "CACCGTCTCTAA"
+
+        instance.close()
     }
 
     @Test
     void partialTest2() {
-        def factory = new BlastInstanceFactory("data/", "human", ["IGH"], true, false)
-        factory.annotateV()
         def instance = factory.create()
 
         def seq = "ATTATAGTGGGAGCACCACCTACAACCCGTCCCGGAAGAGTCGAGTCACA" +
@@ -129,5 +135,12 @@ class ReadMappingDetailsProviderTest {
                 "TGAGGTCCATGACCGCCGCAGACACGGCTGTGTATTTCTGTGCGAGGTGG" +
                 "CTTGGGGAAGACATTCGGACCTTTGACTCCTGGGGCCAGGGAACCCTGGT" +
                 "CACCGTCTCTAA"
+
+        instance.close()
+    }
+
+    @AfterClass
+    static void tearDown() {
+        SegmentDatabase.clearTemporaryFiles()
     }
 }
