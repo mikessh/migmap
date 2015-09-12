@@ -20,16 +20,20 @@ import com.antigenomics.higblast.Util
 import com.antigenomics.higblast.clonotype.Clonotype
 import com.antigenomics.higblast.clonotype.ClonotypeAccumulator
 import com.antigenomics.higblast.mapping.ReadMapping
+import com.antigenomics.higblast.mapping.ReadMappingDetailsProvider
 
 class ClonotypeOutput implements InputPort<ReadMapping> {
+    final ReadMappingDetailsProvider readMappingDetailsProvider
     final ClonotypeAccumulator clonotypeAccumulator
     final PlainTextOutput plainTextOutput
 
-    ClonotypeOutput(PlainTextOutput plainTextOutput = StdOutput.INSTANCE) {
+    ClonotypeOutput(PlainTextOutput plainTextOutput = StdOutput.INSTANCE,
+                    ReadMappingDetailsProvider readMappingDetailsProvider = ReadMappingDetailsProvider.DUMMY) {
         this.plainTextOutput = plainTextOutput
         this.clonotypeAccumulator = new ClonotypeAccumulator()
+        this.readMappingDetailsProvider = readMappingDetailsProvider
         if (plainTextOutput != StdOutput.INSTANCE)
-            plainTextOutput.put(Clonotype.OUTPUT_HEADER)
+            plainTextOutput.put(Clonotype.OUTPUT_HEADER + readMappingDetailsProvider.header)
     }
 
     @Override
@@ -45,7 +49,7 @@ class ClonotypeOutput implements InputPort<ReadMapping> {
         clonotypeAccumulator.clonotypeMap.collect {
             new Clonotype(it.key, it.value, clonotypeAccumulator.total)
         }.sort().each {
-            plainTextOutput.put(it.toString())
+            plainTextOutput.put(it.toString() + readMappingDetailsProvider.getDetails(it.representativeMapping))
         }
         plainTextOutput.close()
 

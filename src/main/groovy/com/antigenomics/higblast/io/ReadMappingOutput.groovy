@@ -18,20 +18,24 @@
 package com.antigenomics.higblast.io
 
 import com.antigenomics.higblast.mapping.ReadMapping
+import com.antigenomics.higblast.mapping.ReadMappingDetailsProvider
 
 class ReadMappingOutput implements InputPort<ReadMapping> {
     final PlainTextOutput plainTextOutput
+    final ReadMappingDetailsProvider readMappingDetailsProvider
 
-    ReadMappingOutput(PlainTextOutput plainTextOutput = StdOutput.INSTANCE) {
+    ReadMappingOutput(PlainTextOutput plainTextOutput = StdOutput.INSTANCE,
+                      ReadMappingDetailsProvider readMappingDetailsProvider = ReadMappingDetailsProvider.DUMMY) {
         this.plainTextOutput = plainTextOutput
+        this.readMappingDetailsProvider = readMappingDetailsProvider
         if (plainTextOutput != StdOutput.INSTANCE)
-            plainTextOutput.put(ReadMapping.OUTPUT_HEADER)
+            plainTextOutput.put(ReadMapping.OUTPUT_HEADER + readMappingDetailsProvider.header)
     }
 
     @Override
     void put(ReadMapping readMapping) {
         if (readMapping.mapped) {
-            plainTextOutput.put(readMapping.toString())
+            plainTextOutput.put(readMapping.toString() + readMappingDetailsProvider.getDetails(readMapping))
         }
     }
 

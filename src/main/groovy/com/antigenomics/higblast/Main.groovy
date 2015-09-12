@@ -19,6 +19,7 @@ package com.antigenomics.higblast
 import com.antigenomics.higblast.blast.BlastInstanceFactory
 import com.antigenomics.higblast.genomic.SegmentDatabase
 import com.antigenomics.higblast.io.*
+import com.antigenomics.higblast.mapping.ReadMappingDetailsProvider
 import com.antigenomics.higblast.mapping.ReadMappingFilter
 
 def ALLOWED_CHAINS = ["TRA", "TRB", "TRG", "TRG", "IGH", "IGL", "IGK"],
@@ -64,6 +65,8 @@ cli._(longOpt: "allow-noncoding",
         "Report clonotypes that have either stop codon or frameshift in their receptor sequence.")
 cli._(longOpt: "allow-noncanonical",
         "Report clonotypes that have non-canonical CDR3 (do not start with C or end with F/W residues).")
+cli._(longOpt: "details", args: 1, argName: "field1,field2,...",
+        "Additional fields to provide for output, allowed values: ${ReadMappingDetailsProvider.ALLOWED_FIELDS.join(",")}.")
 cli.q(args: 1, argName: "2..40",
         "Threshold for average quality of mutations and N-regions of CDR3 [default = $DEFAULT_Q]")
 cli._(longOpt: "by-read",
@@ -163,13 +166,19 @@ if (tr && ig) {
 def allowIncomplete = (boolean) opt.'allow-incomplete',
     allowNoCdr3 = (boolean) opt.'allow-no-cdr3', allowNoncoding = (boolean) opt.'allow-noncoding',
     allowNonCanonical = (boolean) opt.'allow-noncanonical',
-    qualityThreshold = Byte.parseByte((String) (opt.q ?: DEFAULT_Q))
+    qualityThreshold = Byte.parseByte((String) (opt.q ?: DEFAULT_Q)),
+    details = (opt.'details' ?: "").split(",") as List<String>
 
 // RUNNING THE PIPELINE
 def inputPort = fastaFile ? new FastaReader(inputFileName) : new FastqReader(inputFileName)
 def outputPort = stdOutput ? StdOutput.INSTANCE : new FileOutput(outputFileName)
-outputPort = byRead ? new ReadMappingOutput(outputPort) : new ClonotypeOutput(outputPort)
+def detailsProvider = new ReadMappingDetailsProvider(details)
+outputPort = byRead ? new ReadMappingOutput(outputPort, detailsProvider) : new ClonotypeOutput(outputPort, detailsProvider)
 def blastInstanceFactory = new BlastInstanceFactory(dataDir, species, genes, allAlleles, useKabat)
+
+if (!details.empty) {
+    blastInstanceFactory.annotateV()
+}
 
 try {
 
