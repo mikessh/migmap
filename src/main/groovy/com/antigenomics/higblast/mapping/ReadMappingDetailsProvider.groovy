@@ -16,10 +16,10 @@
 
 package com.antigenomics.higblast.mapping
 
-import com.antigenomics.higblast.Util
 import com.antigenomics.higblast.io.Read
 
 import static com.antigenomics.higblast.Util.translateLinear
+import static java.lang.Math.max
 
 class ReadMappingDetailsProvider {
     public static
@@ -81,17 +81,17 @@ class ReadMappingDetailsProvider {
         }
 
         int nCount(int pos) {
-            Math.max(vStartInRef - pos, 0)
+            max(vStartInRef - pos, 0)
         }
 
         int sCount(int pos) {
-            Math.max(vStartInQuery, pos)
+            max(vStartInQuery, pos)
         }
 
         String getFr1nt() {
             vStartInRef < referenceMarkup.cdr1Start ?
                     'N' * nCount(0) + seq.substring(sCount(0), readMarkup.cdr1Start) :
-                    'N' * referenceMarkup.cdr1Start
+                    'N' * max(0, referenceMarkup.cdr1Start)
         }
 
         String getCdr1nt() {
