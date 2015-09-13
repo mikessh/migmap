@@ -16,12 +16,17 @@
 
 package com.antigenomics.higblast.mapping
 
+import com.antigenomics.higblast.Util
 import com.antigenomics.higblast.io.Read
+
+import static com.antigenomics.higblast.Util.translateLinear
 
 class ReadMappingDetailsProvider {
     public static
-    final List<String> ALLOWED_FIELDS = Collections.unmodifiableList(["fr1", "cdr1", "fr2", "cdr2", "fr3",
-                                                                      "contig"])
+    final List<String> ALLOWED_FIELDS = Collections.unmodifiableList(["fr1nt", "cdr1nt", "fr2nt", "cdr2nt", "fr3nt",
+                                                                      "contignt",
+                                                                      "fr1aa", "cdr1aa", "fr2aa", "cdr2aa", "fr3aa",
+                                                                      "contigaa"])
     public static ReadMappingDetailsProvider DUMMY = new ReadMappingDetailsProvider([])
 
     private final String sep
@@ -83,38 +88,62 @@ class ReadMappingDetailsProvider {
             Math.max(vStartInQuery, pos)
         }
 
-        String getFr1() {
+        String getFr1nt() {
             vStartInRef < referenceMarkup.cdr1Start ?
                     'N' * nCount(0) + seq.substring(sCount(0), readMarkup.cdr1Start) :
                     'N' * referenceMarkup.cdr1Start
         }
 
-        String getCdr1() {
+        String getCdr1nt() {
             vStartInRef < referenceMarkup.cdr1End ?
                     'N' * nCount(referenceMarkup.cdr1Start) + seq.substring(sCount(readMarkup.cdr1Start), readMarkup.cdr1End) :
                     'N' * (referenceMarkup.cdr1End - referenceMarkup.cdr1Start)
         }
 
-        String getFr2() {
+        String getFr2nt() {
             vStartInRef < referenceMarkup.cdr2Start ?
                     'N' * nCount(referenceMarkup.cdr1End) + seq.substring(sCount(readMarkup.cdr1End), readMarkup.cdr2Start) :
                     'N' * (referenceMarkup.cdr2Start - referenceMarkup.cdr1End)
         }
 
-        String getCdr2() {
+        String getCdr2nt() {
             vStartInRef < referenceMarkup.cdr2End ?
                     'N' * nCount(referenceMarkup.cdr2Start) + seq.substring(sCount(readMarkup.cdr2Start), readMarkup.cdr2End) :
                     'N' * (referenceMarkup.cdr2End - referenceMarkup.cdr2Start)
         }
 
-        String getFr3() {
+        String getFr3nt() {
             vStartInRef < referenceMarkup.cdr3Start ?
                     'N' * nCount(referenceMarkup.cdr2End) + seq.substring(sCount(readMarkup.cdr2End), readMarkup.cdr3Start) :
                     'N' * (referenceMarkup.cdr3Start - referenceMarkup.cdr2End)
         }
 
-        String getContig() {
-            fr1 + cdr1 + fr2 + cdr2 + fr3 + downstream
+        String getContignt() {
+            fr1nt + cdr1nt + fr2nt + cdr2nt + fr3nt + downstream
+        }
+
+        String getFr1aa() {
+            translateLinear(fr1nt)
+        }
+
+        String getCdr1aa() {
+            translateLinear(cdr1nt)
+        }
+
+        String getFr2aa() {
+            translateLinear(fr2nt)
+        }
+
+        String getCdr2aa() {
+            translateLinear(cdr2nt)
+        }
+
+        String getFr3aa() {
+            translateLinear(fr3nt)
+        }
+
+        String getContigaa() {
+            translateLinear(contignt)
         }
 
         String getDownstream() {
