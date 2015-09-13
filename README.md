@@ -8,16 +8,15 @@ The software is distributed as an executable JAR file and a data bundle.
 
 ## Motivation
 
-While being a gold standard of V-(D)-J mapping, the following limitations apply to IgBlast:
+IgBlast is an excellent  of V-(D)-J mapping tool able to correctly map even severely hypermutated antibody variants. While being a gold standard, the following limitations apply to IgBlast:
 
 - It doesn't extract sequence of CDR3 region directly, neither provide coordinates for CDR3 region in reads. It reports reference Cys residue of Variable segment and Variable segment end in CDR3, but not Phe/Trp residue of J segment that marks the end of CDR3
 
-- Output is not straightforward to parse and summarize, which is important to count clonotype diversity of high-throughput sequencing sample
+- Output is not straightforward to parse and summarize to a readable clonotype abundance table containing CDR3 sequences, segment assignments and list of somatic hypermutations
 
 - It doesn't account for sequence quality
 
-- It cannot group reads into clonotypes
-
+- It is somewhat hard to make it running with a custom segment reference and species other than human and mouse
 
 ## Features
 
@@ -65,7 +64,7 @@ The output is provided in a tab-delimited format. Note that no header column is 
 $type$position:$reference>$query
 ```
 
-where ``$type`` is ``S`` for substitution, ``D`` for deletion or ``I`` for indel. Position field ``$position`` marks either the substituted base, the first deleted base or the first base after insertion. Mutation positions are provided in Variable segment coordinates with the first Variable segment germline nucleotide having position of ``0``. Reference and query bases are provided for substitution, deleted and inserted bases are provided for deletions and insertions (omitting ``>``).
+where ``$type`` is ``S`` for substitution, ``D`` for deletion or ``I`` for indel. Position field ``$position`` marks either the substituted base, the first deleted base or the first base after insertion. Mutation positions are provided in Variable segment coordinates with the first Variable segment germline nucleotide having position of ``0`` (in contrast to BLAST output which is 1-based). Reference and query bases are provided for substitution, deleted and inserted bases are provided for deletions and insertions (omitting ``>``).
 
 Output format for assembled clonotypes is the following:
 
@@ -100,7 +99,9 @@ in.frame         | *true* if receptor has no frameshifts
 no.stop          | *true* if receptor contains no stop codons
 complete         | *true* if CDR3 region is fully defined (both V and J conserved residues are present)
 canonical        | *true* if CDR3 region starts with C residue and ends with F/W residue
- 
+
+In case the ``--details ...`` option is specified, corresponding columns will be added to output. E.g. ``--details cdr1nt,contigaa`` will add CDR1 nucleotide sequence and translated complete receptor sequence to the table.
+
 ## Installation
 
 See [latest release](https://github.com/mikessh/igblastwrp/releases/latest) section for HIgBlast package.
