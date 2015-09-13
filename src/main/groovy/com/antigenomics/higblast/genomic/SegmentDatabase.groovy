@@ -94,7 +94,7 @@ class SegmentDatabase {
     }
 
     void makeBlastDb() {
-        Util.report("Creating temporary blast database at $databaseTempPath.", 2)
+        Util.report("Creating temporary BLAST database $databaseTempPath.", 2)
 
         new File(databaseTempPath).mkdir()
 

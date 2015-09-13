@@ -91,10 +91,14 @@ class Pipeline {
         def reporter = new Thread(new Runnable() {
             @Override
             void run() {
-                while (!Thread.currentThread().isInterrupted()) {
-                    Util.report("Loaded $inputCount reads. " +
-                            (readMappingFilter.total > 0L ? readMappingFilter.toProgressString() : ""), 2)
-                    Thread.sleep(10000)
+                try {
+                    while (!Thread.currentThread().isInterrupted()) {
+                        Util.report("Loaded $inputCount reads. " +
+                                (readMappingFilter.total > 0L ? readMappingFilter.toProgressString() : ""), 2)
+                        Thread.sleep(10000)
+                    }
+                } catch (InterruptedException e) {
+
                 }
             }
         })
