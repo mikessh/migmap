@@ -106,6 +106,8 @@ class Pipeline {
 
         threads.each { it.join() }
 
+        reporter.interrupt()
+
         Util.report("Finished analysis. ${readMappingFilter.toProgressString()}", 2)
 
         // Close all ports
