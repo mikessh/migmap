@@ -89,8 +89,8 @@ if (opt.h || opt == null || opt.arguments().size() != 2 || !opt.R || !opt.S) {
 
 // I/O
 
-String inputFileName = opt.arguments()[0], outputFileName = opt.arguments()[1],
-       reportFileName = opt.'report', unmappedFileName = opt.'unmapped'
+def inputFileName = opt.arguments()[0], outputFileName = opt.arguments()[1],
+    reportFileName = opt.'report', unmappedFileName = opt.'unmapped'
 
 def fastaFile = ["fasta", "fa", "fasta.gz", "fa.gz"].any { inputFileName.endsWith(it) },
     stdOutput = outputFileName == "-", byRead = (boolean) opt.'by-read'
