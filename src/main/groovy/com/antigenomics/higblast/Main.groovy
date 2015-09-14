@@ -65,7 +65,7 @@ cli._(longOpt: "allow-noncoding",
         "Report clonotypes that have either stop codon or frameshift in their receptor sequence.")
 cli._(longOpt: "allow-noncanonical",
         "Report clonotypes that have non-canonical CDR3 (do not start with C or end with F/W residues).")
-cli._(longOpt: "details", args: 1, argName: "field1,field2,...",
+cli._(longOpt: "details", args: 1, argName: "field1,field2,.../all",
         "Additional fields to provide for output, allowed values: ${ReadMappingDetailsProvider.ALLOWED_FIELDS.join(",")}.")
 cli.q(args: 1, argName: "2..40",
         "Threshold for average quality of mutations and N-regions of CDR3 [default = $DEFAULT_Q]")
@@ -168,6 +168,12 @@ def allowIncomplete = (boolean) opt.'allow-incomplete',
     allowNonCanonical = (boolean) opt.'allow-noncanonical',
     qualityThreshold = Byte.parseByte((String) (opt.q ?: DEFAULT_Q)),
     details = (opt.'details' ?: "").split(",") as List<String>
+
+details.removeAll { it.length() == 0 }
+
+if (!details.empty && details[0].toLowerCase() == "all") {
+    details = ReadMappingDetailsProvider.ALLOWED_FIELDS
+}
 
 // RUNNING THE PIPELINE
 def inputPort = fastaFile ? new FastaReader(inputFileName) : new FastqReader(inputFileName)
