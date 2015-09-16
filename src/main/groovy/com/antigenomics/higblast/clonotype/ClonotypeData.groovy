@@ -35,11 +35,12 @@ import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.atomic.AtomicLongArray
 
 class ClonotypeData {
-    final AtomicLong count
+    final AtomicLong count, cdrQualCount
     final AtomicLongArray mutationQual, cdrInsertQual
 
     ClonotypeData(ReadMapping readMapping) {
         this.count = new AtomicLong(0)
+        this.cdrQualCount = new AtomicLong(0)
         this.mutationQual = new AtomicLongArray(readMapping.mutationQual.length)
         this.cdrInsertQual = new AtomicLongArray(readMapping.cdrInsertQual.length)
 
@@ -49,6 +50,11 @@ class ClonotypeData {
     void update(ReadMapping readMapping) {
         count.incrementAndGet()
         readMapping.mutationQual.eachWithIndex { it, i -> mutationQual.addAndGet(i, it) }
-        readMapping.cdrInsertQual.eachWithIndex { it, i -> cdrInsertQual.addAndGet(i, it) }
+        if (readMapping.cdrInsertQual.length == cdrInsertQual.length()) {
+            // protect against very rare cases of ambiguous D alignment
+            // not a big deal as this quality is used just for display
+            readMapping.cdrInsertQual.eachWithIndex { it, i -> cdrInsertQual.addAndGet(i, it) }
+            cdrQualCount.incrementAndGet()
+        }
     }
 }

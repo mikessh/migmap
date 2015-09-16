@@ -43,7 +43,6 @@ class Clonotype implements Comparable<Clonotype> {
     final List<Mutation> mutations
     final long count
     final double freq
-    final byte minQual
     final byte[] cdrInsertQual, mutationQual
     final boolean hasCdr3, complete, inFrame, noStop
     final Cdr3Markup cdr3Markup
@@ -60,20 +59,16 @@ class Clonotype implements Comparable<Clonotype> {
         this.count = data.count.longValue()
         this.freq = (double) count / total
         this.cdrInsertQual = new byte[data.cdrInsertQual.length()]
-        def minQual = Util.MAX_QUAL
+        def cdrQualCount = data.cdrQualCount.longValue()
         (0..<cdrInsertQual.length).each {
-            def qual = (byte) ((double) data.cdrInsertQual.get(it) / count)
+            def qual = (byte) ((double) data.cdrInsertQual.get(it) / cdrQualCount)
             cdrInsertQual[it] = qual
-            minQual = Math.min(qual, minQual)
         }
         this.mutationQual = new byte[data.mutationQual.length()]
         (0..<mutationQual.length).each {
             def qual = (byte) ((double) data.mutationQual.get(it) / count)
             mutationQual[it] = qual
-            minQual = Math.min(qual, minQual)
         }
-        this.minQual = minQual
-
         def representativeMapping = key.representativeMapping
 
         this.cdr3Markup = representativeMapping.mapping.cdr3Markup
