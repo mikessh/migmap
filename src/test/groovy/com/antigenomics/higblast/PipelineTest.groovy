@@ -33,16 +33,24 @@ import com.antigenomics.higblast.blast.BlastInstanceFactory
 import com.antigenomics.higblast.genomic.SegmentDatabase
 import com.antigenomics.higblast.io.*
 import com.antigenomics.higblast.mapping.ReadMapping
+import com.antigenomics.higblast.mapping.ReadMappingDetailsProvider
 import com.antigenomics.higblast.mapping.ReadMappingFilter
 import org.junit.AfterClass
+import org.junit.Before
 import org.junit.Test
 
 import java.util.concurrent.atomic.AtomicInteger
 
 class PipelineTest {
     private final BlastInstanceFactory factory = new BlastInstanceFactory("data/", "human", ["IGH"], true, false)
+
+    PipelineTest() {
+        factory.annotateV()
+    }
+
     private static class NullOutputStream extends OutputStream {
         static final NullOutputStream INSTANCE = new NullOutputStream()
+
         @Override
         void write(int b) throws IOException {
         }
@@ -55,7 +63,8 @@ class PipelineTest {
 
         def pipeline = new Pipeline(reader, factory,
                 new InputPortMerge(
-                        new ReadMappingOutput(new PlainTextOutput(NullOutputStream.INSTANCE)),
+                        new ReadMappingOutput(new PlainTextOutput(NullOutputStream.INSTANCE),
+                                new ReadMappingDetailsProvider()),
                         new ClonotypeOutput(new PlainTextOutput(NullOutputStream.INSTANCE))),
                 filter)
 
@@ -120,13 +129,16 @@ class PipelineTest {
 
         def filter = new ReadMappingFilter((byte) 20, true, true, true, true)
 
-        def pipeline = new Pipeline(reader, factory, DummyInputPort.INSTANCE,
+        def pipeline = new Pipeline(reader, factory,
+                new ReadMappingOutput(new PlainTextOutput(NullOutputStream.INSTANCE),
+                        new ReadMappingDetailsProvider()),
                 filter)
 
         pipeline.run()
 
         assert filter.passed == filter.good
-        assert pipeline.readMappingFilter.mappedRatio >= 0.05
+        assert pipeline.readMappingFilter.mappedRatio >= 0.90
+        assert 1 - pipeline.readMappingFilter.noCdr3Ratio >= 0.03
     }
 
     @AfterClass
