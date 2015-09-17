@@ -45,6 +45,10 @@ class ReadMappingDetailsProvider {
     private final String sep
     private final List<String> fields
 
+    ReadMappingDetailsProvider() {
+        this(ALLOWED_FIELDS)
+    }
+
     ReadMappingDetailsProvider(List<String> fields) {
         this.fields = fields.collect { it.toLowerCase() }
         this.sep = fields.empty ? "" : "\t"
@@ -80,16 +84,24 @@ class ReadMappingDetailsProvider {
 
         ReadMappingDetails(Read read, Mapping mapping) {
             this.seq = read.seq
-            this.readMarkup = mapping.regionMarkup
             this.vStartInRef = mapping.vStartInRef
             this.vStartInQuery = mapping.vStartInQuery
-            this.referenceMarkup = mapping.vSegment.regionMarkup
             this.cdr3Start = max(readMarkup.cdr2End, readMarkup.cdr3Start)
+            this.referenceMarkup = mapping.vSegment.regionMarkup
+            this.readMarkup = mapping.regionMarkup
+
+            if (referenceMarkup == null) {
+                throw new RuntimeException("No reference markup, " +
+                        "it seems you're running on an unnatotated segment database, " +
+                        "forgot factory.annotateV()? :)")
+            }
         }
 
         ReadMappingDetails() {
             this.seq = null
             this.vStartInRef = 480011
+            this.vStartInQuery = vStartInRef
+            this.cdr3Start = -1
             this.referenceMarkup = RegionMarkup.DUMMY
             this.readMarkup = RegionMarkup.DUMMY
         }
@@ -115,13 +127,13 @@ class ReadMappingDetailsProvider {
         }
 
         String getFr2nt() {
-            vStartInRef < referenceMarkup.cdr2Start && vStartInQuery < readMarkup.cdr2Start  ?
+            vStartInRef < referenceMarkup.cdr2Start && vStartInQuery < readMarkup.cdr2Start ?
                     'N' * nCount(referenceMarkup.cdr1End) + seq.substring(sCount(readMarkup.cdr1End), readMarkup.cdr2Start) :
                     'N' * (referenceMarkup.cdr2Start - referenceMarkup.cdr1End)
         }
 
         String getCdr2nt() {
-            vStartInRef < referenceMarkup.cdr2End && vStartInQuery < readMarkup.cdr2End  ?
+            vStartInRef < referenceMarkup.cdr2End && vStartInQuery < readMarkup.cdr2End ?
                     'N' * nCount(referenceMarkup.cdr2Start) + seq.substring(sCount(readMarkup.cdr2Start), readMarkup.cdr2End) :
                     'N' * (referenceMarkup.cdr2End - referenceMarkup.cdr2Start)
         }
