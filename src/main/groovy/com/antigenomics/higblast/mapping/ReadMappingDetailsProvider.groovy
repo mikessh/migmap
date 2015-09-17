@@ -86,15 +86,16 @@ class ReadMappingDetailsProvider {
             this.seq = read.seq
             this.vStartInRef = mapping.vStartInRef
             this.vStartInQuery = mapping.vStartInQuery
-            this.cdr3Start = max(readMarkup.cdr2End, readMarkup.cdr3Start)
             this.referenceMarkup = mapping.vSegment.regionMarkup
-            this.readMarkup = mapping.regionMarkup
-
+            
             if (referenceMarkup == null) {
                 throw new RuntimeException("No reference markup, " +
                         "it seems you're running on an unnatotated segment database, " +
                         "forgot factory.annotateV()? :)")
             }
+            
+            this.readMarkup = mapping.regionMarkup
+            this.cdr3Start = max(readMarkup.cdr2End, readMarkup.cdr3Start)
         }
 
         ReadMappingDetails() {
