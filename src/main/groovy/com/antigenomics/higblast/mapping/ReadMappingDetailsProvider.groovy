@@ -74,7 +74,7 @@ class ReadMappingDetailsProvider {
     static class ReadMappingDetails {
         final String seq
         final RegionMarkup readMarkup, referenceMarkup
-        final int vStartInRef, vStartInQuery
+        final int vStartInRef, vStartInQuery, cdr3Start
 
         static final ReadMappingDetails DUMMY = new ReadMappingDetails()
 
@@ -84,6 +84,7 @@ class ReadMappingDetailsProvider {
             this.vStartInRef = mapping.vStartInRef
             this.vStartInQuery = mapping.vStartInQuery
             this.referenceMarkup = mapping.vSegment.regionMarkup
+            this.cdr3Start = max(readMarkup.cdr2End, readMarkup.cdr3Start)
         }
 
         ReadMappingDetails() {
@@ -127,7 +128,7 @@ class ReadMappingDetailsProvider {
 
         String getFr3nt() {
             vStartInRef < referenceMarkup.cdr3Start && vStartInQuery < readMarkup.cdr3Start ?
-                    'N' * nCount(referenceMarkup.cdr2End) + seq.substring(sCount(readMarkup.cdr2End), readMarkup.cdr3Start) :
+                    'N' * nCount(referenceMarkup.cdr2End) + seq.substring(sCount(readMarkup.cdr2End), cdr3Start) :
                     'N' * (referenceMarkup.cdr3Start - referenceMarkup.cdr2End)
         }
 
@@ -160,7 +161,7 @@ class ReadMappingDetailsProvider {
         }
 
         String getDownstream() {
-            readMarkup.cdr3Start >= 0 ? seq.substring(readMarkup.cdr3Start) : ""
+            cdr3Start >= 0 ? seq.substring(cdr3Start) : ""
         }
     }
 }
