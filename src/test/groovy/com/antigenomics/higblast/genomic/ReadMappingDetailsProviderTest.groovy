@@ -39,8 +39,30 @@ class ReadMappingDetailsProviderTest {
     private final BlastInstanceFactory factory
 
     ReadMappingDetailsProviderTest() {
-        factory = new BlastInstanceFactory("data/", "human", ["IGH"], true, false)
+        factory = new BlastInstanceFactory("data/", "human", ["IGH", "IGL"], true, false)
         factory.annotateV()
+    }
+
+    @Test
+    void cdr23OverlapTest() {
+        def instance = factory.create()
+
+        def seq = "CTGAGTCAATCGCCCTCTGCCTCTGCCTCCCTGGGAGCCTCGGTCAAGCT" +
+                "CCCCTGCACTGTCCAGTGGGCACGACTTCTACGCCATCGCATGCCATCAG" +
+                "TAGCAGCCAGAGAAGGGGCCTCGCTTCTTGATGAAATCTAACAATGCTGG" +
+                "CAGCCACAGTCAG"
+
+
+        instance.put(new Read(null, seq))
+        instance.put(null)
+
+        def readMapping = instance.take()
+
+        def details = ReadMappingDetailsProvider.getDetails(readMapping)
+
+        def markup = readMapping.mapping.regionMarkup
+        assert markup.cdr3Start < markup.cdr2End  // check for test case
+        assert details.contignt.contains(seq)
     }
 
     @Test
@@ -79,7 +101,7 @@ class ReadMappingDetailsProviderTest {
                 "TGAGGTCCATGACCGCCGCAGACACGGCTGTGTATTTCTGTGCGAGGTGG" +
                 "CTTGGGGAAGACATTCGGACCTTTGACTCCTGGGGCCAGGGAACCCTGGT" +
                 "CACCGTCTCTAA"
-        
+
         instance.close()
     }
 
