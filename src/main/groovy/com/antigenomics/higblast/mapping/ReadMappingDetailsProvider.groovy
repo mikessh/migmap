@@ -40,9 +40,9 @@ class ReadMappingDetailsProvider {
                                                                       "contignt",
                                                                       "fr1aa", "cdr1aa", "fr2aa", "cdr2aa", "fr3aa",
                                                                       "contigaa"])
+    
     public static ReadMappingDetailsProvider DUMMY = new ReadMappingDetailsProvider([])
 
-    private final String sep
     private final List<String> fields
 
     ReadMappingDetailsProvider() {
@@ -51,7 +51,6 @@ class ReadMappingDetailsProvider {
 
     ReadMappingDetailsProvider(List<String> fields) {
         this.fields = fields.collect { it.toLowerCase() }
-        this.sep = fields.empty ? "" : "\t"
         def badFields = fields.findAll { !ALLOWED_FIELDS.contains(it) }
         if (!badFields.empty) {
             throw new RuntimeException("Bad fields supplied: ${badFields.join(",")}, " +
@@ -60,13 +59,17 @@ class ReadMappingDetailsProvider {
     }
 
     String getHeader() {
-        sep + fields.join("\t")
+        fields.empty ? "" : ("\t" + fields.join("\t"))
     }
 
     String getDetailsString(ReadMapping readMapping) {
+        if (fields.empty) {
+            return ""
+        }
+
         def details = getDetails(readMapping)
 
-        sep + fields.collect { details."$it" }.join("\t")
+        "\t" + fields.collect { details."$it" }.join("\t")
     }
 
     static ReadMappingDetails getDetails(ReadMapping readMapping) {
@@ -87,13 +90,13 @@ class ReadMappingDetailsProvider {
             this.vStartInRef = mapping.vStartInRef
             this.vStartInQuery = mapping.vStartInQuery
             this.referenceMarkup = mapping.vSegment.regionMarkup
-            
+
             if (referenceMarkup == null) {
                 throw new RuntimeException("No reference markup, " +
                         "it seems you're running on an unnatotated segment database, " +
                         "forgot factory.annotateV()? :)")
             }
-            
+
             this.readMarkup = mapping.regionMarkup
             this.cdr3Start = max(readMarkup.cdr2End, readMarkup.cdr3Start)
         }
