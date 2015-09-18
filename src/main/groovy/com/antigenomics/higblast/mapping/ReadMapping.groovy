@@ -36,9 +36,9 @@ import com.antigenomics.higblast.mutation.MutationType
 class ReadMapping {
     final Read read
     final Mapping mapping
-    final String cdr3nt
+    final String cdr3nt, cdr3aa
     final byte[] mutationQual, cdrInsertQual
-    final boolean canonical
+    final boolean canonical, inFrame, noStop
 
     ReadMapping(Mapping mapping, Read read) {
         this.mapping = mapping
@@ -52,12 +52,7 @@ class ReadMapping {
 
             def seq = read.seq
             def regionMarkup = mapping.regionMarkup
-            this.cdr3nt = mapping.hasCdr3 ?
-                    (mapping.complete ?
-                            seq.substring(regionMarkup.cdr3Start, regionMarkup.cdr3End) :
-                            seq.substring(regionMarkup.cdr3Start))
-                    : Util.MY_NA
-
+            
             this.mutationQual = new byte[mapping.mutations.size()]
 
             mapping.mutations.eachWithIndex { it, i ->
@@ -68,6 +63,9 @@ class ReadMapping {
 
             if (mapping.hasCdr3) {
                 if (mapping.complete) {
+                    this.cdr3nt = seq.substring(regionMarkup.cdr3Start, regionMarkup.cdr3End)
+                    this.cdr3aa = Util.translateCdr(cdr3nt)
+
                     int i = 0
 
                     if (mapping.hasD) {
@@ -95,21 +93,35 @@ class ReadMapping {
                     }
                     this.canonical = Util.isCanonical(cdr3nt)
                 } else {
+                    this.cdr3nt = seq.substring(regionMarkup.cdr3Start)
+                    this.cdr3aa = Util.translateLinear(cdr3nt)
                     this.cdrInsertQual = new byte[cdr3nt.length()]
                     (0..<cdr3nt.length()).each {
                         cdrInsertQual[it] = read.qualAt(regionMarkup.cdr3Start + it)
                     }
                     this.canonical = false
                 }
+
+                def inFrame = !cdr3aa.contains("?"), noStop = !cdr3aa.contains("*")
+
+                this.inFrame = mapping.inFrame && inFrame
+                this.noStop = mapping.inFrame && noStop
             } else {
+                this.cdr3nt = Util.MY_NA
+                this.cdr3aa = Util.MY_NA
                 this.cdrInsertQual = new byte[0]
                 this.canonical = false
+                this.inFrame = mapping.inFrame
+                this.noStop = mapping.inFrame
             }
         } else {
             this.cdr3nt = null
+            this.cdr3aa = null
             this.mutationQual = null
             this.cdrInsertQual = null
             this.canonical = false
+            this.inFrame = false
+            this.noStop = false
         }
     }
 
@@ -126,10 +138,10 @@ class ReadMapping {
     }
 
     static
-    final String OUTPUT_HEADER = "read.header\tcdr3nt\tcdr.insert.qual\tmutations.qual\t" + Mapping.OUTPUT_HEADER + "\tcanonical"
+    final String OUTPUT_HEADER = "read.header\tcdr3nt\tcdr3aa\tcdr.insert.qual\tmutations.qual\t" + Mapping.OUTPUT_HEADER + "\tcanonical"
 
     @Override
     String toString() {
-        [read.header, cdr3nt, Util.qualToString(cdrInsertQual), Util.qualToString(mutationQual), mapping.toString(), canonical].join("\t")
+        [read.header, cdr3nt, cdr3aa, Util.qualToString(cdrInsertQual), Util.qualToString(mutationQual), mapping.toString(), canonical].join("\t")
     }
 }
