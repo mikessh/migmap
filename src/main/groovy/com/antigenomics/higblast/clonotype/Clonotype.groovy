@@ -44,20 +44,22 @@ class Clonotype implements Comparable<Clonotype> {
     final long count
     final double freq
     final byte[] cdrInsertQual, mutationQual
-    final boolean hasCdr3, complete, inFrame, noStop
+    final boolean hasCdr3, complete, inFrame, noStop, canonical
     final Cdr3Markup cdr3Markup
     final Truncations truncations
     final ReadMapping representativeMapping
 
     Clonotype(ClonotypeKey key, ClonotypeData data, long total) {
         this.representativeMapping = key.representativeMapping
-        this.cdr3nt = key.cdr3nt
+        this.cdr3nt = representativeMapping.cdr3nt
+        this.cdr3aa = representativeMapping.cdr3aa
         this.vSegment = key.vSegment
         this.dSegment = key.dSegment
         this.jSegment = key.jSegment
         this.mutations = key.mutations
         this.count = data.count.longValue()
         this.freq = (double) count / total
+        
         this.cdrInsertQual = new byte[data.cdrInsertQual.length()]
         def cdrQualCount = data.cdrQualCount.longValue()
         (0..<cdrInsertQual.length).each {
@@ -69,26 +71,15 @@ class Clonotype implements Comparable<Clonotype> {
             def qual = (byte) ((double) data.mutationQual.get(it) / count)
             mutationQual[it] = qual
         }
-        def representativeMapping = key.representativeMapping
 
         this.cdr3Markup = representativeMapping.mapping.cdr3Markup
         this.truncations = representativeMapping.mapping.truncations
-
         this.hasCdr3 = representativeMapping.mapping.hasCdr3
         this.complete = representativeMapping.mapping.complete
-
-        boolean inFrame, noStop
-
-        if (hasCdr3) {
-            this.cdr3aa = complete ? Util.translateCdr(cdr3nt) : Util.translateLinear(cdr3nt)
-            inFrame = !cdr3aa.contains("?")
-            noStop = !cdr3aa.contains("*")
-        } else {
-            this.cdr3aa = Util.MY_NA
-        }
-
-        this.inFrame = representativeMapping.mapping.inFrame && inFrame
-        this.noStop = representativeMapping.mapping.noStop && noStop
+        
+        this.inFrame = representativeMapping.inFrame
+        this.noStop = representativeMapping.noStop
+        this.canonical = representativeMapping.canonical
     }
 
     @Override
@@ -99,7 +90,7 @@ class Clonotype implements Comparable<Clonotype> {
     static
     final String OUTPUT_HEADER = "freq\tcount\tv\td\tj\tcdr3nt\tcdr3aa\t" + MutationStringifier.OUTPUT_HEADER +
             "\tcdr.insert.qual\tmutations.qual\t" + Cdr3Markup.OUTPUT_HEADER + "\t" + Truncations.OUTPUT_HEADER +
-            "\thas.cdr3\tin.frame\tno.stop\tcomplete"
+            "\thas.cdr3\tin.frame\tno.stop\tcomplete\tcanonical"
 
     @Override
     String toString() {
@@ -109,6 +100,6 @@ class Clonotype implements Comparable<Clonotype> {
          MutationStringifier.toString(mutations),
          Util.qualToString(cdrInsertQual), Util.qualToString(mutationQual),
          cdr3Markup, truncations,
-         hasCdr3, inFrame, noStop, complete].join("\t")
+         hasCdr3, inFrame, noStop, complete, canonical].join("\t")
     }
 }
