@@ -2,15 +2,15 @@ apply plugin: 'java'
 apply plugin: 'groovy'
 apply plugin: 'application'
 
-mainClassName = 'com.antigenomics.higblast.Main'
+mainClassName = 'com.antigenomics.migmap.Main'
 
 repositories {
     mavenCentral()
 }
 
 jar {
-    baseName = 'higblast'
-    version = '0.9.6-SNAPSHOT'
+    baseName = 'migmap'
+    version = '0.9.6'
 
     manifest {
         attributes "Main-Class": "$mainClassName"
