@@ -34,7 +34,7 @@ Present wrapper adds the following capabilities to IgBlast:
 
 ## Pre-requisites
 
-[Java v1.8](http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html) is required to run HIgBlast. Users should then install [IgBlast v1.4.0](http://www.ncbi.nlm.nih.gov/igblast/faq.html#standalone) binaries that are appropriate for their system and make sure that ``igblastn`` and ``makeblastdb`` are added to ``$PATH`` or the directory that contains binaries is specified using ``--blast-dir /path/to/bin/`` argument during HIgBlast execution.
+[Java v1.8](http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html) is required to run HIgBlast. Users should then install [IgBlast v1.4.0](http://www.ncbi.nlm.nih.gov/igblast/faq.html#standalone) binaries that are appropriate for their system and make sure that ``igblastn`` and ``makeblastdb`` are added to ``$PATH`` or the directory that contains binaries is specified using ``--blast-dir /path/to/bin/`` argument during MiGMAP execution. Note that IgBlast v1.4.0 binaries can also be downloaded from [here](https://github.com/mikessh/igblast-bin).
 
 ## Execution
 
