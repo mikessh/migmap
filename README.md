@@ -1,10 +1,10 @@
-#  HIgBlast aka IgBlastWrapper
+#  MiGMAP aka IgBlastWrapper
 
 A wrapper for [IgBlast](http://www.ncbi.nlm.nih.gov/igblast/igblast.cgi) V-(D)-J mapping tool designed to facilitate analysis immune receptor libraries profiled using high-throughput sequencing.
 
 The software is distributed as an executable JAR file and a data bundle.
 
-**NOTE** Last IgBlastWrp version is available [here](https://github.com/mikessh/higblast/releases/tag/v0.6) (source and readme are available [here](https://github.com/mikessh/higblast/tree/v0.6)), this is a completely re-written version of original software.
+**NOTE** Last IgBlastWrp version is available [here](https://github.com/mikessh/migmap/releases/tag/v0.6) (source and readme are available [here](https://github.com/mikessh/migmap/tree/v0.6)), this is a completely re-written version of original software.
 
 ## Motivation
 
@@ -38,22 +38,22 @@ Present wrapper adds the following capabilities to IgBlast:
 
 ## Execution
 
-To see the full list of HIgBlast options run 
+To see the full list of MiGMAP options run 
 
 ```bash
-java -jar higblast.jar -h
+java -jar migmap.jar -h
 ```
 
 The following command will process ``sample.fastq.gz`` file, assemble clonotypes and store them in ``out.txt``:
 
 ```bash
-java -Xmx8G -jar higblast.jar -R IGH -S human sample.fastq.gz out.txt
+java -Xmx8G -jar migmap.jar -R IGH -S human sample.fastq.gz out.txt
 ```
 
-HIgBlast can be also run in per-read mode and allows piping results, e.g.:
+MiGMAP can be also run in per-read mode and allows piping results, e.g.:
 
 ```bash
-java -Xmx8G -jar higblast.jar --by-read -R IGH -S human sample.fastq.gz - | grep "IGHV1-8" > out.txt
+java -Xmx8G -jar migmap.jar --by-read -R IGH -S human sample.fastq.gz - | grep "IGHV1-8" > out.txt
 ```
 
 ## Output format
@@ -104,9 +104,9 @@ In case the ``--details ...`` option is specified, corresponding columns will be
 
 ## Installation
 
-See [latest release](https://github.com/mikessh/igblastwrp/releases/latest) section for HIgBlast package.
+See [latest release](https://github.com/mikessh/migmap/releases/latest) section for MiGMAP package.
 
-HIgBlast can be also compiled from sources using [Gradle](https://gradle.org/) with ``gradle build``. Note that in order for tests to pass IgBlast binaries should be in ``$PATH`` variable, you may need to modify following part of ``build.gradle`` 
+MiGMAP can be also compiled from sources using [Gradle](https://gradle.org/) with ``gradle build``. Note that in order for tests to pass IgBlast binaries should be in ``$PATH`` variable, you may need to modify following part of ``build.gradle`` 
 
 ```gradle
 test {
