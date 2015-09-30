@@ -60,21 +60,17 @@ class BlastParser {
         def summary, alignments, cdrBounds
 
         // Rearrangement summary
-        boolean hasD = segmentDatabase.hasD
-        if (hasD) {
-            summary = groomMatch(chunk =~
-                    //         V     D     J  chain stop frame (prod) strand
-                    /# V-.+\n(.+)\t(.+)\t(.+)\tV.\t(.+)\t(.+)\t.+\t(.+)\n/)
-            if (summary == null) {
-                hasD = false
-                summary = groomMatch(chunk =~
-                        //         V     J    chain   stop frame (prod)  strand
-                        /# V-.+\n(.+)\t(.+)\tV.\t(.+)\t(.+)\t.+\t(.+)\n/)
-            }
-        } else {
+        boolean hasD = true
+
+        summary = groomMatch(chunk =~
+                //         V     D     J  chain stop frame (prod) strand
+                /# V-.+\n(\S+)\t(\S+)\t(\S+)\tV\S\t(.+)\t(\S+)\t\S+\t(\S+)\n/)
+        
+        if (summary == null) {
+            hasD = false
             summary = groomMatch(chunk =~
                     //         V     J    chain   stop frame (prod)  strand
-                    /# V-.+\n(.+)\t(.+)\tV.\t(.+)\t(.+)\t.+\t(.+)\n/)
+                    /# V-.+\n(\S+)\t(\S+)\tV\S\t(\S+)\t(\S+)\t\S+\t(\S+)\n/)
         }
 
         if (summary == null) {
@@ -104,6 +100,7 @@ class BlastParser {
             jSegment = jFound ? segmentDatabase.segments[jSegmentNames.split(",").sort()[0]] : Segment.DUMMY_J
 
         // - Alignments for V, D and J segments, remember here and further BLAST coordinates are 1-based
+
         alignments = [
                 groomMatch(chunk =~
                         //                                            qstart     qseq        sstart     sseq
