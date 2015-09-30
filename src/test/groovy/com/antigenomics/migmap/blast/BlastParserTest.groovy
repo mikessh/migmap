@@ -333,6 +333,77 @@ class BlastParserTest {
         assert !mapping.complete
     }
 
+    @Test
+    void parserCase1Test() {
+        def segmentDatabase = new SegmentDatabase("data/", "human", ["IGK"])
+        def parser = new BlastParser(segmentDatabase)
+
+        def chunk = "# IGBLASTN 2.2.29+\n" +
+                "# Query: @MIG UMI:TACCGCCGCTTGT:5\n" +
+                "# Database: /Users/mikesh/Programming/higblast/data/database-46f68e99-c1e5-45cc-b3cd-0934b850d3d4/v /Users/mikesh/Programming/higblast/data/database-46f68e99-c1e5-45cc-b3cd-0934b850d3d4/d /Users/mikesh/Programming/higblast/data/database-46f68e99-c1e5-45cc-b3cd-0934b850d3d4/j\n" +
+                "# Domain classification requested: imgt\n" +
+                "\n" +
+                "# V-(D)-J rearrangement summary for query sequence (Top V gene match, Top D gene match, Top J gene match, Chain type, stop codon, V-J frame, Productive, Strand).  Multiple equivalent top matches having the same score and percent identity, if present, are separated by a comma.\n" +
+                "IGKV4-1*01\tN/A\tN/A\tVH\tNo\tN/A\tN/A\t+\n" +
+                "\n" +
+                "# V-(D)-J junction details based on top germline gene matches (V end, V-D junction, D region, D-J junction, J start).  Note that possible overlapping nucleotides at VDJ junction (i.e, nucleotides that could be assigned to either rearranging gene) are indicated in parentheses (i.e., (TACT)) but are not included under the V, D, or J gene itself\n" +
+                "ACTGT\tN/A\tN/A\tN/A\tN/A\t\n" +
+                "\n" +
+                "# Alignment summary between query and top germline V gene hit (from, to, length, matches, mismatches, gaps, percent identity)\n" +
+                "FR3-IMGT\t382\t424\t43\t33\t10\t0\t76.7\n" +
+                "Total\tN/A\tN/A\t43\t33\t10\t0\t76.7\n" +
+                "\n" +
+                "# Hit table (the first field indicates the chain type of the hit)\n" +
+                "# Fields: subject id, q. start, query seq, s. start, subject seq\n" +
+                "# 3 hits found\n" +
+                "V\tIGKV4-1*01\t382\tCATGAGCAGCCTGAGAGCCGAAGACACGGCCGTATATTACTGT\t240\tCATCAGCAGCCTGCAGGCTGAAGATGTGGCAGTTTATTACTGT\n" +
+                "V\tIGKV6D-41*01\t382\tCATGAGCAGCCTGAGAGCCGAAGACACGGCCGTATATTACTGT\t222\tCATCAGTAGCCTGGAAGCTGAAGATGCTGCAACATATTACTGT\n" +
+                "V\tIGKV3D-7*01\t382\tCATGAGCAGCCTGAGAGCCGAAGACACGGCCGTATATTACTGT\t225\tCATCAGCAGCCTGCAGCCTGAAGATTTTGCAGTTTATTACTGT"
+
+        def mapping = parser.parse(chunk)
+
+        assert mapping.vSegment.name == "IGKV4-1*01"
+        assert mapping.dSegment.name == "."
+        assert mapping.jSegment.name == "."
+    }
+
+    @Test
+    void parserCase2Test() {
+        def segmentDatabase = new SegmentDatabase("data/", "human", ["TRA"])
+        def parser = new BlastParser(segmentDatabase)
+
+        def chunk = "# Query: @MIG UMI:TAACAATCTGAAC:11\n" +
+                "# Database: /Users/mikesh/Programming/higblast/data/database-ba5de9d1-adfb-4cd7-b514-f52f28ab614e/v /Users/mikesh/Programming/higblast/data/database-ba5de9d1-adfb-4cd7-b514-f52f28ab614e/d /Users/mikesh/Programming/higblast/data/database-ba5de9d1-adfb-4cd7-b514-f52f28ab614e/j\n" +
+                "# Domain classification requested: imgt\n" +
+                "\n" +
+                "# V-(D)-J rearrangement summary for query sequence (Top V gene match, Top D gene match, Top J gene match, Chain type, stop codon, V-J frame, Productive, Strand).  Multiple equivalent top matches having the same score and percent identity, if present, are separated by a comma.\n" +
+                "TRAV8-6*02,TRAV8-6*01\t.,.,.\tN/A\tVB\tNo\tN/A\tN/A\t+\n" +
+                "\n" +
+                "# V-(D)-J junction details based on top germline gene matches (V end, V-D junction, D region, D-J junction, J start).  Note that possible overlapping nucleotides at VDJ junction (i.e, nucleotides that could be assigned to either rearranging gene) are indicated in parentheses (i.e., (TACT)) but are not included under the V, D, or J gene itself\n" +
+                "TGTGC\tGAGACTGATTAGGGACGA\tTTTTT\tN/A\tN/A\t\n" +
+                "\n" +
+                "# Alignment summary between query and top germline V gene hit (from, to, length, matches, mismatches, gaps, percent identity)\n" +
+                "FR3-IMGT\t365\t385\t21\t18\t3\t0\t85.7\n" +
+                "CDR3-IMGT (germline)\t386\t387\t2\t2\t0\t0\t100\n" +
+                "Total\tN/A\tN/A\t23\t20\t3\t0\t87\n" +
+                "\n" +
+                "# Hit table (the first field indicates the chain type of the hit)\n" +
+                "# Fields: subject id, q. start, query seq, s. start, subject seq\n" +
+                "# 6 hits found\n" +
+                "V\tTRAV8-6*02\t365\tGACACGGCTGTGTATTACTGTGC\t253\tGACACGGCTGAGTACTTCTGTGC\n" +
+                "V\tTRAV8-6*01\t365\tGACACGGCTGTGTATTACTGTGC\t253\tGACACGGCTGAGTACTTCTGTGC\n" +
+                "V\tTRAV16*01\t364\tAGACACGGCTGTGTATTACTGTGC\t240\tAGACTCAGCCATGTATTACTGTGC\n" +
+                "D\t.\t406\tTTTTT\t25\tTTTTT\n" +
+                "D\t.\t406\tTTTTT\t24\tTTTTT\n" +
+                "D\t.\t406\tTTTTT\t23\tTTTTT"
+
+        def mapping = parser.parse(chunk)
+
+        assert mapping.vSegment.name == "TRAV8-6*01"
+        assert mapping.dSegment.name == "."
+        assert mapping.jSegment.name == "."
+    }
+
     @AfterClass
     static void tearDown() {
         SegmentDatabase.clearTemporaryFiles()
