@@ -35,6 +35,8 @@ import com.antigenomics.migmap.io.OutputPort
 import com.antigenomics.migmap.io.Read
 import com.antigenomics.migmap.mapping.ReadMapping
 
+import java.util.regex.Pattern
+
 class BlastInstance implements OutputPort<ReadMapping>, InputPort<Read> {
     final Queue<Read> reads = new LinkedList<>()
     final Process proc
@@ -94,11 +96,30 @@ class BlastInstance implements OutputPort<ReadMapping>, InputPort<Read> {
         }
     }
 
+    static final Pattern ALLOWED_BASES = ~/^[ATGCUatgcuRrYySsWwKkMmBbDdHhVvNn]+$/,
+                         AMBIGOUS_BASE = ~/[^ATGCUatgcu]/;
+
+    static boolean isGoodBlastSeq(String seq) {
+        if (seq.length() == 0 || !seq =~ ALLOWED_BASES) {
+            return false
+        }
+
+        int goodBases = seq.length() - seq.replaceAll(AMBIGOUS_BASE, "").length()
+
+        if (goodBases / (double) seq.length() >= 0.7) {
+            return false
+        }
+
+        true
+    }
+
     @Override
     void put(Read input) {
-        if (input) {
-            reads.add(input)
-            writer.println(">" + input.header + "\n" + input.seq)
+        if (input) { // should contain at least one non-ambiguous base, otherwise BLAST crashes
+            if (isGoodBlastSeq(input.seq)) {
+                reads.add(input)
+                writer.println(">" + input.header + "\n" + input.seq)
+            }
         } else {
             // no more reads
             writer.close()
@@ -110,7 +131,7 @@ class BlastInstance implements OutputPort<ReadMapping>, InputPort<Read> {
         proc.waitFor()
 
         if (proc.exitValue() > 0) {
-            Util.error("IgBlast failed with CODE${proc.exitValue()}: ${proc.getErrorStream()}", 2)
+            Util.error("IgBlast failed with CODE${proc.exitValue()}:\n${proc.getErrorStream()}", 2)
         }
     }
 }
