@@ -45,11 +45,15 @@ class FastqReader implements OutputPort<Read> {
             return null
         }
         if (!header.startsWith("@")) {
-            throw new RuntimeException("Bad FASTQ header")
+            throw new RuntimeException("Bad FASTQ header: $header.")
         }
 
         def seq = reader.readLine()
+        if (seq =~ /[^ATGCN]/) {
+            throw new RuntimeException("Bad sequence: $seq.")
+        }
         reader.readLine()
+
         def qual = reader.readLine()
 
         new Read(header, seq, qual)

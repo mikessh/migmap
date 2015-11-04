@@ -36,11 +36,13 @@ import org.junit.AfterClass
 import org.junit.Test
 
 class ReadMappingDetailsProviderTest {
-    private final BlastInstanceFactory factory
+    private final BlastInstanceFactory factory, factoryMm
 
     ReadMappingDetailsProviderTest() {
         factory = new BlastInstanceFactory("data/", "human", ["IGH", "IGL"], true, false)
         factory.annotateV()
+        factoryMm = new BlastInstanceFactory("data/", "mouse", ["IGH"], true, false)
+        factoryMm.annotateV()
     }
 
     @Test
@@ -101,6 +103,34 @@ class ReadMappingDetailsProviderTest {
                 "TGAGGTCCATGACCGCCGCAGACACGGCTGTGTATTTCTGTGCGAGGTGG" +
                 "CTTGGGGAAGACATTCGGACCTTTGACTCCTGGGGCCAGGGAACCCTGGT" +
                 "CACCGTCTCTAA"
+
+        instance.close()
+    }
+
+    @Test
+    void rcTest() {
+        def instance = factoryMm.create()
+
+        def seq = "CAGATCCTCTTCTGAGATGAGTTTTTGTTCGCTACCGCCACCCTCGAGTG" +
+                "AGGAGACGGTGACCATTGTCCCTTGGCCCCAGATATCAAAAGCACTCCTA" +
+                "GTTCCAGTTAAACCTCCTCTTGTACAATAATACACAGCCGTGTCCTCGGG" +
+                "AGTCACAGAGTTCAGCTGCAGGGAGAACTGGTTCTTGGATGTGTCTGGGT" +
+                "TGATGCTTATTCGACTTTTCACAGACACTGCATATTCATTATACCACTTG" +
+                "GACCTGTAGTATATCCTTCCCAGCCACTCAAGGCCTCTCGATGGGGACTG" +
+                "CCTGATCCAGTTCCAAGCAGCACTGTTGCTAGAGACACTGTCCCCGGAGA" +
+                "TGGCACAGGTGAGTAAGAGGGTCTGCGAGGGCTTCACCAGTCCTGGACCT" +
+                "GACTGCTGCAGCTGTACCTGGGCCATGGCCGGCTGGGCCGCGAGTAATAA" +
+                "CAATCCAGCGGC"
+
+        instance.put(new Read(null, seq))
+        instance.put(null)
+
+        def readMapping = instance.take()
+
+        def details = ReadMappingDetailsProvider.getDetails(readMapping)
+
+        assert details.cdr1aa == "GDSVSSNSAA"
+        assert details.cdr2aa == "IYYRSKWYN"
 
         instance.close()
     }

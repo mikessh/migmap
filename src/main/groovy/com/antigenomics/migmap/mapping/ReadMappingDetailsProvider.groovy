@@ -29,6 +29,7 @@
 
 package com.antigenomics.migmap.mapping
 
+import com.antigenomics.migmap.Util
 import com.antigenomics.migmap.io.Read
 
 import static com.antigenomics.migmap.Util.translateLinear
@@ -86,7 +87,7 @@ class ReadMappingDetailsProvider {
         static final ReadMappingDetails DUMMY = new ReadMappingDetails()
 
         ReadMappingDetails(Read read, Mapping mapping) {
-            this.seq = read.seq
+            this.seq = mapping.rc ? Util.revCompl(read.seq) : read.seq
             this.vStartInRef = mapping.vStartInRef
             this.vStartInQuery = mapping.vStartInQuery
             this.referenceMarkup = mapping.vSegment.regionMarkup
