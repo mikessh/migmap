@@ -34,17 +34,20 @@ import com.antigenomics.migmap.mutation.Mutation
 import com.antigenomics.migmap.mutation.MutationStringifier
 
 class Mapping {
-    final Segment vSegment, dSegment, jSegment
+    final Segment vSegment, jSegment
+    Segment dSegment
     final RegionMarkup regionMarkup
     final Cdr3Markup cdr3Markup
     final Truncations truncations
     final List<Mutation> mutations
     final int vStartInRef, vStartInQuery
-    final boolean rc, complete, hasCdr3, inFrame, noStop, hasD
+    final boolean rc, complete, hasCdr3, inFrame, noStop, hasD, dFound
+    PSegments pSegments = null
 
     Mapping(Segment vSegment, Segment dSegment, Segment jSegment, int vStartInRef, int vStartInQuery,
             RegionMarkup regionMarkup, Cdr3Markup cdr3Markup, Truncations truncations,
-            boolean rc, boolean complete, boolean hasCdr3, boolean inFrame, boolean noStop, boolean hasD,
+            boolean rc, boolean complete, boolean hasCdr3, boolean inFrame, boolean noStop,
+            boolean hasD,boolean dFound,
             List<Mutation> mutations) {
         // needed to extract CDR3 sequence
         this.vStartInRef = vStartInRef
@@ -68,6 +71,7 @@ class Mapping {
         this.inFrame = inFrame
         this.noStop = noStop
         this.hasD = hasD
+        this.dFound = dFound
     }
 
     static final String OUTPUT_HEADER = "v.segment\td.segment\tj.segment\t" +

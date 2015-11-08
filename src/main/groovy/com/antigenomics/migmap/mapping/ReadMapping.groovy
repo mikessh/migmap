@@ -68,7 +68,7 @@ class ReadMapping {
 
                     int i = 0
 
-                    if (mapping.hasD) {
+                    if (mapping.dFound) {
                         this.cdrInsertQual = new byte[Math.max(0, cdrMarkup.dStart - cdrMarkup.vEnd) +
                                 Math.max(0, cdrMarkup.jStart - cdrMarkup.dEnd)]
 

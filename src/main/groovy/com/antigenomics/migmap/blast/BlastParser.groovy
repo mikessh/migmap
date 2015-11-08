@@ -38,6 +38,7 @@ import com.antigenomics.migmap.mapping.Truncations
 import com.antigenomics.migmap.mutation.MutationExtractor
 
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.regex.Pattern
 
 import static com.antigenomics.migmap.Util.BLAST_NA
 import static com.antigenomics.migmap.Util.groomMatch
@@ -48,37 +49,126 @@ class BlastParser {
                         noMatch = new AtomicInteger(),
                         vNotFound = new AtomicInteger(),
                         noCdr3 = new AtomicInteger()
+    final Pattern dSummaryPattern =
+            //                 V     D     J  chain stop frame (prod) strand
+            Pattern.compile(/# V-.+\n(\S+)\t(\S+)\t(\S+)\tV\S\t(.+)\t(\S+)\t\S+\t(\S+)\n/),
+                  noDSummaryPattern =
+                          //                  V     J    chain   stop frame (prod)  strand
+                          Pattern.compile(/# V-.+\n(\S+)\t(\S+)\tV\S\t(\S+)\t(\S+)\t\S+\t(\S+)\n/),
+                  cdr1Pattern = Pattern.compile(/# Alignment summary(?:.+\n)+CDR1-IMGT\t([0-9]+)\t([0-9]+)/),
+                  cdr2Pattern = Pattern.compile(/# Alignment summary(?:.+\n)+CDR2-IMGT\t([0-9]+)\t([0-9]+)/),
+                  cdr3Pattern = Pattern.compile(/# Alignment summary(?:.+\n)+CDR3-IMGT \(germline\)\t([0-9]+)\t([0-9]+)/)
+
+
     final SegmentDatabase segmentDatabase
 
     public BlastParser(SegmentDatabase segmentDatabase) {
         this.segmentDatabase = segmentDatabase
     }
 
+    static Alignment createAlignment(List<String> hitChunk) {
+        new Alignment(hitChunk[0].toInteger() - 1, hitChunk[1], hitChunk[2].toInteger() - 1, hitChunk[3])
+    }
+
+    Mapping createMapping(List<String> summary,
+                          List<String> cdr1Bounds, List<String> cdr2Bounds, List<String> cdr3Bounds,
+                          Segment vSegment, Segment dSegment, Segment jSegment,
+                          Alignment vAlignment, Alignment jAlignment, Alignment dAlignment,
+                          boolean hasD) {
+        def rc = summary[-1] != "+", inFrame = summary[-2] != "Out-of-frame", noStop = summary[-3] != "Yes"
+
+        int cdr1Start = -1, cdr1End = -1,
+            cdr2Start = -1, cdr2End = -1,
+            cdr3Start = -1, cdr3End = -1
+
+        if (cdr1Bounds) {
+            cdr1Start = cdr1Bounds[0].toInteger() - 1
+            cdr1End = cdr1Bounds[1].toInteger()
+        }
+
+        if (cdr2Bounds) {
+            cdr2Start = cdr2Bounds[0].toInteger() - 1
+            cdr2End = cdr2Bounds[1].toInteger()
+        }
+
+        // - Find CDR3 end using J reference point manually
+        if (cdr3Bounds) {
+            cdr3Start = cdr3Bounds[0].toInteger() - 4
+        } else {
+            // try rescue CDR3
+            cdr3Start = RefPointSearcher.getCdr3Start(vSegment, vAlignment)
+        }
+
+        if (jSegment != Segment.DUMMY_J && cdr3Start >= 0) {
+            cdr3End = RefPointSearcher.getCdr3End(jSegment, jAlignment)
+        }
+
+        def regionMarkup = new RegionMarkup(cdr1Start, cdr1End, cdr2Start, cdr2End, cdr3Start, cdr3End)
+        def hasCdr3 = cdr3Start >= 0 && (cdr3End < 0 || cdr3End - cdr3Start >= MIN_CDR3_LEN),
+            complete = cdr3End >= 0 && hasCdr3
+
+        // - Markup of V/D/J within CDR3
+        int vCdr3End = -1, dCdr3Start = -1, dCdr3End = -1, jCdr3Start = -1,
+            vDel = -1, dDel5 = -1, dDel3 = -1, jDel = -1
+
+        if (hasCdr3) {
+            vCdr3End = vAlignment.qend - cdr3Start
+            vDel = vSegment.sequence.length() - vAlignment.send
+
+            if (dSegment != Segment.DUMMY_D) {
+                dCdr3Start = dAlignment.qstart - cdr3Start
+                dCdr3End = dCdr3Start + dAlignment.qLength
+                dDel5 = dAlignment.sstart
+                dDel3 = dSegment.sequence.length() - dAlignment.send
+            }
+
+            if (jSegment != Segment.DUMMY_J) {
+                jCdr3Start = jAlignment.qstart - cdr3Start
+                jDel = jAlignment.sstart
+            }
+        } else {
+            noCdr3.incrementAndGet()
+        }
+
+        Cdr3Markup cdr3Markup = new Cdr3Markup(vCdr3End, dCdr3Start, dCdr3End, jCdr3Start)
+        def truncations = new Truncations(vDel, dDel5, dDel3, jDel)
+
+        // Finally, deal with hypermutations
+        // offset for converting coordinate in read to coordinate in germline V
+        def mutationExtractor = new MutationExtractor(vSegment, vAlignment, regionMarkup)
+
+        if (hasCdr3) {
+            if (dSegment != Segment.DUMMY_D) {
+                mutationExtractor.extractD(dSegment, dAlignment)
+            }
+            if (jSegment != Segment.DUMMY_J) {
+                mutationExtractor.extractJ(jSegment, jAlignment)
+            }
+        }
+
+        return new Mapping(vSegment, dSegment, jSegment, vAlignment.sstart, vAlignment.qstart,
+                regionMarkup, cdr3Markup, truncations,
+                rc, complete, hasCdr3, inFrame, noStop, hasD, dSegment != Segment.DUMMY_D,
+                mutationExtractor.mutations)
+    }
+
     Mapping parse(String chunk) {
         total.incrementAndGet()
 
-        def summary, alignments, cdrBounds
-
         // Rearrangement summary
-        boolean hasD = true
+        boolean hasD = true // tells if the chain has D segment, while dFound tells whether it was found
 
-        summary = groomMatch(chunk =~
-                //         V     D     J  chain stop frame (prod) strand
-                /# V-.+\n(\S+)\t(\S+)\t(\S+)\tV\S\t(.+)\t(\S+)\t\S+\t(\S+)\n/)
-        
+        def summary = groomMatch(chunk =~ dSummaryPattern)
+
         if (summary == null) {
             hasD = false
-            summary = groomMatch(chunk =~
-                    //         V     J    chain   stop frame (prod)  strand
-                    /# V-.+\n(\S+)\t(\S+)\tV\S\t(\S+)\t(\S+)\t\S+\t(\S+)\n/)
+            summary = groomMatch(chunk =~ noDSummaryPattern)
         }
 
         if (summary == null) {
             noMatch.incrementAndGet()
             return null
         }
-
-        def rc = summary[-1] != "+", inFrame = summary[-2] != "Out-of-frame", noStop = summary[-3] != "Yes"
 
         // Information on segments mapped
         // - Segment names, can be multiple of them
@@ -101,101 +191,24 @@ class BlastParser {
 
         // - Alignments for V, D and J segments, remember here and further BLAST coordinates are 1-based
 
-        alignments = [
-                groomMatch(chunk =~
-                        //                                            qstart     qseq        sstart     sseq
-                        /# Hit table(?:.+\n)+V\t$vSegment.regexName\t([0-9]+)\t([ATGCN-]+)\t([0-9]+)\t([ATGCN-]+)/),
-                dFound ? groomMatch(chunk =~
-                        /# Hit table(?:.+\n)+D\t$dSegment.regexName\t([0-9]+)\t([ATGCN-]+)\t([0-9]+)\t([ATGCN-]+)/) : null,
-                jFound ? groomMatch(chunk =~
-                        /# Hit table(?:.+\n)+J\t$jSegment.regexName\t([0-9]+)\t([ATGCN-]+)\t([0-9]+)\t([ATGCN-]+)/) : null
-        ].collect {
-            it ? new Alignment(it[0].toInteger() - 1, it[1], it[2].toInteger() - 1, it[3]) : null
-        }
+        def vAlignment = createAlignment(groomMatch(chunk =~
+                //                                            qstart     qseq        sstart     sseq
+                /# Hit table(?:.+\n)+V\t$vSegment.regexName\t([0-9]+)\t([ATGCN-]+)\t([0-9]+)\t([ATGCN-]+)/)),
+            dAlignment = dFound ? createAlignment(groomMatch(chunk =~
+                    /# Hit table(?:.+\n)+D\t$dSegment.regexName\t([0-9]+)\t([ATGCN-]+)\t([0-9]+)\t([ATGCN-]+)/)) : null,
+            jAlignment = jFound ? createAlignment(groomMatch(chunk =~
+                    /# Hit table(?:.+\n)+J\t$jSegment.regexName\t([0-9]+)\t([ATGCN-]+)\t([0-9]+)\t([ATGCN-]+)/)) : null
 
         // Deduce CDR/FW markup
         // - CDR1,2 and CDR3(start only) coords
-        cdrBounds = [
-                groomMatch(chunk =~
-                        /# Alignment summary(?:.+\n)+CDR1-IMGT\t([0-9]+)\t([0-9]+)/),
-                groomMatch(chunk =~
-                        /# Alignment summary(?:.+\n)+CDR2-IMGT\t([0-9]+)\t([0-9]+)/),
-                groomMatch(chunk =~
-                        /# Alignment summary(?:.+\n)+CDR3-IMGT \(germline\)\t([0-9]+)\t([0-9]+)/)
-        ]
+        def cdr1Bounds = groomMatch(chunk =~ cdr1Pattern),
+            cdr2Bounds = groomMatch(chunk =~ cdr2Pattern),
+            cdr3Bounds = groomMatch(chunk =~ cdr3Pattern)
 
-        int cdr1Start = -1, cdr1End = -1,
-            cdr2Start = -1, cdr2End = -1,
-            cdr3Start = -1, cdr3End = -1
-
-        if (cdrBounds[0]) {
-            cdr1Start = cdrBounds[0][0].toInteger() - 1
-            cdr1End = cdrBounds[0][1].toInteger()
-        }
-
-        if (cdrBounds[1]) {
-            cdr2Start = cdrBounds[1][0].toInteger() - 1
-            cdr2End = cdrBounds[1][1].toInteger()
-        }
-
-        // - Find CDR3 end using J reference point manually
-        if (cdrBounds[2]) {
-            cdr3Start = cdrBounds[2][0].toInteger() - 4
-        } else if (alignments[0]) {
-            // try rescue CDR3
-            cdr3Start = RefPointSearcher.getCdr3Start(vSegment, alignments[0])
-        }
-
-        if (jFound && cdr3Start >= 0) {
-            cdr3End = RefPointSearcher.getCdr3End(jSegment, alignments[2])
-        }
-
-        def regionMarkup = new RegionMarkup(cdr1Start, cdr1End, cdr2Start, cdr2End, cdr3Start, cdr3End)
-        def hasCdr3 = cdr3Start >= 0 && (cdr3End < 0 || cdr3End - cdr3Start >= MIN_CDR3_LEN),
-            complete = cdr3End >= 0 && hasCdr3
-
-        // - Markup of V/D/J within CDR3
-        int vCdr3End = -1, dCdr3Start = -1, dCdr3End = -1, jCdr3Start = -1,
-            vDel = -1, dDel5 = -1, dDel3 = -1, jDel = -1
-
-        if (hasCdr3) {
-            vCdr3End = alignments[0].qend - cdr3Start
-            vDel = vSegment.sequence.length() - alignments[0].send
-
-            if (dFound) {
-                dCdr3Start = alignments[1].qstart - cdr3Start
-                dCdr3End = dCdr3Start + alignments[1].qLength
-                dDel5 = alignments[1].sstart
-                dDel3 = dSegment.sequence.length() - alignments[1].send
-            }
-
-            if (jFound) {
-                jCdr3Start = alignments[2].qstart - cdr3Start
-                jDel = alignments[2].sstart
-            }
-        } else {
-            noCdr3.incrementAndGet()
-        }
-
-        def cdr3Markup = new Cdr3Markup(vCdr3End, dCdr3Start, dCdr3End, jCdr3Start)
-        def truncations = new Truncations(vDel, dDel5, dDel3, jDel)
-
-        // Finally, deal with hypermutations
-        // offset for converting coordinate in read to coordinate in germline V
-        def mutationExtractor = new MutationExtractor(vSegment, alignments[0], regionMarkup)
-
-        if (hasCdr3) {
-            if (dFound) {
-                mutationExtractor.extractD(dSegment, alignments[1])
-            }
-            if (jFound) {
-                mutationExtractor.extractJ(jSegment, alignments[2])
-            }
-        }
-
-        return new Mapping(vSegment, dSegment, jSegment, alignments[0].sstart, alignments[0].qstart,
-                regionMarkup, cdr3Markup, truncations,
-                rc, complete, hasCdr3, inFrame, noStop, dFound,
-                mutationExtractor.mutations)
+        createMapping(summary,
+                cdr1Bounds, cdr2Bounds, cdr3Bounds,
+                vSegment, dSegment, jSegment,
+                vAlignment, jAlignment, dAlignment,
+                hasD)
     }
 }
