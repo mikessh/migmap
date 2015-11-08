@@ -34,7 +34,9 @@ import com.antigenomics.migmap.clonotype.Clonotype
 import com.antigenomics.migmap.clonotype.ClonotypeAccumulator
 import com.antigenomics.migmap.mapping.ReadMapping
 import com.antigenomics.migmap.mapping.ReadMappingDetailsProvider
+import groovy.transform.CompileStatic
 
+@CompileStatic
 class ClonotypeOutput implements InputPort<ReadMapping> {
     final ReadMappingDetailsProvider readMappingDetailsProvider
     final ClonotypeAccumulator clonotypeAccumulator

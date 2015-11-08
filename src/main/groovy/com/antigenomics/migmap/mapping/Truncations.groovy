@@ -29,6 +29,9 @@
 
 package com.antigenomics.migmap.mapping
 
+import groovy.transform.CompileStatic
+
+@CompileStatic
 class Truncations {
     final int vDel, dDel5, dDel3, jDel
 

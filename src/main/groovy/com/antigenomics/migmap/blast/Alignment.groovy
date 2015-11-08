@@ -30,7 +30,9 @@
 package com.antigenomics.migmap.blast
 
 import com.antigenomics.migmap.Util
+import groovy.transform.CompileStatic
 
+@CompileStatic
 class Alignment {
     final int qstart, sstart
     final int qLength, sLength

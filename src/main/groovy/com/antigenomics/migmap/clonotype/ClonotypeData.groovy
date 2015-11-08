@@ -30,10 +30,12 @@
 package com.antigenomics.migmap.clonotype
 
 import com.antigenomics.migmap.mapping.ReadMapping
+import groovy.transform.CompileStatic
 
 import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.atomic.AtomicLongArray
 
+@CompileStatic
 class ClonotypeData {
     final AtomicLong count, cdrQualCount
     final AtomicLongArray mutationQual, cdrInsertQual
@@ -49,11 +51,11 @@ class ClonotypeData {
 
     void update(ReadMapping readMapping) {
         count.incrementAndGet()
-        readMapping.mutationQual.eachWithIndex { it, i -> mutationQual.addAndGet(i, it) }
+        readMapping.mutationQual.eachWithIndex { byte it, int i -> mutationQual.addAndGet(i, it) }
         if (readMapping.cdrInsertQual.length == cdrInsertQual.length()) {
             // protect against very rare cases of ambiguous D alignment
             // not a big deal as this quality is used just for display
-            readMapping.cdrInsertQual.eachWithIndex { it, i -> cdrInsertQual.addAndGet(i, it) }
+            readMapping.cdrInsertQual.eachWithIndex { byte it, int i -> cdrInsertQual.addAndGet(i, it) }
             cdrQualCount.incrementAndGet()
         }
     }

@@ -82,6 +82,6 @@ class BlastInstanceFactory {
     }
 
     BlastInstance create() {
-        new BlastInstance(cmdLine.execute(env, dir), parser)
+        new BlastInstance(cmdLine.execute(env, dir), parser, segmentDatabase)
     }
 }

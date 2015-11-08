@@ -29,6 +29,9 @@
 
 package com.antigenomics.migmap.io
 
+import groovy.transform.CompileStatic
+
+@CompileStatic
 class PlainTextOutput implements InputPort<String> {
     protected final PrintWriter writer
 

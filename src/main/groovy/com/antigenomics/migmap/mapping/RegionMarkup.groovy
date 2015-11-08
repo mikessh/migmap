@@ -32,7 +32,9 @@ package com.antigenomics.migmap.mapping
 import com.antigenomics.migmap.mutation.Mutation
 import com.antigenomics.migmap.mutation.MutationType
 import com.antigenomics.migmap.mutation.SubRegion
+import groovy.transform.CompileStatic
 
+@CompileStatic
 class RegionMarkup {
     final static RegionMarkup DUMMY = new RegionMarkup(-1, -1, -1, -1, -1, -1)
 

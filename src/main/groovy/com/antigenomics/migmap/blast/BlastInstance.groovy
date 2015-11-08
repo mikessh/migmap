@@ -30,10 +30,12 @@
 package com.antigenomics.migmap.blast
 
 import com.antigenomics.migmap.Util
+import com.antigenomics.migmap.genomic.SegmentDatabase
 import com.antigenomics.migmap.io.InputPort
 import com.antigenomics.migmap.io.OutputPort
 import com.antigenomics.migmap.io.Read
 import com.antigenomics.migmap.mapping.ReadMapping
+import groovy.transform.CompileStatic
 
 import java.util.regex.Pattern
 
@@ -43,20 +45,23 @@ class BlastInstance implements OutputPort<ReadMapping>, InputPort<Read> {
     final BufferedReader reader
     final PrintWriter writer
     final BlastParser parser
+    final SegmentDatabase segmentDatabase
 
     protected boolean last = false
 
-    protected BlastInstance(Process proc, BlastParser parser) {
+    protected BlastInstance(Process proc, BlastParser parser, SegmentDatabase segmentDatabase) {
         this.proc = proc
         this.reader = proc.in.newReader()
         this.writer = proc.out.newPrintWriter()
         this.parser = parser
+        this.segmentDatabase = segmentDatabase
     }
 
     static String getHeader(String chunk) {
         (chunk =~ /# Query: (.+)/)[0][1]
     }
 
+    @CompileStatic
     String nextChunk() {
         if (last) {
             // finished
@@ -85,6 +90,7 @@ class BlastInstance implements OutputPort<ReadMapping>, InputPort<Read> {
     }
 
     @Override
+    @CompileStatic
     ReadMapping take() {
         def chunk = nextChunk(), read
 
@@ -99,6 +105,7 @@ class BlastInstance implements OutputPort<ReadMapping>, InputPort<Read> {
     static final Pattern ALLOWED_BASES = ~/^[ATGCUatgcuRrYySsWwKkMmBbDdHhVvNn]+$/,
                          AMBIGOUS_BASE = ~/[^ATGCUatgcu]/;
 
+    @CompileStatic
     static boolean isGoodBlastSeq(String seq) {
         if (seq.length() == 0 || !seq =~ ALLOWED_BASES) {
             return false
@@ -114,6 +121,7 @@ class BlastInstance implements OutputPort<ReadMapping>, InputPort<Read> {
     }
 
     @Override
+    @CompileStatic
     void put(Read input) {
         if (input) { // should contain at least one non-ambiguous base, otherwise BLAST crashes
             if (isGoodBlastSeq(input.seq)) {

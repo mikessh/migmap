@@ -29,6 +29,9 @@
 
 package com.antigenomics.migmap.mutation
 
+import groovy.transform.CompileStatic
+
+@CompileStatic
 enum SubRegion {
     FR1(0), CDR1(1), FR2(2), CDR2(3), FR3(4), CDR3(5), FR4(6)
 

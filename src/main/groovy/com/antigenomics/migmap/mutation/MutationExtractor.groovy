@@ -33,10 +33,12 @@ import com.antigenomics.migmap.Util
 import com.antigenomics.migmap.blast.Alignment
 import com.antigenomics.migmap.genomic.Segment
 import com.antigenomics.migmap.mapping.RegionMarkup
+import groovy.transform.CompileStatic
 
 import static com.antigenomics.migmap.mutation.MutationType.Deletion
 import static com.antigenomics.migmap.mutation.MutationType.None
 
+@CompileStatic
 class MutationExtractor {
     final List<Mutation> mutations
     final int offset

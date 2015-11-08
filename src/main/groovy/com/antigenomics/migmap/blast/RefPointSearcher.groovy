@@ -30,9 +30,11 @@
 package com.antigenomics.migmap.blast
 
 import com.antigenomics.migmap.genomic.Segment
+import groovy.transform.CompileStatic
 
 import static com.antigenomics.migmap.Util.GAP
 
+@CompileStatic
 class RefPointSearcher {
     final static int MAX_J_FR4_TRUNCATIONS = 5, MAX_V_FR4_TRUNCATIONS = 5
 

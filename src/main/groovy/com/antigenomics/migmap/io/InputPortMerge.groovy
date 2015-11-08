@@ -29,6 +29,9 @@
 
 package com.antigenomics.migmap.io
 
+import groovy.transform.CompileStatic
+
+@CompileStatic
 class InputPortMerge<T> implements InputPort<T> {
     final InputPort<T>[] inputPorts
 
@@ -38,11 +41,11 @@ class InputPortMerge<T> implements InputPort<T> {
 
     @Override
     void put(T obj) {
-        inputPorts.each { it.put(obj) }
+        inputPorts.each { InputPort it -> it.put(obj) }
     }
 
     @Override
     void close() {
-        inputPorts.each { it.close() }
+        inputPorts.each { InputPort it -> it.close() }
     }
 }

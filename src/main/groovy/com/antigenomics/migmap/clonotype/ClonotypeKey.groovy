@@ -32,7 +32,9 @@ package com.antigenomics.migmap.clonotype
 import com.antigenomics.migmap.genomic.Segment
 import com.antigenomics.migmap.mapping.ReadMapping
 import com.antigenomics.migmap.mutation.Mutation
+import groovy.transform.CompileStatic
 
+@CompileStatic
 class ClonotypeKey {
     final String cdr3nt
     protected final ReadMapping representativeMapping

@@ -34,14 +34,17 @@ import com.antigenomics.migmap.Util
 import com.antigenomics.migmap.blast.BlastInstanceFactory
 import com.antigenomics.migmap.io.Read
 import com.antigenomics.migmap.mapping.RegionMarkup
+import groovy.transform.CompileStatic
 
+@CompileStatic
 class SegmentDatabase {
     private static final List<SegmentDatabase> DB_CACHE = new LinkedList<>()
     final String databaseTempPath
+    final Set<String> genes
     final Map<String, Segment> segments = new HashMap<>()
     final boolean hasD
     final int vSegments, dSegments, jSegments, vSegmentsNoMarkup
-    private int annotatedV =0
+    private int annotatedV = 0
 
     static final SPECIES_ALIAS =
             ["human"        : "HomoSapiens",
@@ -53,20 +56,20 @@ class SegmentDatabase {
     SegmentDatabase(String dataBundlePath,
                     String species, List<String> genes,
                     boolean allAlleles = true) {
-        genes = genes.unique()
+        this.genes = new HashSet<>(genes.unique())
 
-        def speciesAlias = SPECIES_ALIAS[species]
+        String speciesAlias = SPECIES_ALIAS[species]
 
         boolean hasD = false
 
         int vSegments = 0, dSegments = 0, jSegments = 0, vSegmentsNoMarkup = 0
 
-        Util.getStream("segments.txt", true).splitEachLine("[\t ]+") { splitLine ->
+        Util.getStream("segments.txt", true).splitEachLine("[\t ]+") { List<String> splitLine ->
             if (!splitLine[0].startsWith("#") &&
                     splitLine[0].startsWith(speciesAlias) &&
-                    genes.contains(splitLine[1])) {
+                    this.genes.contains(splitLine[1])) {
 
-                def segmentName = splitLine[3]
+                def gene = splitLine[1], segmentName = splitLine[3]
 
                 if (allAlleles || segmentName.endsWith("*01")) {
                     def seq = splitLine[5],
@@ -75,21 +78,21 @@ class SegmentDatabase {
                     assert !segments.containsKey(segmentName)
 
                     if (segmentTypeStr.startsWith("V")) {
-                        segments.put(segmentName, new Segment(SegmentType.V, segmentName, seq, referencePoint))
+                        segments.put(segmentName, new Segment(this, SegmentType.V, gene, segmentName, seq, referencePoint))
                         vSegments++
                     } else if (segmentTypeStr.startsWith("D")) {
-                        segments.put(segmentName, new Segment(SegmentType.D, segmentName, seq, referencePoint))
+                        segments.put(segmentName, new Segment(this, SegmentType.D, gene, segmentName, seq, referencePoint))
                         hasD = true
                         dSegments++
                     } else if (segmentTypeStr.startsWith("J")) {
-                        segments.put(segmentName, new Segment(SegmentType.J, segmentName, seq, referencePoint))
+                        segments.put(segmentName, new Segment(this, SegmentType.J, gene, segmentName, seq, referencePoint))
                         jSegments++
                     }
                 }
             }
         }
 
-        Util.report("Loaded database for $speciesAlias ${genes.join(",")} gene(s): " +
+        Util.report("Loaded database for $speciesAlias ${this.genes.join(",")} gene(s): " +
                 "$vSegments Variable, $dSegments Diversity and $jSegments Joining segments.", 2)
 
         if (!hasD) {

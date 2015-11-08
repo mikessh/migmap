@@ -30,6 +30,7 @@
 package com.antigenomics.migmap.io
 
 import com.antigenomics.migmap.Util
+import groovy.transform.CompileStatic
 
 class Read {
     final String header, seq, qual
@@ -44,20 +45,24 @@ class Read {
         this(header, seq, Util.MAX_QUAL_SYMBOL * seq.length())
     }
 
+    @CompileStatic
     Read getRc() {
         new Read(header, Util.revCompl(seq), qual.reverse())
     }
 
+    @CompileStatic
     byte qualAt(int pos) {
         qual ? ((int) (qual.charAt(pos)) - Util.QUAL_OFFSET) : Util.MAX_QUAL
     }
 
     @Override
+    @CompileStatic
     String toString() {
         header + "\n" + seq + "\n+\n" + qual
     }
 
     @Override
+    @CompileStatic
     boolean equals(o) {
         if (this.is(o)) return true
         if (getClass() != o.class) return false
@@ -68,6 +73,7 @@ class Read {
     }
 
     @Override
+    @CompileStatic
     int hashCode() {
         int result = header.hashCode()
         result = 31 * result + seq.hashCode()

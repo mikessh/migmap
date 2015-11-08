@@ -36,6 +36,7 @@ import com.antigenomics.migmap.mapping.Mapping
 import com.antigenomics.migmap.mapping.RegionMarkup
 import com.antigenomics.migmap.mapping.Truncations
 import com.antigenomics.migmap.mutation.MutationExtractor
+import groovy.transform.CompileStatic
 
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.regex.Pattern
@@ -43,6 +44,7 @@ import java.util.regex.Pattern
 import static com.antigenomics.migmap.Util.BLAST_NA
 import static com.antigenomics.migmap.Util.groomMatch
 
+@CompileStatic
 class BlastParser {
     final static int MIN_CDR3_LEN = 6
     final AtomicInteger total = new AtomicInteger(),
@@ -176,7 +178,7 @@ class BlastParser {
             jSegmentNames = hasD ? summary[2] : summary[1],
             dSegmentNames = hasD ? summary[1] : BLAST_NA
 
-        def dFound = dSegmentNames != BLAST_NA,
+        boolean dFound = dSegmentNames != BLAST_NA,
             vFound = vSegmentNames != BLAST_NA,
             jFound = jSegmentNames != BLAST_NA
 
@@ -185,13 +187,13 @@ class BlastParser {
             return null
         }
 
-        def vSegment = segmentDatabase.segments[vSegmentNames.split(",").sort()[0]],
+        Segment vSegment = segmentDatabase.segments[vSegmentNames.split(",").sort()[0]],
             dSegment = dFound ? segmentDatabase.segments[dSegmentNames.split(",").sort()[0]] : Segment.DUMMY_D,
             jSegment = jFound ? segmentDatabase.segments[jSegmentNames.split(",").sort()[0]] : Segment.DUMMY_J
 
         // - Alignments for V, D and J segments, remember here and further BLAST coordinates are 1-based
 
-        def vAlignment = createAlignment(groomMatch(chunk =~
+        Alignment vAlignment = createAlignment(groomMatch(chunk =~
                 //                                            qstart     qseq        sstart     sseq
                 /# Hit table(?:.+\n)+V\t$vSegment.regexName\t([0-9]+)\t([ATGCN-]+)\t([0-9]+)\t([ATGCN-]+)/)),
             dAlignment = dFound ? createAlignment(groomMatch(chunk =~

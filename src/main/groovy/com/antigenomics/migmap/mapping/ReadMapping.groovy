@@ -31,8 +31,11 @@ package com.antigenomics.migmap.mapping
 
 import com.antigenomics.migmap.Util
 import com.antigenomics.migmap.io.Read
+import com.antigenomics.migmap.mutation.Mutation
 import com.antigenomics.migmap.mutation.MutationType
+import groovy.transform.CompileStatic
 
+@CompileStatic
 class ReadMapping {
     final Read read
     final Mapping mapping
@@ -52,10 +55,10 @@ class ReadMapping {
 
             def seq = read.seq
             def regionMarkup = mapping.regionMarkup
-            
+
             this.mutationQual = new byte[mapping.mutations.size()]
 
-            mapping.mutations.eachWithIndex { it, i ->
+            mapping.mutations.eachWithIndex { Mutation it, Integer i ->
                 mutationQual[i] = it.type == MutationType.Substitution ? read.qualAt(it.posInRead) : Util.MAX_QUAL
             }
 

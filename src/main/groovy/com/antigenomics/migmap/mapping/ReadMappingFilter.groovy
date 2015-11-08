@@ -34,9 +34,11 @@ import com.antigenomics.migmap.Util
 import com.antigenomics.migmap.io.DummyInputPort
 import com.antigenomics.migmap.io.InputPort
 import com.antigenomics.migmap.io.Read
+import groovy.transform.CompileStatic
 
 import java.util.concurrent.atomic.AtomicLong
 
+@CompileStatic
 class ReadMappingFilter {
     final boolean allowNoCdr3, allowIncomplete, allowNonCoding, allowNonCanonical
     final byte qualityThreshold

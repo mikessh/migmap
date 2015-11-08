@@ -29,6 +29,9 @@
 
 package com.antigenomics.migmap.mutation
 
+import groovy.transform.CompileStatic
+
+@CompileStatic
 enum MutationType {
     Insertion("I"), Deletion("D"), Substitution("S"), None("?")
 

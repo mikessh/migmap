@@ -29,8 +29,11 @@
 
 package com.antigenomics.migmap.mutation
 
+import groovy.transform.CompileStatic
+
+@CompileStatic
 class MutationStringifier {
-    static final String OUTPUT_HEADER = SubRegion.REGION_LIST.collect { "mutations." + it }.join("\t")
+    static final String OUTPUT_HEADER = SubRegion.REGION_LIST.collect { SubRegion it -> "mutations." + it }.join("\t")
 
     static String toString(List<Mutation> mutations) {
         def mutationStrings = [""] * SubRegion.REGION_LIST.length

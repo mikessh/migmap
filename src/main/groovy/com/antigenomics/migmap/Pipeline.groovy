@@ -36,9 +36,11 @@ import com.antigenomics.migmap.io.OutputPort
 import com.antigenomics.migmap.io.Read
 import com.antigenomics.migmap.mapping.ReadMapping
 import com.antigenomics.migmap.mapping.ReadMappingFilter
+import groovy.transform.CompileStatic
 
 import java.util.concurrent.atomic.AtomicLong
 
+@CompileStatic
 class Pipeline {
     private final AtomicLong inputCounter = new AtomicLong()
     final long limit
@@ -66,8 +68,8 @@ class Pipeline {
         Util.report("Started analysis", 2)
 
         // read >> blast instance threads
-        (0..<nThreads).each {
-            def instance = blastInstanceFactory.create()
+        (0..<nThreads).each { int it ->
+            BlastInstance instance = blastInstanceFactory.create()
             instances[it] = instance
             threads[it] = new Thread(new Runnable() {
                 @Override
@@ -87,11 +89,11 @@ class Pipeline {
 
         // blast instance >> output threads
         (0..<nThreads).each {
-            def instance = instances[it]
+            BlastInstance instance = instances[it]
             threads[nThreads + it] = new Thread(new Runnable() {
                 @Override
                 void run() {
-                    def result
+                    ReadMapping result
                     while ((result = instance.take()) != null) {
                         if (readMappingFilter.pass(result)) {
                             output.put(result)
@@ -116,12 +118,12 @@ class Pipeline {
             }
         })
 
-        threads.each { it.start() }
+        threads.each { Thread it -> it.start() }
 
         reporter.daemon = true
         reporter.start()
 
-        threads.each { it.join() }
+        threads.each { Thread it -> it.join() }
 
         reporter.interrupt()
 

@@ -29,6 +29,9 @@
 
 package com.antigenomics.migmap.io
 
+import groovy.transform.CompileStatic
+
+@CompileStatic
 class StdOutput extends PlainTextOutput {
     static final StdOutput INSTANCE = new StdOutput()
 

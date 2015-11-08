@@ -31,6 +31,7 @@ package com.antigenomics.migmap.mapping
 
 import com.antigenomics.migmap.Util
 import com.antigenomics.migmap.io.Read
+import groovy.transform.CompileStatic
 
 import static com.antigenomics.migmap.Util.translateLinear
 import static java.lang.Math.max
@@ -41,7 +42,7 @@ class ReadMappingDetailsProvider {
                                                                       "contignt",
                                                                       "fr1aa", "cdr1aa", "fr2aa", "cdr2aa", "fr3aa",
                                                                       "contigaa"])
-    
+
     public static ReadMappingDetailsProvider DUMMY = new ReadMappingDetailsProvider([])
 
     private final List<String> fields
@@ -59,6 +60,7 @@ class ReadMappingDetailsProvider {
         }
     }
 
+    @CompileStatic
     String getHeader() {
         fields.empty ? "" : ("\t" + fields.join("\t"))
     }
@@ -73,12 +75,14 @@ class ReadMappingDetailsProvider {
         "\t" + fields.collect { details."$it" }.join("\t")
     }
 
+    @CompileStatic
     static ReadMappingDetails getDetails(ReadMapping readMapping) {
         readMapping.mapped ?
                 new ReadMappingDetails(readMapping.read, readMapping.mapping) :
                 ReadMappingDetails.DUMMY
     }
 
+    @CompileStatic
     static class ReadMappingDetails {
         final String seq
         final RegionMarkup readMarkup, referenceMarkup

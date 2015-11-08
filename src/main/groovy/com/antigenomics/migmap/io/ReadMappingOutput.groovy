@@ -32,7 +32,9 @@ package com.antigenomics.migmap.io
 
 import com.antigenomics.migmap.mapping.ReadMapping
 import com.antigenomics.migmap.mapping.ReadMappingDetailsProvider
+import groovy.transform.CompileStatic
 
+@CompileStatic
 class ReadMappingOutput implements InputPort<ReadMapping> {
     final PlainTextOutput plainTextOutput
     final ReadMappingDetailsProvider readMappingDetailsProvider

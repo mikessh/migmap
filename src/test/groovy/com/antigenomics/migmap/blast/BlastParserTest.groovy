@@ -309,7 +309,7 @@ class BlastParserTest {
         def mapping = parser.parse(chunk)
 
         def readMapping = new ReadMapping(mapping, read)
-        println readMapping
+        println mapping
     }
 
     @Test

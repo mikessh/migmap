@@ -31,10 +31,12 @@ package com.antigenomics.migmap.clonotype
 
 import com.antigenomics.migmap.io.InputPort
 import com.antigenomics.migmap.mapping.ReadMapping
+import groovy.transform.CompileStatic
 
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
 
+@CompileStatic
 class ClonotypeAccumulator implements InputPort<ReadMapping> {
     final AtomicLong totalCounter = new AtomicLong()
     final ConcurrentHashMap<ClonotypeKey, ClonotypeData> clonotypeMap = new ConcurrentHashMap<>()

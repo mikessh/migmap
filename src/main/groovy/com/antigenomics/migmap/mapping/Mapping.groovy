@@ -32,7 +32,9 @@ package com.antigenomics.migmap.mapping
 import com.antigenomics.migmap.genomic.Segment
 import com.antigenomics.migmap.mutation.Mutation
 import com.antigenomics.migmap.mutation.MutationStringifier
+import groovy.transform.CompileStatic
 
+@CompileStatic
 class Mapping {
     final Segment vSegment, jSegment
     Segment dSegment

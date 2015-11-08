@@ -29,6 +29,9 @@
 
 package com.antigenomics.migmap.io
 
+import groovy.transform.CompileStatic
+
+@CompileStatic
 class SeqData {
     int nReads = 0, nEvents = 0
     final int[] qual

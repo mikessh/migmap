@@ -30,7 +30,9 @@
 package com.antigenomics.migmap.io
 
 import com.antigenomics.migmap.Util
+import groovy.transform.CompileStatic
 
+@CompileStatic
 class FastaReader implements OutputPort<Read> {
     final BufferedReader reader
     String header = ""

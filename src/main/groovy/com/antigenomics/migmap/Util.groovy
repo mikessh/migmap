@@ -30,11 +30,13 @@
 package com.antigenomics.migmap
 
 import com.antigenomics.migmap.genomic.SegmentDatabase
+import groovy.transform.CompileStatic
 
 import java.util.concurrent.TimeUnit
 import java.util.regex.Matcher
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
+
 
 class Util {
     static final int N_THREADS = Runtime.runtime.availableProcessors()
@@ -47,6 +49,7 @@ class Util {
 
     private static Date start = null
 
+    @CompileStatic
     private static String timePassed(long millis) {
         String.format("%02dm%02ds",
                 TimeUnit.MILLISECONDS.toMinutes(millis),
@@ -55,6 +58,7 @@ class Util {
         )
     }
 
+    @CompileStatic
     static void report(String message, int verbosity = 1) {
         if (verbosity <= VERBOSITY_LEVEL) {
             if (start == null)
@@ -64,10 +68,12 @@ class Util {
         }
     }
 
+    @CompileStatic
     static double toPercent(double ratio) {
         ((int) (ratio * 10000) / 100)
     }
 
+    @CompileStatic
     static void error(String message, int code) {
         // code
         // 1 - runtime error in wrapper
@@ -78,27 +84,32 @@ class Util {
         System.exit(code)
     }
 
+    @CompileStatic
     static byte minQual(byte[] qual) {
         byte min = MAX_QUAL
         for (byte q : qual) {
-            min = Math.min(q, min)
+            min = (byte) Math.min(q, min)
         }
         min
     }
 
+    @CompileStatic
     static String qualToString(byte[] qual) {
         qual.collect { (char) ((int) it + 33) }.join("")
     }
 
+    @CompileStatic
     static InputStream getStream(String fname, boolean resource) {
         resource ? Util.class.classLoader.getResourceAsStream(fname) : new FileInputStream(fname)
     }
 
+    @CompileStatic
     static BufferedReader getReader(String fname, boolean resource) {
         def inputStream = getStream(fname, resource)
         new BufferedReader(new InputStreamReader(fname.endsWith(".gz") ? new GZIPInputStream(inputStream) : inputStream))
     }
 
+    @CompileStatic
     static BufferedWriter getWriter(String outfile) {
         def compressed = outfile.endsWith(".gz")
         new BufferedWriter(new OutputStreamWriter(compressed ?
@@ -110,50 +121,48 @@ class Util {
         matcher.size() > 0 ? matcher[0][1..-1] : null//[]
     }
 
+
     static final char ntA = 'A', ntT = 'T', ntG = 'G', ntC = 'C', ntN = 'N',
                       nta = 'a', ntt = 't', ntg = 'g', ntc = 'c', ntn = 'n'
 
-    static revCompl(String seq) {
-        def chars = seq.reverse().toCharArray()
+    @CompileStatic
+    static char revCompl(char nt) {
+        switch (nt) {
+            case ntA:
+                return ntT
+            case ntT:
+                return ntA
+            case ntG:
+                return ntC
+            case ntC:
+                return ntG
+            case ntN:
+                return ntN
+            case nta:
+                return ntt
+            case ntt:
+                return nta
+            case ntg:
+                return ntc
+            case ntc:
+                return ntg
+            case ntn:
+                return ntn
+            default:
+                return ntN
+        }
+    }
+
+    @CompileStatic
+    static String revCompl(String seq) {
+        char[] chars = seq.reverse().toCharArray()
         for (int i = 0; i < chars.length; i++) {
-            switch (chars[i]) {
-                case ntA:
-                    chars[i] = ntT
-                    break
-                case ntT:
-                    chars[i] = ntA
-                    break
-                case ntG:
-                    chars[i] = ntC
-                    break
-                case ntC:
-                    chars[i] = ntG
-                    break
-                case ntN:
-                    chars[i] = ntN
-                    break
-                case nta:
-                    chars[i] = ntt
-                    break
-                case ntt:
-                    chars[i] = nta
-                    break
-                case ntg:
-                    chars[i] = ntc
-                    break
-                case ntc:
-                    chars[i] = ntg
-                    break
-                case ntn:
-                    chars[i] = ntn
-                    break
-                default:
-                    chars[i] = ntN
-            }
+            chars[i] = revCompl(chars[i])
         }
         new String(chars)
     }
 
+    @CompileStatic
     static String codon2aa(String codon) {
         String codonUpper = codon.toUpperCase()
         switch (codonUpper) {
@@ -229,6 +238,7 @@ class Util {
         }
     }
 
+    @CompileStatic
     static String translateCdr(String seq) {
         def aaSeq = ""
         def oof = seq.size() % 3
@@ -263,10 +273,12 @@ class Util {
         aaSeq + seq.substring(leftEnd, rightEnd).toLowerCase() + aaRight.reverse()
     }
 
+    @CompileStatic
     static String removeGaps(String seq) {
         seq.replaceAll("-", "")
     }
 
+    @CompileStatic
     static String translateLinear(String seq) {
         def aaSeq = ""
 
@@ -278,7 +290,9 @@ class Util {
         aaSeq
     }
 
+    @CompileStatic
     static boolean isCanonical(String cdr3) {
         cdr3 =~ /^TG[TC].+(?:TGG|TT[TC])$/
     }
+
 }

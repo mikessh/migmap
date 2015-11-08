@@ -36,7 +36,9 @@ import com.antigenomics.migmap.mapping.ReadMapping
 import com.antigenomics.migmap.mapping.Truncations
 import com.antigenomics.migmap.mutation.Mutation
 import com.antigenomics.migmap.mutation.MutationStringifier
+import groovy.transform.CompileStatic
 
+@CompileStatic
 class Clonotype implements Comparable<Clonotype> {
     final String cdr3nt, cdr3aa
     final Segment vSegment, dSegment, jSegment

@@ -29,6 +29,9 @@
 
 package com.antigenomics.migmap.io
 
+import groovy.transform.CompileStatic
+
+@CompileStatic
 class FileOutput extends PlainTextOutput {
     FileOutput(String fileName) {
         super(new FileOutputStream(fileName))

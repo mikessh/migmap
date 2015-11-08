@@ -29,6 +29,9 @@
 
 package com.antigenomics.migmap.io
 
+import groovy.transform.CompileStatic
+
+@CompileStatic
 class DummyInputPort<T> implements InputPort<T> {
     static final DummyInputPort INSTANCE = new DummyInputPort()
     

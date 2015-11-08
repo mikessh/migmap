@@ -29,8 +29,12 @@
 
 package com.antigenomics.migmap.mapping
 
+import groovy.transform.CompileStatic
+
+@CompileStatic
 class Cdr3Markup {
-    final int vEnd, dStart, dEnd, jStart   // within CDR3 coordinates, used for output
+    final int vEnd, jStart   // within CDR3 coordinates, used for output
+    int dStart, dEnd
 
     Cdr3Markup(int vEnd, int dStart, int dEnd, int jStart) {
         this.vEnd = vEnd

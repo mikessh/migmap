@@ -30,7 +30,9 @@
 package com.antigenomics.migmap.mutation
 
 import com.antigenomics.migmap.genomic.Segment
+import groovy.transform.CompileStatic
 
+@CompileStatic
 class Mutation {
     final int startInRead, endInRead
     final String ntFrom, ntTo
