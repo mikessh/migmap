@@ -91,7 +91,7 @@ class ReadMappingDetailsProvider {
         static final ReadMappingDetails DUMMY = new ReadMappingDetails()
 
         ReadMappingDetails(Read read, Mapping mapping) {
-            this.seq = mapping.rc ? Util.revCompl(read.seq) : read.seq
+            this.seq = read.seq
             this.vStartInRef = mapping.vStartInRef
             this.vStartInQuery = mapping.vStartInQuery
             this.referenceMarkup = mapping.vSegment.regionMarkup
