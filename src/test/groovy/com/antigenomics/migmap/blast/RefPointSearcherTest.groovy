@@ -30,13 +30,18 @@
 package com.antigenomics.migmap.blast
 
 import com.antigenomics.migmap.genomic.SegmentDatabase
-import com.antigenomics.migmap.mapping.ReadMapping
 import org.junit.AfterClass
 import org.junit.Test
 
 import static com.antigenomics.migmap.blast.BlastTestUtil.*
 
 class RefPointSearcherTest {
+    final BlastInstance blastInstance
+
+    RefPointSearcherTest() {
+        blastInstance = new BlastInstanceFactory("data/", "human", ["IGH"], true, false).create()
+    }
+
     @Test
     void cdr3EndTest() {
         def seq = "CAGGTGCAGCTGCAGGAGTCGGGCCCAGGACTGGTAAAGCCTTCGGAGACCCTGTCCCTCACCTGCGGTGTCTCTGGTTACTCCATAAGCAGTGGTTACTACTGGGCCTGGATCCGGCAGCCCCCAGGGAAGGGGCTGGAGTGGGTTGCGACTATCTATCATGATGGAAGATCCTACTACAACCCGTCCCTGGAAAGTCGAGTCACCATATCAGTAGACACGTCCAAGAACCAGTTCTCCCTGAGGCTGACTTCTGTGACCGCCGCAGACACGGCCGTATATTTCTGTGCGAGGGATCAGGGGCCACGAGACCACCCCAGTTCATCGTTTTGGGGCCAGGGAACCCTGGTCACCGTCTCCTCA"
@@ -48,7 +53,7 @@ class RefPointSearcherTest {
         assert mapping.complete
         assert mapping.regionMarkup.cdr3End == 333
 
-        def readMapping = new ReadMapping(mapping, read)
+        def readMapping = blastInstance.createReadMapping(mapping, read)
         assert readMapping.canonical
         assert readMapping.cdr3nt == "TGTGCGAGGGATCAGGGGCCACGAGACCACCCCAGTTCATCGTTTTGG"
     }
@@ -61,7 +66,7 @@ class RefPointSearcherTest {
 
         def mapping = parser.parse(chunk)
 
-        def readMapping = new ReadMapping(mapping, read)
+        def readMapping = blastInstance.createReadMapping(mapping, read)
         assert readMapping.cdr3nt == "TGCACCACCTATGGTTATTATTACTATTACGGCATGGACGTCTGG"
     }
 
@@ -73,7 +78,7 @@ class RefPointSearcherTest {
 
         def mapping = parser.parse(chunk)
 
-        def readMapping = new ReadMapping(mapping, read)
+        def readMapping = blastInstance.createReadMapping(mapping, read)
         assert readMapping.cdr3nt == "TGTCTTGGTGACAACGGCCATTGG"
     }
 
@@ -107,11 +112,7 @@ class RefPointSearcherTest {
                 "J\tIGHJ6*04\t415\tTTACTACTACTACTACGGTATGGACGTCTGG\t2\tTTACTACTACTACTACGGTATGGACGTCTGG\n" +
                 "# BLAST processed 1 queries"
 
-        def segmentDatabase = new SegmentDatabase("data/", "human", ["IGH"])
-
-        def parser = new BlastParser(segmentDatabase)
-
-        def mapping = parser.parse(chunk)
+        def mapping = blastInstance.parser.parse(chunk)
 
         assert mapping.complete
     }

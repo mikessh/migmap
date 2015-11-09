@@ -36,20 +36,18 @@ import groovy.transform.CompileStatic
 
 @CompileStatic
 class Mapping {
-    final Segment vSegment, jSegment
-    Segment dSegment
+    final Segment vSegment, jSegment, dSegment
     final RegionMarkup regionMarkup
     final Cdr3Markup cdr3Markup
     final Truncations truncations
     final List<Mutation> mutations
     final int vStartInRef, vStartInQuery
     final boolean rc, complete, hasCdr3, inFrame, noStop, hasD, dFound
-    PSegments pSegments = null
 
     Mapping(Segment vSegment, Segment dSegment, Segment jSegment, int vStartInRef, int vStartInQuery,
             RegionMarkup regionMarkup, Cdr3Markup cdr3Markup, Truncations truncations,
             boolean rc, boolean complete, boolean hasCdr3, boolean inFrame, boolean noStop,
-            boolean hasD,boolean dFound,
+            boolean hasD, boolean dFound,
             List<Mutation> mutations) {
         // needed to extract CDR3 sequence
         this.vStartInRef = vStartInRef
@@ -77,10 +75,10 @@ class Mapping {
     }
 
     static final String OUTPUT_HEADER = "v.segment\td.segment\tj.segment\t" +
-            RegionMarkup.OUTPUT_HEADER + "\t" +
-            Cdr3Markup.OUTPUT_HEADER + "\t" +
-            Truncations.OUTPUT_HEADER + "\t" +
-            MutationStringifier.OUTPUT_HEADER + "\t" +
+            "$RegionMarkup.OUTPUT_HEADER\t" +
+            "$Cdr3Markup.OUTPUT_HEADER\t" +
+            "$Truncations.OUTPUT_HEADER\t" +
+            "$MutationStringifier.OUTPUT_HEADER\t" +
             "rc\tcomplete\thas.cdr3\tin.frame\tno.stop"
 
 

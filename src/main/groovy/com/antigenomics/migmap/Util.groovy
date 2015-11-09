@@ -126,7 +126,7 @@ class Util {
                       nta = 'a', ntt = 't', ntg = 'g', ntc = 'c', ntn = 'n'
 
     @CompileStatic
-    static char revCompl(char nt) {
+    static char compl(char nt) {
         switch (nt) {
             case ntA:
                 return ntT
@@ -157,7 +157,7 @@ class Util {
     static String revCompl(String seq) {
         char[] chars = seq.reverse().toCharArray()
         for (int i = 0; i < chars.length; i++) {
-            chars[i] = revCompl(chars[i])
+            chars[i] = compl(chars[i])
         }
         new String(chars)
     }

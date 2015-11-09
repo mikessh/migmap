@@ -34,7 +34,10 @@ import com.antigenomics.migmap.genomic.SegmentDatabase
 import com.antigenomics.migmap.io.InputPort
 import com.antigenomics.migmap.io.OutputPort
 import com.antigenomics.migmap.io.Read
+import com.antigenomics.migmap.mapping.Mapping
 import com.antigenomics.migmap.mapping.ReadMapping
+import com.antigenomics.migmap.mutation.Mutation
+import com.antigenomics.migmap.mutation.MutationType
 import groovy.transform.CompileStatic
 
 import java.util.regex.Pattern
@@ -45,7 +48,7 @@ class BlastInstance implements OutputPort<ReadMapping>, InputPort<Read> {
     final BufferedReader reader
     final PrintWriter writer
     final BlastParser parser
-    final SegmentDatabase segmentDatabase
+    private final DSearcherBundle auxDSearcher
 
     protected boolean last = false
 
@@ -54,7 +57,7 @@ class BlastInstance implements OutputPort<ReadMapping>, InputPort<Read> {
         this.reader = proc.in.newReader()
         this.writer = proc.out.newPrintWriter()
         this.parser = parser
-        this.segmentDatabase = segmentDatabase
+        this.auxDSearcher = new DSearcherBundle(segmentDatabase)
     }
 
     static String getHeader(String chunk) {
@@ -89,13 +92,124 @@ class BlastInstance implements OutputPort<ReadMapping>, InputPort<Read> {
         chunk
     }
 
+    ReadMapping createReadMapping(Mapping mapping, Read read) {
+        String cdr3nt, cdr3aa
+        byte[] mutationQual, cdrInsertQual
+        boolean canonical, inFrame, noStop
+        PSegments pSegments
+
+        if (mapping) {
+            if (mapping.rc) {
+                // don't forget to reverse complement
+                read = read.rc
+            }
+
+            def seq = read.seq
+            def regionMarkup = mapping.regionMarkup
+
+            mutationQual = new byte[mapping.mutations.size()]
+
+            mapping.mutations.eachWithIndex { Mutation it, Integer i ->
+                mutationQual[i] = it.type == MutationType.Substitution ? read.qualAt(it.posInRead) : Util.MAX_QUAL
+            }
+
+            if (mapping.hasCdr3) {
+                if (mapping.complete) {
+                    cdr3nt = seq.substring(regionMarkup.cdr3Start, regionMarkup.cdr3End)
+                    cdr3aa = Util.translateCdr(cdr3nt)
+
+                    // Try refining D segment assignment
+                    /*if (mapping.hasD && !mapping.dFound) {
+                        // search only small inserts, IgBlast handles the rest OK
+                        def searchResult = auxDSearcher.search(mapping.vSegment.gene,
+                                mapping.cdr3Markup, cdr3nt)
+
+                        if (searchResult != null &&
+                                searchResult.score <= 0.2) {
+                            // require match of considerable size 2 of 4, 3 of 14, ...
+                            mapping = searchResult.updateMapping(mapping)
+                        }
+                    }*/
+
+                    def cdrMarkup = mapping.cdr3Markup
+
+                    // Check for P-segments
+                    pSegments = PSegmentSearcher.search(mapping.cdr3Markup, mapping.truncations, cdr3nt)
+
+                    // Quality of N-nucleotides
+                    int i = 0
+                    if (mapping.dFound) {
+                        cdrInsertQual = new byte[Math.max(0, cdrMarkup.dStart - cdrMarkup.vEnd) +
+                                Math.max(0, cdrMarkup.jStart - cdrMarkup.dEnd)]
+
+                        if (cdrMarkup.vEnd <= cdrMarkup.dStart) {
+                            ((regionMarkup.cdr3Start + cdrMarkup.vEnd)..<(regionMarkup.cdr3Start + cdrMarkup.dStart)).each {
+                                cdrInsertQual[i++] = read.qualAt(it)
+                            }
+                        }
+
+                        if (cdrMarkup.dEnd <= cdrMarkup.jStart) {
+                            ((regionMarkup.cdr3Start + cdrMarkup.dEnd)..<(regionMarkup.cdr3Start + cdrMarkup.jStart)).each {
+                                cdrInsertQual[i++] = read.qualAt(it)
+                            }
+                        }
+                    } else {
+                        cdrInsertQual = new byte[Math.max(0, cdrMarkup.jStart - cdrMarkup.vEnd)]
+                        if (cdrMarkup.vEnd <= cdrMarkup.jStart) {
+                            ((regionMarkup.cdr3Start + cdrMarkup.vEnd)..<(regionMarkup.cdr3Start + cdrMarkup.jStart)).each {
+                                cdrInsertQual[i++] = read.qualAt(it)
+                            }
+                        }
+                    }
+                    canonical = Util.isCanonical(cdr3nt)
+                } else {
+                    cdr3nt = seq.substring(regionMarkup.cdr3Start)
+                    cdr3aa = Util.translateLinear(cdr3nt)
+                    cdrInsertQual = new byte[cdr3nt.length()]
+                    (0..<cdr3nt.length()).each {
+                        cdrInsertQual[it] = read.qualAt(regionMarkup.cdr3Start + it)
+                    }
+                    canonical = false
+                    pSegments = new PSegments(-1, -1, -1, -1)
+                }
+
+                inFrame = mapping.inFrame && !cdr3aa.contains("?")
+                noStop = mapping.noStop && !cdr3aa.contains("*")
+            } else {
+                cdr3nt = Util.MY_NA
+                cdr3aa = Util.MY_NA
+                mutationQual = new byte[0]
+                cdrInsertQual = new byte[0]
+                canonical = false
+                inFrame = mapping.inFrame
+                noStop = mapping.noStop
+                pSegments = new PSegments(-1, -1, -1, -1)
+            }
+        } else {
+            cdr3nt = null
+            cdr3aa = null
+            mutationQual = null
+            cdrInsertQual = null
+            canonical = false
+            inFrame = false
+            noStop = false
+            pSegments = null
+        }
+
+        return new ReadMapping(read, mapping,
+                cdr3nt, cdr3aa,
+                mutationQual, cdrInsertQual,
+                canonical, inFrame, noStop,
+                pSegments)
+    }
+
     @Override
     @CompileStatic
     ReadMapping take() {
         def chunk = nextChunk(), read
 
         if (chunk && (read = reads.poll())) { // second condition protects from empty input
-            return new ReadMapping(parser.parse(chunk), read)
+            return createReadMapping(parser.parse(chunk), read)
         } else {
             close()
             return null

@@ -31,53 +31,76 @@ package com.antigenomics.migmap.blast
 
 import com.antigenomics.migmap.Util
 import com.antigenomics.migmap.mapping.Cdr3Markup
+import com.antigenomics.migmap.mapping.Truncations
 import groovy.transform.CompileStatic
 
 @CompileStatic
 public class PSegmentSearcher {
-    final static int P_SEGM_MIN_LEN = 2
+    final static int P_SEGM_MIN_LEN = 3
 
-    static PSegments search(Cdr3Markup cdr3Markup, String cdr3seq) {
-        int lastVMatch = -1, lastJMatch = -1, lastMm = -2
+    static PSegments search(Cdr3Markup cdr3Markup, Truncations truncations, String cdr3seq) {
+        boolean dFound = cdr3Markup.dStart >= 0
+        int vp3 = -1, dp5 = -1, dp3 = -1, jp5 = -1
 
-        for (int i = cdr3Markup.vEnd + 1;
-             i < (cdr3Markup.dStart < 0 ? cdr3Markup.jStart : cdr3Markup.dStart); i++) {
-            int j = 2 * cdr3Markup.vEnd - i + 1
-            if (j < 0)
+        if (truncations.vDel == 0) {
+            vp3 = searchRight(cdr3Markup.vEnd + 1, dFound ? cdr3Markup.dStart : cdr3Markup.jStart, 0, cdr3seq)
+        }
+
+        if (truncations.dDel5 == 0) {
+            dp5 = searchLeft(cdr3Markup.dStart - 1, cdr3Markup.vEnd, cdr3Markup.dEnd, cdr3seq)
+        }
+
+        if (truncations.dDel3 == 0) {
+            dp3 = searchRight(cdr3Markup.dEnd + 1, cdr3Markup.jStart, cdr3Markup.dStart, cdr3seq)
+        }
+
+        if (truncations.jDel == 0) {
+            jp5 = searchLeft(cdr3Markup.jStart - 1, dFound ? cdr3Markup.vEnd : cdr3Markup.dEnd, cdr3seq.length(), cdr3seq)
+        }
+
+        new PSegments(
+                vp3 - cdr3Markup.vEnd >= P_SEGM_MIN_LEN ? vp3 : -1,
+                cdr3Markup.dStart - dp5 >= P_SEGM_MIN_LEN ? dp5 : -1,
+                dp3 - cdr3Markup.dEnd >= P_SEGM_MIN_LEN ? dp3 : -1,
+                cdr3Markup.jStart - jp5 >= P_SEGM_MIN_LEN ? jp5 : -1)
+    }
+
+    static int searchRight(int from, int to, int from2, String cdr3seq) {
+        int lastMatch = -1, lastMm = -2
+        for (int i = from; i < to; i++) {
+            int j = 2 * from - i - 1
+            if (j < from2)
                 break
             if (cdr3seq.charAt(i) == Util.compl(cdr3seq.charAt(j))) {
-                lastVMatch = i
+                lastMatch = i
             } else {
                 if (i - lastMm <= 2) { // no more than 2 consequent mismatches or 2 mismatches separated by 1 base
-                    lastVMatch = lastMm - 1
+                    lastMatch = lastMm - 1
                     break
                 }
                 lastMm = i
             }
         }
+        lastMatch
+    }
 
-        lastMm = cdr3seq.length() + 1
-
-        for (int i = cdr3Markup.jStart - 1;
-             i > (cdr3Markup.dEnd < 0 ? cdr3Markup.dEnd : cdr3Markup.vEnd);
-             i--) {
-            int j = 2 * cdr3Markup.jStart - i - 1
-            if (j >= cdr3seq.length())
+    static int searchLeft(int from, int to, int from2, String cdr3seq) {
+        int lastMatch = -1, lastMm = cdr3seq.length() + 1
+        for (int i = from; i > to; i--) {
+            int j = 2 * from - i + 1
+            if (j >= from2)
                 break
             if (cdr3seq.charAt(i) == Util.compl(cdr3seq.charAt(j))) {
-                //println(cdr3seq.charAt(i).toString() + " " + Util.compl(cdr3seq.charAt(j)).toString() + "  ")
-                lastJMatch = i
+                lastMatch = i
             } else {
-                //println(cdr3seq.charAt(i).toString() + " " + Util.compl(cdr3seq.charAt(j)).toString() + " *")
                 if (lastMm - i <= 2) { // no more than 2 consequent mismatches or 2 mismatches separated by 1 base
-                    lastJMatch = lastMm + 1
+                    lastMatch = lastMm + 1
                     break
                 }
                 lastMm = i
             }
         }
-
-        new PSegments(lastVMatch - cdr3Markup.vEnd >= P_SEGM_MIN_LEN ? lastVMatch : -1,
-                cdr3Markup.jStart - lastJMatch >= P_SEGM_MIN_LEN ? lastJMatch : -1)
+        lastMatch
     }
+
 }

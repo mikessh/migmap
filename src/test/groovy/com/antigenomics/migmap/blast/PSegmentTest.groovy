@@ -30,6 +30,7 @@
 package com.antigenomics.migmap.blast
 
 import com.antigenomics.migmap.mapping.Cdr3Markup
+import com.antigenomics.migmap.mapping.Truncations
 import org.junit.Test
 
 class PSegmentTest {
@@ -41,11 +42,12 @@ class PSegmentTest {
         //             012345678901234567890123456789012345678901234
         def cdr3seq = "TGTGCGAGGTGGCTTGGGGAAGACATTCGGACCTTTGACTCCTGG"
         def cdr3Markup = new Cdr3Markup(7, 14, 19, 32)
+        def truncations = new Truncations(0, 0, 0, 0)
 
-        def pSegments = PSegmentSearcher.search(cdr3Markup, cdr3seq)
+        def pSegments = PSegmentSearcher.search(cdr3Markup, truncations, cdr3seq)
 
-        assert pSegments.pSegmentEndV == -1
-        assert pSegments.pSegmentStartJ == -1
+        assert pSegments.pSegmentV == -1
+        assert pSegments.pSegmentJ == -1
     }
 
     @Test
@@ -56,11 +58,12 @@ class PSegmentTest {
         //             012345678901234567890123456789012345678901234
         def cdr3seq = "TGTGCGAGCTCGCTTGGGGAAGACATTCGAAGCTTTGACTCCTGG"
         def cdr3Markup = new Cdr3Markup(7, 14, 19, 32)
+        def truncations = new Truncations(0, 0, 0, 0)
 
-        def pSegments = PSegmentSearcher.search(cdr3Markup, cdr3seq)
+        def pSegments = PSegmentSearcher.search(cdr3Markup, truncations, cdr3seq)
 
-        assert pSegments.pSegmentEndV == 12
-        assert pSegments.pSegmentStartJ == 26
+        assert pSegments.pSegmentV == 12
+        assert pSegments.pSegmentJ == 26
     }
 
     @Test
@@ -72,10 +75,11 @@ class PSegmentTest {
         def cdr3seq = "TGTGCGAGGTGGCTTGGGGAAGGGAGAAAAAGCTTTGACTCCTGG"
         //                                   GGAGTCAAAG
         def cdr3Markup = new Cdr3Markup(7, 14, 19, 32)
+        def truncations = new Truncations(0, 0, 0, 0)
 
-        def pSegments = PSegmentSearcher.search(cdr3Markup, cdr3seq)
+        def pSegments = PSegmentSearcher.search(cdr3Markup, truncations, cdr3seq)
 
-        assert pSegments.pSegmentStartJ == 28
+        assert pSegments.pSegmentJ == 28
     }
 
     @Test
@@ -87,10 +91,11 @@ class PSegmentTest {
         def cdr3seq = "TGTGCGAGGTGGCTTGGGGAAGGGTGCCAAAGCTTTGACTCCTGG"
         //                                   GGAGTCAAAG
         def cdr3Markup = new Cdr3Markup(7, 14, 19, 32)
+        def truncations = new Truncations(0, 0, 0, 0)
 
-        def pSegments = PSegmentSearcher.search(cdr3Markup, cdr3seq)
+        def pSegments = PSegmentSearcher.search(cdr3Markup, truncations, cdr3seq)
 
-        assert pSegments.pSegmentStartJ == 27
+        assert pSegments.pSegmentJ == 27
     }
-    
+
 }

@@ -33,10 +33,19 @@ import groovy.transform.CompileStatic
 
 @CompileStatic
 class PSegments {
-    final int pSegmentEndV, pSegmentStartJ
+    final int pSegmentV, pSegmentJ, pSegmentD5, pSegmentD3
 
-    PSegments(int pSegmentEndV, int pSegmentStartJ) {
-        this.pSegmentEndV = pSegmentEndV
-        this.pSegmentStartJ = pSegmentStartJ
+    PSegments(int pSegmentV, int pSegmentD5, int pSegmentD3, int pSegmentJ) {
+        this.pSegmentV = pSegmentV
+        this.pSegmentD5 = pSegmentD5
+        this.pSegmentD3 = pSegmentD3
+        this.pSegmentJ = pSegmentJ
+    }
+
+    static final String OUTPUT_HEADER = "pol.v\tpol.d.5\tpol.d.3\tpol.j"
+
+    @Override
+    String toString() {
+        [pSegmentV, pSegmentD5, pSegmentD3, pSegmentJ].join("\t")
     }
 }

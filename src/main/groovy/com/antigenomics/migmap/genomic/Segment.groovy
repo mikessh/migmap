@@ -34,7 +34,7 @@ import com.antigenomics.migmap.mapping.RegionMarkup
 import groovy.transform.CompileStatic
 
 @CompileStatic
-class Segment {
+class Segment implements Comparable<Segment> {
     static
     final Segment DUMMY_J = new Segment(null, SegmentType.J, "DUMMY", Util.MY_NA, "AAAAAAAAAAAAAAAAAAAAAAAAA", -1),
                   DUMMY_D = new Segment(null, SegmentType.D, "DUMMY", Util.MY_NA, "AAAAAAAAAAAAAAAAAAAAAAAAA", -1)
@@ -79,9 +79,13 @@ class Segment {
         name.hashCode()
     }
 
-
     @Override
     public String toString() {
         name
+    }
+
+    @Override
+    int compareTo(Segment o) {
+        this.name.compareTo(o.name)
     }
 }

@@ -33,14 +33,25 @@ import groovy.transform.CompileStatic
 
 @CompileStatic
 class Cdr3Markup {
-    final int vEnd, jStart   // within CDR3 coordinates, used for output
-    int dStart, dEnd
+    final int vEnd, dStart, dEnd, jStart   // within CDR3 coordinates, used for output
 
     Cdr3Markup(int vEnd, int dStart, int dEnd, int jStart) {
         this.vEnd = vEnd
         this.dStart = dStart
         this.dEnd = dEnd
         this.jStart = jStart
+    }
+
+    int getInsertSizeVJ() {
+        dStart < 0 ? Math.max(0, jStart - vEnd - 1) : (insertSizeVD + insertSizeDJ)
+    }
+
+    int getInsertSizeVD() {
+        dStart < 0 ? Math.max(0, dStart - vEnd - 1) : -1
+    }
+
+    int getInsertSizeDJ() {
+        dStart < 0 ? Math.max(0, jStart - dEnd - 1) : -1
     }
 
     static final String OUTPUT_HEADER = "v.end.in.cdr3\td.start.in.cdr3\td.end.in.cdr3\tj.start.in.cdr3"
