@@ -217,7 +217,7 @@ class BlastInstance implements OutputPort<ReadMapping>, InputPort<Read> {
     }
 
     static final Pattern ALLOWED_BASES = ~/^[ATGCUatgcuRrYySsWwKkMmBbDdHhVvNn]+$/,
-                         AMBIGOUS_BASE = ~/[^ATGCUatgcu]/;
+                         AMBIGUOUS_BASE = ~/[^ATGCUatgcu]/;
 
     @CompileStatic
     static boolean isGoodBlastSeq(String seq) {
@@ -225,7 +225,7 @@ class BlastInstance implements OutputPort<ReadMapping>, InputPort<Read> {
             return false
         }
 
-        int goodBases = seq.length() - seq.replaceAll(AMBIGOUS_BASE, "").length()
+        int goodBases = seq.length() - seq.replaceAll(AMBIGUOUS_BASE, "").length()
 
         if (goodBases / (double) seq.length() >= 0.7) {
             return false
