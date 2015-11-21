@@ -95,7 +95,7 @@ d.del.5          | Number of nucleotides deleted from D segment 5' end or *-1* i
 d.del.3          | Number of nucleotides deleted from D segment 3' end or *-1* if D segment is not defined
 j.del            | Number of nucleotides deleted from J segment 5' end or *-1* if J segment is not defined
 pol.v            | Position of last nucleotide of V segment's P segment or *-1* if P segment was not found
-pol.d.5          | Position of first nucleotide of D segment's 5' P segment or *-1* if P segment was not found3
+pol.d.5          | Position of first nucleotide of D segment's 5' P segment or *-1* if P segment was not found
 pol.d.3          | Position of last nucleotide of D segment's 3' P segment or *-1* if P segment was not found
 pol.j            | Position of first nucleotide of J segment's P segment or *-1* if P segment was not found
 has.cdr3         | *true* if CDR3 region is present (both V segment conserved residue is present)
