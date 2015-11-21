@@ -30,6 +30,7 @@
 package com.antigenomics.migmap.clonotype
 
 import com.antigenomics.migmap.Util
+import com.antigenomics.migmap.blast.PSegments
 import com.antigenomics.migmap.genomic.Segment
 import com.antigenomics.migmap.mapping.Cdr3Markup
 import com.antigenomics.migmap.mapping.ReadMapping
@@ -49,6 +50,7 @@ class Clonotype implements Comparable<Clonotype> {
     final boolean hasCdr3, complete, inFrame, noStop, canonical
     final Cdr3Markup cdr3Markup
     final Truncations truncations
+    final PSegments pSegments
     final ReadMapping representativeMapping
 
     Clonotype(ClonotypeKey key, ClonotypeData data, long total) {
@@ -61,7 +63,7 @@ class Clonotype implements Comparable<Clonotype> {
         this.mutations = key.mutations
         this.count = data.count.longValue()
         this.freq = (double) count / total
-        
+
         this.cdrInsertQual = new byte[data.cdrInsertQual.length()]
         def cdrQualCount = data.cdrQualCount.longValue()
         (0..<cdrInsertQual.length).each {
@@ -76,9 +78,10 @@ class Clonotype implements Comparable<Clonotype> {
 
         this.cdr3Markup = representativeMapping.mapping.cdr3Markup
         this.truncations = representativeMapping.mapping.truncations
+        this.pSegments = representativeMapping.pSegments
         this.hasCdr3 = representativeMapping.mapping.hasCdr3
         this.complete = representativeMapping.mapping.complete
-        
+
         this.inFrame = representativeMapping.inFrame
         this.noStop = representativeMapping.noStop
         this.canonical = representativeMapping.canonical
@@ -92,6 +95,7 @@ class Clonotype implements Comparable<Clonotype> {
     static
     final String OUTPUT_HEADER = "freq\tcount\tv\td\tj\tcdr3nt\tcdr3aa\t" + MutationStringifier.OUTPUT_HEADER +
             "\tcdr.insert.qual\tmutations.qual\t" + Cdr3Markup.OUTPUT_HEADER + "\t" + Truncations.OUTPUT_HEADER +
+            "\t" + PSegments.OUTPUT_HEADER +
             "\thas.cdr3\tin.frame\tno.stop\tcomplete\tcanonical"
 
     @Override
@@ -101,7 +105,7 @@ class Clonotype implements Comparable<Clonotype> {
          cdr3nt, cdr3aa,
          MutationStringifier.toString(mutations),
          Util.qualToString(cdrInsertQual), Util.qualToString(mutationQual),
-         cdr3Markup, truncations,
+         cdr3Markup, truncations, pSegments,
          hasCdr3, inFrame, noStop, complete, canonical].join("\t")
     }
 }
