@@ -64,7 +64,7 @@ class Util {
             if (start == null)
                 start = new Date()
 
-            System.err.println("[${new Date()} HIGBLAST +" + timePassed(new Date().time - start.time) + "] $message")
+            System.err.println("[${new Date()} MIGMAP +" + timePassed(new Date().time - start.time) + "] $message")
         }
     }
 
@@ -79,7 +79,7 @@ class Util {
         // 1 - runtime error in wrapper
         // 2 - blast error
         // 3 - error in main script
-        System.err.println("[${new Date()} HIGBLAST ERROR] $message")
+        System.err.println("[${new Date()} MIGMAP ERROR] $message")
         SegmentDatabase.clearTemporaryFiles()
         System.exit(code)
     }

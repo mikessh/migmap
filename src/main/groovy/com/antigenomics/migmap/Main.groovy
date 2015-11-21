@@ -38,7 +38,7 @@ import com.antigenomics.migmap.mapping.ReadMappingFilter
 def ALLOWED_CHAINS = ["TRA", "TRB", "TRG", "TRG", "IGH", "IGL", "IGK"],
     ALLOWED_SPECIES = ["human", "mouse", "rat", "rabbit", "rhesus_monkey"],
     HOME = new File(this.class.protectionDomain.codeSource.location.path).parent.replaceAll("%20", " "),
-    DEFAULT_Q = "25", ERROR_LOG = "_higblast_error.log"
+    DEFAULT_Q = "25", ERROR_LOG = "_migmap_error.log"
 
 def cli = new CliBuilder(usage: "migmap [options] input.(fa/fastq)[.gz] (output_file/- for stdout)")
 
@@ -54,7 +54,7 @@ cli.n(args: 1, argName: "int",
 cli.p(args: 1, argName: "int",
         "Number of cores to use. [default = all available processors]")
 cli._(longOpt: "report", args: 1, argName: "file",
-        "File to store HigBlast report. Will append report line if file exists.")
+        "File to store MIGMAP report. Will append report line if file exists.")
 
 // Mapping
 cli.R(args: 1, argName: "chain1,...",
