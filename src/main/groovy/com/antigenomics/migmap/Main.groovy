@@ -229,6 +229,8 @@ try {
         }
     }
 
+    Util.report("Finished.", 2)
+
 } catch (Exception e) {
 
     new File("$ERROR_LOG").withPrintWriter { writer ->

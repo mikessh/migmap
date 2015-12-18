@@ -132,6 +132,8 @@ if (tr && ig) {
 
 // Deal with V segments first
 
+Util.report("Annotating V segments...", 2)
+
 def vReferencePoints = new HashMap<Integer, Integer>()
 
 def blastInstanceFactory = new BlastInstanceFactory(dataDir, species, genes, true, useKabat)
@@ -170,6 +172,8 @@ readThread.join()
 
 // Read one more time & assign reference points
 
+Util.report("Annotating J segments and writing output.", 2)
+
 def J_PATTERN = Pattern.compile("T(?:GG|T[TC])GG.{4}GG.")
 
 def getJRef = { String seq ->
@@ -202,3 +206,5 @@ new File(outputFileName).withPrintWriter { pw ->
         i++
     }
 }
+
+Util.report("Finished.", 2)
