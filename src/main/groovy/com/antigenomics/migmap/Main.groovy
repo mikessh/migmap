@@ -49,6 +49,8 @@ cli._(longOpt: "blast-dir", args: 1, argName: "path",
 cli._(longOpt: "data-dir", args: 1, argName: "path",
         "Path to folder that contains data bundle (internal_data/ and optional_file/ directories). " +
                 "[default = \$install_dir/data/]")
+cli._(longOpt: "custom-database", args: 1, argName: "path",
+        "Path to a custom segments database. [default = use built-in database]")
 cli.n(args: 1, argName: "int",
         "Number of reads to take. [default = all]")
 cli.p(args: 1, argName: "int",
@@ -103,7 +105,8 @@ if (opt.h || opt == null || opt.arguments().size() != 2 || !opt.R || !opt.S) {
 // I/O
 
 def inputFileName = opt.arguments()[0], outputFileName = opt.arguments()[1],
-    reportFileName = opt.'report', unmappedFileName = opt.'unmapped'
+    reportFileName = opt.'report', unmappedFileName = opt.'unmapped',
+    customDatabaseFileName = (String)opt.'custom-database'
 
 def fastaFile = ["fasta", "fa", "fasta.gz", "fa.gz"].any { inputFileName.endsWith(it) },
     stdOutput = outputFileName == "-", byRead = (boolean) opt.'by-read'
@@ -193,7 +196,7 @@ def inputPort = fastaFile ? new FastaReader(inputFileName) : new FastqReader(inp
 def outputPort = stdOutput ? StdOutput.INSTANCE : new FileOutput(outputFileName)
 def detailsProvider = new ReadMappingDetailsProvider(details)
 outputPort = byRead ? new ReadMappingOutput(outputPort, detailsProvider) : new ClonotypeOutput(outputPort, detailsProvider)
-def blastInstanceFactory = new BlastInstanceFactory(dataDir, species, genes, allAlleles, useKabat)
+def blastInstanceFactory = new BlastInstanceFactory(dataDir, species, genes, allAlleles, useKabat, customDatabaseFileName)
 
 if (!details.empty) {
     blastInstanceFactory.annotateV()

@@ -37,13 +37,21 @@ class BlastInstanceFactory {
     final File dir
     final List<String> env
     final BlastParser parser
+    final String species
+    final List<String> genes
     final SegmentDatabase segmentDatabase
+    final boolean allAlleles, useKabat
 
     BlastInstanceFactory(String dataBundlePath,
                          String species, List<String> genes,
-                         boolean allAlleles, boolean useKabat) {
-        this.segmentDatabase = new SegmentDatabase(dataBundlePath, species, genes, allAlleles)
+                         boolean allAlleles, boolean useKabat,
+                         String cusomDatabaseFileName = null) {
+        this.segmentDatabase = new SegmentDatabase(dataBundlePath, species, genes, allAlleles, cusomDatabaseFileName)
         this.parser = new BlastParser(segmentDatabase)
+        this.species = species
+        this.genes = genes
+        this.allAlleles = allAlleles
+        this.useKabat = useKabat
 
         def seqtype = genes[0].startsWith("TR") ? "TCR" : "Ig"
 
