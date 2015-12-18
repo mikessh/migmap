@@ -34,7 +34,7 @@ class ExecutionUtil {
     static String BLAST_HOME = ""
 
     static String wrapCommand(String command) {
-        "${BLAST_HOME.length() > 0 ? "$BLAST_HOME/" : ""}$command${WIN ? ".exe" : ""}"
+        BLAST_HOME.length() > 0 ? "$BLAST_HOME/$command${WIN ? ".exe" : ""}" : command
     }
 
     static String getMakeDb() {
