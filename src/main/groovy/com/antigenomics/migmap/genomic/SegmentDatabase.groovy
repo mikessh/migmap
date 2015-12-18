@@ -40,10 +40,10 @@ import groovy.transform.CompileStatic
 class SegmentDatabase {
     private static final List<SegmentDatabase> DB_CACHE = new LinkedList<>()
     final String databaseTempPath
-    final Set<String> genes
+    final Set<String> genes = new HashSet<>()
     final Map<String, Segment> segments = new HashMap<>()
     final boolean hasD
-    final int vSegments, dSegments, jSegments, vSegmentsNoMarkup
+    final int vSegments, dSegments, jSegments
     private int annotatedV = 0
 
     static final SPECIES_ALIAS =
@@ -55,16 +55,18 @@ class SegmentDatabase {
 
     SegmentDatabase(String dataBundlePath,
                     String species, List<String> genes,
-                    boolean allAlleles = true) {
-        this.genes = new HashSet<>(genes.unique())
+                    boolean allAlleles = true,
+                    String segmentsFilePath = null) {
+        this.genes.addAll(genes)
 
         String speciesAlias = SPECIES_ALIAS[species]
 
         boolean hasD = false
 
-        int vSegments = 0, dSegments = 0, jSegments = 0, vSegmentsNoMarkup = 0
+        int vSegments = 0, dSegments = 0, jSegments = 0
 
-        Util.getStream("segments.txt", true).splitEachLine("[\t ]+") { List<String> splitLine ->
+        segmentsFilePath ? new File(segmentsFilePath) : Util.getStream("segments.txt", true)
+                .splitEachLine("[\t ]+") { List<String> splitLine ->
             if (!splitLine[0].startsWith("#") &&
                     splitLine[0].startsWith(speciesAlias) &&
                     this.genes.contains(splitLine[1])) {
@@ -104,7 +106,6 @@ class SegmentDatabase {
         this.vSegments = vSegments
         this.dSegments = dSegments
         this.jSegments = jSegments
-        this.vSegmentsNoMarkup = vSegmentsNoMarkup
 
         DB_CACHE.add(this)
     }
