@@ -170,7 +170,7 @@ def allowIncomplete = (boolean) opt.'allow-incomplete',
     allowNoCdr3 = (boolean) opt.'allow-no-cdr3', allowNoncoding = (boolean) opt.'allow-noncoding',
     allowNonCanonical = (boolean) opt.'allow-noncanonical',
     qualityThreshold = Byte.parseByte((String) (opt.q ?: DEFAULT_Q)),
-    details = (opt.'details' ?: "").split(",") as List<String>
+    details = (opt.'details' ?: "contignt").split(",") as List<String>
 
 details.removeAll { it.length() == 0 }
 
