@@ -33,7 +33,7 @@ class Mutation {
     SubRegion subRegion
 
     static Mutation fromString(String signature) {
-        MutationType type = MutationType.valueOf(signature[0])
+        MutationType type = MutationType.byShortName(signature[0])
 
         def tmp = signature.substring(1).split(":")
 
@@ -84,25 +84,26 @@ class Mutation {
                 (type == MutationType.Deletion ? "" : ntTo)
     }
 
-    @Override
     boolean equals(o) {
         if (this.is(o)) return true
         if (getClass() != o.class) return false
 
         Mutation mutation = (Mutation) o
 
-        start == mutation.start &&
-                ntFrom == mutation.ntFrom &&
-                ntTo == mutation.ntTo &&
-                parent == mutation.parent
+        if (start != mutation.start) return false
+        if (ntFrom != mutation.ntFrom) return false
+        if (ntTo != mutation.ntTo) return false
+        if (parent != mutation.parent) return false
+
+        return true
     }
 
-    @Override
     int hashCode() {
         int result
         result = ntFrom.hashCode()
         result = 31 * result + ntTo.hashCode()
         result = 31 * result + start
-        31 * result + parent.hashCode()
+        result = 31 * result + (parent != null ? parent.hashCode() : 0)
+        return result
     }
 }

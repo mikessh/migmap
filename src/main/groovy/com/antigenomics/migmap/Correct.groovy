@@ -20,6 +20,7 @@ import com.antigenomics.migmap.mutation.Mutation
 import com.milaboratory.core.sequence.NucleotideSequence
 import com.milaboratory.core.tree.SequenceTreeMap
 import com.milaboratory.core.tree.TreeSearchParameters
+import com.milaboratory.util.Factory
 import groovy.transform.Canonical
 
 def DEFAULT_ERROR_RATE = "0.01", DEFAULT_DEPTH = "2"
@@ -68,7 +69,7 @@ def countColIndex = -1, freqColIndex = -1, contigNtIndex = -1,
     mutationsFr2Index = -1, mutationsCdr2Index = -1,
     mutationsFr3Index = -1, mutationsFr4Index = -1
 
-def header = (String[]) null
+def header
 def parseColumns = {
     freqColIndex = header.findIndexOf { it.toLowerCase() == "freq" }
     countColIndex = header.findIndexOf { it.toLowerCase() == "count" }
@@ -92,7 +93,7 @@ def parseColumns = {
 class ClonotypeEntry {
     int count
     float freq
-    String[] data
+    List<String> data
     NucleotideSequence seq
     ClonotypeEntry parent
     Set<Mutation> mutations = new HashSet<>()
@@ -103,10 +104,11 @@ class ClonotypeEntry {
     }
 }
 
-def stm = new SequenceTreeMap<NucleotideSequence, ClonotypeEntry>(NucleotideSequence.ALPHABET)
+def stm = new SequenceTreeMap<NucleotideSequence, List<ClonotypeEntry>>(NucleotideSequence.ALPHABET)
 def searchParams = new TreeSearchParameters(depth, depth, depth, depth)
 
-new File(inputFileName).splitEachLine("\t") { String[] splitLine ->
+new File(inputFileName).splitEachLine("\t") { List<String> splitLine ->
+
     if (!header) {
         header = splitLine
         parseColumns()
@@ -126,7 +128,12 @@ new File(inputFileName).splitEachLine("\t") { String[] splitLine ->
             }
         }
 
-        stm.put(seq, entry)
+        stm.createIfAbsent(seq, new Factory<List<ClonotypeEntry>>() {
+            @Override
+            List<ClonotypeEntry> create() {
+                new ArrayList<ClonotypeEntry>()
+            }
+        }).add(entry)
     }
 }
 
@@ -143,38 +150,44 @@ def countNonCdr3Mutations = { ClonotypeEntry parent, ClonotypeEntry child ->
     }.size()
 }
 
-stm.values().each { child ->
-    def iter = stm.getNeighborhoodIterator(child.seq, searchParams)
-    float bestParentScore = 1.0
+stm.values().each { children ->
+    children.each { child ->
+        def iter = stm.getNeighborhoodIterator(child.seq, searchParams)
+        float bestParentScore = 1.0
 
-    def bestParent = null, parent
+        def bestParent = (ClonotypeEntry) null, parents
 
-    while ((parent = iter.next())) {
-        int mutationsCount = iter.mutationsCount
+        while ((parents = iter.next())) {
+            parents.each { parent ->
+                int mutationsCount = iter.mutationsCount
 
-        if (!contig) {
-            int additionalMutations = countNonCdr3Mutations(parent, child)
-            if (additionalMutations < 0)
-                continue
-            mutationsCount += additionalMutations
-        }
+                if (!contig) {
+                    int additionalMutations = countNonCdr3Mutations(parent, child)
+                    if (additionalMutations < 0)
+                        return
+                    mutationsCount += additionalMutations
+                }
 
-        if (parent.count > child.count) {
-            def score = Math.log(child.count / (float) parent.count) / mutationsCount
+                if (parent.count > child.count) {
+                    def score = Math.log(child.count / (float) parent.count) / mutationsCount
 
-            if (score < bestParentScore) {
-                bestParent = parent
-                bestParentScore = score
+                    if (score < bestParentScore) {
+                        bestParent = parent
+                        bestParentScore = score
+                    }
+                }
             }
         }
-    }
 
-    if (bestParentScore <= errorRate) {
-        child.parent = bestParent
+        if (bestParentScore <= errorRate) {
+            child.parent = bestParent
+        }
     }
 }
 
-stm.values().sort { it.count }.each {
+def sortedEntries = stm.values().flatten().sort { -it.count }
+
+sortedEntries.reverseEach {
     if (it.parent != null) {
         it.parent.append(it)
     }
@@ -183,7 +196,7 @@ stm.values().sort { it.count }.each {
 new File(outputFileName).withPrintWriter { pw ->
     pw.println(header.join("\t"))
 
-    stm.values().each {
+    sortedEntries.each {
         if (it.parent == null) {
             pw.println(it.data.join("\t"))
         }

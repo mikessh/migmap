@@ -27,4 +27,8 @@ enum MutationType {
     MutationType(String shortName) {
         this.shortName = shortName
     }
+
+    static MutationType byShortName(String shortName) {
+        values().find { it.shortName == shortName }
+    }
 }
