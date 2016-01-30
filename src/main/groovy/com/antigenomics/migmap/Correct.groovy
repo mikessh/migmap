@@ -16,6 +16,7 @@
 
 package com.antigenomics.migmap
 
+import com.antigenomics.migmap.mutation.Mutation
 import com.milaboratory.core.sequence.NucleotideSequence
 import com.milaboratory.core.tree.SequenceTreeMap
 import com.milaboratory.core.tree.TreeSearchParameters
@@ -25,8 +26,10 @@ def DEFAULT_ERROR_RATE = "0.01", DEFAULT_DEPTH = "2"
 
 def cli = new CliBuilder(usage: "Correct [options] clonotype_table.txt output.txt")
 
-cli.r(args: 1, argName: "float", "Child-to-parent ratio for a single error. [default=$DEFAULT_ERROR_RATE]")
+cli.r(args: 1, argName: "float", "Maximum child-to-parent ratio for a single error. [default=$DEFAULT_ERROR_RATE]")
 cli.d(args: 1, argName: "int", "Scan depth, maximum number of allowed mismatches. [default=$DEFAULT_DEPTH]")
+cli._(longOpt: "contig", "Use entire contigs for error correction. " +
+        "May not work properly for non-full-length sequencing and does not rely on parsimony principle.")
 
 // Misc
 cli.h("Display this help message")
@@ -54,20 +57,34 @@ if (parentFolder) {
     parentFolder.mkdirs()
 }
 
-def errorRate = Math.log((opt.r ?: DEFAULT_ERROR_RATE).toFloat()), depth = (opt.d ?: DEFAULT_DEPTH).toInteger()
+def errorRate = Math.log((opt.r ?: DEFAULT_ERROR_RATE).toFloat()), depth = (opt.d ?: DEFAULT_DEPTH).toInteger(),
+    contig = (boolean) opt.'contig'
 
 // Parsing required columns, here we operate on full contigs
 
-def countColIndex = -1, freqColIndex = -1, contigNtIndex = -1
+def countColIndex = -1, freqColIndex = -1, contigNtIndex = -1,
+    cdr3NtIndex = -1,
+    mutationsFr1Index = -1, mutationsCdr1Index = -1,
+    mutationsFr2Index = -1, mutationsCdr2Index = -1,
+    mutationsFr3Index = -1, mutationsFr4Index = -1
 
 def header = (String[]) null
 def parseColumns = {
     freqColIndex = header.findIndexOf { it.toLowerCase() == "freq" }
     countColIndex = header.findIndexOf { it.toLowerCase() == "count" }
     contigNtIndex = header.findIndexOf { it.toLowerCase() == "contignt" }
+    cdr3NtIndex = header.findIndexOf { it.toLowerCase() == "cdr3nt" }
+    mutationsFr1Index = header.findIndexOf { it.toLowerCase() == "mutations.fr1" }
+    mutationsCdr1Index = header.findIndexOf { it.toLowerCase() == "mutations.cdr1" }
+    mutationsFr2Index = header.findIndexOf { it.toLowerCase() == "mutations.fr2" }
+    mutationsCdr2Index = header.findIndexOf { it.toLowerCase() == "mutations.cdr2" }
+    mutationsFr3Index = header.findIndexOf { it.toLowerCase() == "mutations.fr3" }
+    mutationsFr4Index = header.findIndexOf { it.toLowerCase() == "mutations.fr4" }
 
-    if ([freqColIndex, countColIndex, contigNtIndex].any { it < 0 }) {
-        Util.error("One of the critical columns ('freq', 'count', 'contignt') is missing.", 3)
+    if ([freqColIndex, countColIndex, contigNtIndex, cdr3NtIndex].any { it < 0 }) {
+        Util.error("One or more the critical columns " +
+                "('freq', 'count', 'contignt', 'cdr3nt', 'mutations.fr1/cdr1/fr2/cdr2/fr3/fr4') " +
+                "are missing.", 3)
     }
 }
 
@@ -78,6 +95,7 @@ class ClonotypeEntry {
     String[] data
     NucleotideSequence seq
     ClonotypeEntry parent
+    Set<Mutation> mutations = new HashSet<>()
 
     void append(ClonotypeEntry other) {
         count += other.count
@@ -93,11 +111,36 @@ new File(inputFileName).splitEachLine("\t") { String[] splitLine ->
         header = splitLine
         parseColumns()
     } else {
-        def seq = new NucleotideSequence(splitLine[contigNtIndex])
-        stm.put(seq, new ClonotypeEntry(splitLine[countColIndex].toInteger(),
+        def seq = contig ? new NucleotideSequence(splitLine[contigNtIndex]) :
+                new NucleotideSequence(splitLine[cdr3NtIndex])
+        def entry = new ClonotypeEntry(splitLine[countColIndex].toInteger(),
                 splitLine[freqColIndex].toFloat(),
-                splitLine, seq))
+                splitLine, seq)
+        if (!contig) {
+            splitLine[[mutationsFr1Index, mutationsCdr1Index,
+                       mutationsFr2Index, mutationsCdr2Index,
+                       mutationsFr3Index, mutationsFr4Index]].collect { it.split(",") }.flatten().each { String it ->
+                if (it.length() > 0) {
+                    entry.mutations.add(Mutation.fromString(it))
+                }
+            }
+        }
+
+        stm.put(seq, entry)
     }
+}
+
+def countNonCdr3Mutations = { ClonotypeEntry parent, ClonotypeEntry child ->
+    if (!parent.mutations.findAll {
+        !child.mutations.contains(it) &&
+                child.data[contigNtIndex][it.pos] != "N"
+    }.empty)
+        return -1 // parsimony principle
+
+    child.mutations.findAll {
+        !parent.mutations.contains(it) &&
+                parent.data[contigNtIndex][it.pos] != "N"
+    }.size()
 }
 
 stm.values().each { child ->
@@ -107,8 +150,17 @@ stm.values().each { child ->
     def bestParent = null, parent
 
     while ((parent = iter.next())) {
+        int mutationsCount = iter.mutationsCount
+
+        if (!contig) {
+            int additionalMutations = countNonCdr3Mutations(parent, child)
+            if (additionalMutations < 0)
+                continue
+            mutationsCount += additionalMutations
+        }
+
         if (parent.count > child.count) {
-            def score = Math.log(child.count / (float) parent.count) / iter.mutationsCount
+            def score = Math.log(child.count / (float) parent.count) / mutationsCount
 
             if (score < bestParentScore) {
                 bestParent = parent

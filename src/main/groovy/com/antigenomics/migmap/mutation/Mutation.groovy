@@ -32,6 +32,29 @@ class Mutation {
     Segment parent
     SubRegion subRegion
 
+    static Mutation fromString(String signature) {
+        MutationType type = MutationType.valueOf(signature[0])
+
+        def tmp = signature.substring(1).split(":")
+
+        int pos = tmp[0].toInteger()
+        String ntFrom = "", ntTo = ""
+        switch (type){
+            case MutationType.Substitution:
+                tmp = tmp[1].split(">")
+                ntFrom = tmp[0]
+                ntTo = tmp[1]
+                break
+            case MutationType.Deletion:
+                ntFrom = tmp[1]
+                break
+            case MutationType.Insertion:
+                ntTo = tmp[1]
+                break
+        }
+        new Mutation(type, pos, -1, -1, -1, ntFrom, ntTo)
+    }
+
     Mutation(MutationType type,
              int start, int end, int startInRead, int endInRead,
              String ntFrom, String ntTo) {
