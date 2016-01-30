@@ -22,8 +22,8 @@ import com.antigenomics.migmap.io.*
 import com.antigenomics.migmap.mapping.ReadMappingDetailsProvider
 import com.antigenomics.migmap.mapping.ReadMappingFilter
 
-def ALLOWED_CHAINS = ["TRA", "TRB", "TRG", "TRG", "IGH", "IGL", "IGK"],
-    ALLOWED_SPECIES = ["human", "mouse", "rat", "rabbit", "rhesus_monkey"],
+def ALLOWED_SPECIES = [SegmentDatabase.SPECIES_ALIAS.keySet(), SegmentDatabase.SPECIES_ALIAS.values()].flatten(),
+    ALLOWED_CHAINS = ["TRA", "TRB", "TRG", "TRG", "IGH", "IGL", "IGK"],
     HOME = new File(this.class.protectionDomain.codeSource.location.path).parent.replaceAll("%20", " "),
     DEFAULT_Q = "25", ERROR_LOG = "_migmap_error.log"
 
@@ -93,7 +93,7 @@ if (opt.h || opt == null || opt.arguments().size() != 2 || !opt.R || !opt.S) {
 
 def inputFileName = opt.arguments()[0], outputFileName = opt.arguments()[1],
     reportFileName = opt.'report', unmappedFileName = opt.'unmapped',
-    customDatabaseFileName = (String)opt.'custom-database'
+    customDatabaseFileName = (String) (opt.'custom-database' ?: null)
 
 def fastaFile = ["fasta", "fa", "fasta.gz", "fa.gz"].any { inputFileName.endsWith(it) },
     stdOutput = outputFileName == "-", byRead = (boolean) opt.'by-read'

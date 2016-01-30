@@ -33,7 +33,7 @@ class SegmentDatabase {
     final int vSegments, dSegments, jSegments
     private int annotatedV = 0
 
-    static final SPECIES_ALIAS =
+    static final Map<String, String> SPECIES_ALIAS =
             ["human"        : "HomoSapiens",
              "mouse"        : "MusMusculus",
              "rat"          : "RattusNorvegicus",
@@ -46,16 +46,18 @@ class SegmentDatabase {
                     String segmentsFilePath = null) {
         this.genes.addAll(genes)
 
-        String speciesAlias = SPECIES_ALIAS[species]
+        String speciesAlias = (SPECIES_ALIAS.containsKey(species) ? SPECIES_ALIAS[species] : species).toLowerCase()
 
         boolean hasD = false
 
         int vSegments = 0, dSegments = 0, jSegments = 0
 
+        println segmentsFilePath
+
         segmentsFilePath ? new File(segmentsFilePath) : Util.getStream("segments.txt", true)
                 .splitEachLine("[\t ]+") { List<String> splitLine ->
             if (!splitLine[0].startsWith("#") &&
-                    splitLine[0].startsWith(speciesAlias) &&
+                    splitLine[0].toLowerCase().startsWith(speciesAlias) &&
                     this.genes.contains(splitLine[1])) {
 
                 def gene = splitLine[1], segmentName = splitLine[3]
@@ -81,8 +83,12 @@ class SegmentDatabase {
             }
         }
 
-        Util.report("Loaded database for $speciesAlias ${this.genes.join(",")} gene(s): " +
+        Util.report("Loaded database for $species ${this.genes.join(",")} gene(s): " +
                 "$vSegments Variable, $dSegments Diversity and $jSegments Joining segments.", 2)
+
+        if (vSegments == 0 || jSegments == 0) {
+            Util.error("Cannot continue with no V/J segments", 3)
+        }
 
         if (!hasD) {
             segments.put(Segment.DUMMY_D.name, Segment.DUMMY_D)
