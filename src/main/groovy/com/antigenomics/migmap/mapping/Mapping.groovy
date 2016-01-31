@@ -65,7 +65,7 @@ class Mapping {
             "$RegionMarkup.OUTPUT_HEADER\t" +
             "$Cdr3Markup.OUTPUT_HEADER\t" +
             "$Truncations.OUTPUT_HEADER\t" +
-            "$MutationFormatter.OUTPUT_HEADER\t" +
+            "$MutationFormatter.OUTPUT_HEADER_NT\t" +
             "rc\tcomplete\thas.cdr3\tin.frame\tno.stop"
 
 
@@ -75,7 +75,7 @@ class Mapping {
          regionMarkup.toString(),
          cdr3Markup.toString(),
          truncations.toString(),
-         MutationFormatter.toString(mutations),
+         MutationFormatter.toStringNT(mutations),
          rc, complete, hasCdr3, inFrame, noStop].join("\t")
     }
 }

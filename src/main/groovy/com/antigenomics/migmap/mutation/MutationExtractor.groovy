@@ -86,7 +86,8 @@ class MutationExtractor {
         }
 
         for (int i = 0; i < alignment.qseq.length(); i++) {
-            char q = alignment.qseq.charAt(i), s = alignment.sseq.charAt(i)
+            char q = alignment.qseq.charAt(i),
+                 s = alignment.sseq.charAt(i)
 
             if (q == Util.GAP) {
                 if (type != Deletion) {

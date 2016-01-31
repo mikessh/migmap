@@ -16,20 +16,55 @@
 
 package com.antigenomics.migmap.mutation
 
+import com.antigenomics.migmap.Util
 import groovy.transform.CompileStatic
 
 @CompileStatic
 class MutationFormatter {
-    static final String OUTPUT_HEADER = SubRegion.REGION_LIST.collect { SubRegion it -> "mutations." + it }.join("\t")
+    static
+    final String OUTPUT_HEADER_NT = SubRegion.REGION_LIST.collect { SubRegion it -> "mutations.nt." + it }.join("\t"),
+                 OUTPUT_HEADER_AA = SubRegion.REGION_LIST.collect { SubRegion it -> "mutations.aa." + it }.join("\t")
 
-    static String toString(List<Mutation> mutations) {
+    static String toStringNT(List<Mutation> mutations) {
+        // assume mutations are sorted
+
         def mutationStrings = [""] * SubRegion.REGION_LIST.length
 
         mutations.each {
             int order = it.subRegion.order
+
             if (mutationStrings[order].length() > 0)
                 mutationStrings[order] += ","
+
             mutationStrings[order] += it.toString()
+        }
+
+        mutationStrings.join("\t")
+    }
+
+    static String toStringAA(List<Mutation> mutations, String rawQuery, int vStartInRef, int vStartInQuery) {
+        String ref = Util.translateLinear('N' * vStartInRef + mutateBack(rawQuery, mutations).substring(vStartInQuery)),
+               query = Util.translateLinear('N' * vStartInRef + rawQuery.substring(vStartInQuery))
+
+        // assume mutations are sorted
+
+        def mutationStrings = [""] * SubRegion.REGION_LIST.length
+
+        mutations.each {
+            int order = it.subRegion.order
+
+            if (mutationStrings[order].length() > 0)
+                mutationStrings[order] += ","
+
+            int startInQuery = (int) ((it.startInRead - vStartInQuery + vStartInRef) / 3),
+                endInQuery = (int) ((it.endInRead - vStartInQuery + vStartInRef - 1) / 3),
+                startInRef = (int) (it.start / 3),
+                endInRef = (int) ((it.end - 1) / 3)
+
+            mutationStrings[order] += it.type.shortName + (int) (it.pos / 3) + ":" +
+                    (it.type == MutationType.Insertion ? "" : ref[startInRef..endInRef]) +
+                    (it.type == MutationType.Substitution ? ">" : "") +
+                    (it.type == MutationType.Deletion ? "" : query[startInQuery..endInQuery])
         }
 
         mutationStrings.join("\t")
@@ -54,5 +89,4 @@ class MutationFormatter {
 
         mutatedSeq.join("")
     }
-
 }

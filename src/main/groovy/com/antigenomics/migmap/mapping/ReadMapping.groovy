@@ -19,6 +19,7 @@ package com.antigenomics.migmap.mapping
 import com.antigenomics.migmap.Util
 import com.antigenomics.migmap.blast.PSegments
 import com.antigenomics.migmap.io.Read
+import com.antigenomics.migmap.mutation.MutationFormatter
 import groovy.transform.CompileStatic
 
 @CompileStatic
@@ -31,8 +32,8 @@ class ReadMapping {
     final PSegments pSegments
 
     ReadMapping(Read read, Mapping mapping, String cdr3nt, String cdr3aa,
-                byte[] mutationQual, byte[] cdrInsertQual, 
-                boolean canonical, boolean inFrame, boolean noStop, 
+                byte[] mutationQual, byte[] cdrInsertQual,
+                boolean canonical, boolean inFrame, boolean noStop,
                 PSegments pSegments) {
         this.read = read
         this.mapping = mapping
@@ -60,11 +61,16 @@ class ReadMapping {
 
     static
     final String OUTPUT_HEADER = "read.header\tcdr3nt\tcdr3aa\tcdr.insert.qual\tmutations.qual\t" +
-            "$Mapping.OUTPUT_HEADER\t$PSegments.OUTPUT_HEADER\tcanonical"
+            "$Mapping.OUTPUT_HEADER\t$MutationFormatter.OUTPUT_HEADER_AA\t$PSegments.OUTPUT_HEADER\tcanonical"
 
     @Override
     String toString() {
         [read.header, cdr3nt, cdr3aa, Util.qualToString(cdrInsertQual), Util.qualToString(mutationQual),
-         mapping.toString(), pSegments.toString(), canonical].join("\t")
+         mapping.toString(),
+         MutationFormatter.toStringAA(
+                 mapping.mutations,
+                 mapping.rc ? read.rc.seq : read.seq,
+                 mapping.vStartInRef, mapping.vStartInQuery),
+         pSegments.toString(), canonical].join("\t")
     }
 }

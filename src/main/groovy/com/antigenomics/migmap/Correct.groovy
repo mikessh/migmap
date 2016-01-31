@@ -75,16 +75,16 @@ def parseColumns = {
     countColIndex = header.findIndexOf { it.toLowerCase() == "count" }
     contigNtIndex = header.findIndexOf { it.toLowerCase() == "contignt" }
     cdr3NtIndex = header.findIndexOf { it.toLowerCase() == "cdr3nt" }
-    mutationsFr1Index = header.findIndexOf { it.toLowerCase() == "mutations.fr1" }
-    mutationsCdr1Index = header.findIndexOf { it.toLowerCase() == "mutations.cdr1" }
-    mutationsFr2Index = header.findIndexOf { it.toLowerCase() == "mutations.fr2" }
-    mutationsCdr2Index = header.findIndexOf { it.toLowerCase() == "mutations.cdr2" }
-    mutationsFr3Index = header.findIndexOf { it.toLowerCase() == "mutations.fr3" }
-    mutationsFr4Index = header.findIndexOf { it.toLowerCase() == "mutations.fr4" }
+    mutationsFr1Index = header.findIndexOf { it.toLowerCase() == "mutations.nt.fr1" }
+    mutationsCdr1Index = header.findIndexOf { it.toLowerCase() == "mutations.nt.cdr1" }
+    mutationsFr2Index = header.findIndexOf { it.toLowerCase() == "mutations.nt.fr2" }
+    mutationsCdr2Index = header.findIndexOf { it.toLowerCase() == "mutations.nt.cdr2" }
+    mutationsFr3Index = header.findIndexOf { it.toLowerCase() == "mutations.nt.fr3" }
+    mutationsFr4Index = header.findIndexOf { it.toLowerCase() == "mutations.nt.fr4" }
 
     if ([freqColIndex, countColIndex, contigNtIndex, cdr3NtIndex].any { it < 0 }) {
         Util.error("One or more the critical columns " +
-                "('freq', 'count', 'contignt', 'cdr3nt', 'mutations.fr1/cdr1/fr2/cdr2/fr3/fr4') " +
+                "('freq', 'count', 'contignt', 'cdr3nt', 'mutations.nt.fr1/cdr1/fr2/cdr2/fr3/fr4') " +
                 "are missing.", 3)
     }
 }
