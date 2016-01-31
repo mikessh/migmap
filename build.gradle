@@ -10,7 +10,7 @@ repositories {
 
 jar {
     baseName = 'migmap'
-    version = '0.9.9-SNAPSHOT'
+    version = '0.9.9'
 
     manifest {
         attributes "Main-Class": "$mainClassName"
