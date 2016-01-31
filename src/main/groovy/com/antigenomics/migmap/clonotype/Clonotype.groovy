@@ -81,6 +81,7 @@ class Clonotype implements Comparable<Clonotype> {
 
     static
     final String OUTPUT_HEADER = "freq\tcount\tv\td\tj\tcdr3nt\tcdr3aa\t" + MutationFormatter.OUTPUT_HEADER_NT +
+            "\t" + MutationFormatter.OUTPUT_HEADER_AA +
             "\tcdr.insert.qual\tmutations.qual\t" + Cdr3Markup.OUTPUT_HEADER + "\t" + Truncations.OUTPUT_HEADER +
             "\t" + PSegments.OUTPUT_HEADER +
             "\thas.cdr3\tin.frame\tno.stop\tcomplete\tcanonical"
@@ -91,6 +92,10 @@ class Clonotype implements Comparable<Clonotype> {
          vSegment.toString(), dSegment.toString(), jSegment.toString(),
          cdr3nt, cdr3aa,
          MutationFormatter.toStringNT(mutations),
+         MutationFormatter.toStringAA(
+                 representativeMapping.mapping.mutations,
+                 representativeMapping.mapping.rc ? representativeMapping.read.rc.seq : representativeMapping.read.seq,
+                 representativeMapping.mapping.vStartInRef, representativeMapping.mapping.vStartInQuery),
          Util.qualToString(cdrInsertQual), Util.qualToString(mutationQual),
          cdr3Markup, truncations, pSegments,
          hasCdr3, inFrame, noStop, complete, canonical].join("\t")
