@@ -52,8 +52,6 @@ class SegmentDatabase {
 
         int vSegments = 0, dSegments = 0, jSegments = 0
 
-        println segmentsFilePath
-
         segmentsFilePath ? new File(segmentsFilePath) : Util.getStream("segments.txt", true)
                 .splitEachLine("[\t ]+") { List<String> splitLine ->
             if (!splitLine[0].startsWith("#") &&
