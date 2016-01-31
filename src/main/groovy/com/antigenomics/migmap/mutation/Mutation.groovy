@@ -25,9 +25,6 @@ class Mutation {
     final String ntFrom, ntTo
 
     int start, end
-
-    String aaFrom, aaTo // todo
-
     final MutationType type
     Segment parent
     SubRegion subRegion

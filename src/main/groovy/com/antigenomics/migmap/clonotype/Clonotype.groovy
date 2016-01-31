@@ -23,7 +23,7 @@ import com.antigenomics.migmap.mapping.Cdr3Markup
 import com.antigenomics.migmap.mapping.ReadMapping
 import com.antigenomics.migmap.mapping.Truncations
 import com.antigenomics.migmap.mutation.Mutation
-import com.antigenomics.migmap.mutation.MutationStringifier
+import com.antigenomics.migmap.mutation.MutationFormatter
 import groovy.transform.CompileStatic
 
 @CompileStatic
@@ -80,7 +80,7 @@ class Clonotype implements Comparable<Clonotype> {
     }
 
     static
-    final String OUTPUT_HEADER = "freq\tcount\tv\td\tj\tcdr3nt\tcdr3aa\t" + MutationStringifier.OUTPUT_HEADER +
+    final String OUTPUT_HEADER = "freq\tcount\tv\td\tj\tcdr3nt\tcdr3aa\t" + MutationFormatter.OUTPUT_HEADER +
             "\tcdr.insert.qual\tmutations.qual\t" + Cdr3Markup.OUTPUT_HEADER + "\t" + Truncations.OUTPUT_HEADER +
             "\t" + PSegments.OUTPUT_HEADER +
             "\thas.cdr3\tin.frame\tno.stop\tcomplete\tcanonical"
@@ -90,7 +90,7 @@ class Clonotype implements Comparable<Clonotype> {
         [freq, count,
          vSegment.toString(), dSegment.toString(), jSegment.toString(),
          cdr3nt, cdr3aa,
-         MutationStringifier.toString(mutations),
+         MutationFormatter.toString(mutations),
          Util.qualToString(cdrInsertQual), Util.qualToString(mutationQual),
          cdr3Markup, truncations, pSegments,
          hasCdr3, inFrame, noStop, complete, canonical].join("\t")

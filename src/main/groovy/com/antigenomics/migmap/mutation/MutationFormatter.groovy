@@ -19,7 +19,7 @@ package com.antigenomics.migmap.mutation
 import groovy.transform.CompileStatic
 
 @CompileStatic
-class MutationStringifier {
+class MutationFormatter {
     static final String OUTPUT_HEADER = SubRegion.REGION_LIST.collect { SubRegion it -> "mutations." + it }.join("\t")
 
     static String toString(List<Mutation> mutations) {
@@ -34,4 +34,25 @@ class MutationStringifier {
 
         mutationStrings.join("\t")
     }
+
+    static String mutateBack(String readSeq, List<Mutation> mutations) {
+        List<String> mutatedSeq = readSeq.toCharArray().collect { it.toString() }
+
+        mutations.each {
+            switch (it.type) {
+                case MutationType.Substitution:
+                    mutatedSeq[it.startInRead] = it.ntFrom
+                    break
+                case MutationType.Deletion:
+                    mutatedSeq[it.endInRead] = it.ntFrom + mutatedSeq[it.endInRead]
+                    break
+                case MutationType.Insertion:
+                    (it.startInRead..<it.endInRead).each { mutatedSeq[it] = "" }
+                    break
+            }
+        }
+
+        mutatedSeq.join("")
+    }
+
 }

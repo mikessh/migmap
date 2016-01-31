@@ -18,7 +18,7 @@ package com.antigenomics.migmap.mapping
 
 import com.antigenomics.migmap.genomic.Segment
 import com.antigenomics.migmap.mutation.Mutation
-import com.antigenomics.migmap.mutation.MutationStringifier
+import com.antigenomics.migmap.mutation.MutationFormatter
 import groovy.transform.CompileStatic
 
 @CompileStatic
@@ -65,7 +65,7 @@ class Mapping {
             "$RegionMarkup.OUTPUT_HEADER\t" +
             "$Cdr3Markup.OUTPUT_HEADER\t" +
             "$Truncations.OUTPUT_HEADER\t" +
-            "$MutationStringifier.OUTPUT_HEADER\t" +
+            "$MutationFormatter.OUTPUT_HEADER\t" +
             "rc\tcomplete\thas.cdr3\tin.frame\tno.stop"
 
 
@@ -75,7 +75,7 @@ class Mapping {
          regionMarkup.toString(),
          cdr3Markup.toString(),
          truncations.toString(),
-         MutationStringifier.toString(mutations),
+         MutationFormatter.toString(mutations),
          rc, complete, hasCdr3, inFrame, noStop].join("\t")
     }
 }
