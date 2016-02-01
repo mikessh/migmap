@@ -1,3 +1,5 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+
 apply plugin: 'java'
 apply plugin: 'groovy'
 apply plugin: 'application'
@@ -29,5 +31,7 @@ dependencies {
 }
 
 test {
-    environment "PATH", "$System.env.PATH:/usr/local/bin/:/usr/local/ncbi/igblast/bin/"
+    if (!Os.isFamily(Os.FAMILY_WINDOWS)) {
+        environment "PATH", "$System.env.PATH:/usr/local/bin/:/usr/local/ncbi/igblast/bin/"
+    }
 }
