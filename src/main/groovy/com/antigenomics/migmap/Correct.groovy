@@ -82,7 +82,9 @@ def parseColumns = {
     mutationsFr3Index = header.findIndexOf { it.toLowerCase() == "mutations.nt.fr3" }
     mutationsFr4Index = header.findIndexOf { it.toLowerCase() == "mutations.nt.fr4" }
 
-    if ([freqColIndex, countColIndex, contigNtIndex, cdr3NtIndex].any { it < 0 }) {
+    if ([freqColIndex, countColIndex, contigNtIndex, cdr3NtIndex,
+         mutationsFr1Index, mutationsCdr1Index, mutationsFr2Index, mutationsCdr2Index,
+         mutationsFr3Index, mutationsFr4Index].any { it < 0 }) {
         Util.error("One or more the critical columns " +
                 "('freq', 'count', 'contignt', 'cdr3nt', 'mutations.nt.fr1/cdr1/fr2/cdr2/fr3/fr4') " +
                 "are missing.", 3)
@@ -90,21 +92,21 @@ def parseColumns = {
 }
 
 @Canonical
-class ClonotypeEntry {
+class CorrectorClonotypeEntry {
     int count
     float freq
     List<String> data
     NucleotideSequence seq
-    ClonotypeEntry parent
+    CorrectorClonotypeEntry parent
     Set<Mutation> mutations = new HashSet<>()
 
-    void append(ClonotypeEntry other) {
+    void append(CorrectorClonotypeEntry other) {
         count += other.count
         freq += other.freq
     }
 }
 
-def stm = new SequenceTreeMap<NucleotideSequence, List<ClonotypeEntry>>(NucleotideSequence.ALPHABET)
+def stm = new SequenceTreeMap<NucleotideSequence, List<CorrectorClonotypeEntry>>(NucleotideSequence.ALPHABET)
 def searchParams = new TreeSearchParameters(depth, depth, depth, depth)
 
 new File(inputFileName).splitEachLine("\t") { List<String> splitLine ->
@@ -115,7 +117,7 @@ new File(inputFileName).splitEachLine("\t") { List<String> splitLine ->
     } else {
         def seq = contig ? new NucleotideSequence(splitLine[contigNtIndex]) :
                 new NucleotideSequence(splitLine[cdr3NtIndex])
-        def entry = new ClonotypeEntry(splitLine[countColIndex].toInteger(),
+        def entry = new CorrectorClonotypeEntry(splitLine[countColIndex].toInteger(),
                 splitLine[freqColIndex].toFloat(),
                 splitLine, seq)
         if (!contig) {
@@ -128,16 +130,16 @@ new File(inputFileName).splitEachLine("\t") { List<String> splitLine ->
             }
         }
 
-        stm.createIfAbsent(seq, new Factory<List<ClonotypeEntry>>() {
+        stm.createIfAbsent(seq, new Factory<List<CorrectorClonotypeEntry>>() {
             @Override
-            List<ClonotypeEntry> create() {
-                new ArrayList<ClonotypeEntry>()
+            List<CorrectorClonotypeEntry> create() {
+                new ArrayList<CorrectorClonotypeEntry>()
             }
         }).add(entry)
     }
 }
 
-def countNonCdr3Mutations = { ClonotypeEntry parent, ClonotypeEntry child ->
+def countNonCdr3Mutations = { CorrectorClonotypeEntry parent, CorrectorClonotypeEntry child ->
     if (!parent.mutations.findAll {
         !child.mutations.contains(it) &&
                 child.data[contigNtIndex][it.pos] != "N"
@@ -155,7 +157,7 @@ stm.values().each { children ->
         def iter = stm.getNeighborhoodIterator(child.seq, searchParams)
         float bestParentScore = 1.0
 
-        def bestParent = (ClonotypeEntry) null, parents
+        def bestParent = (CorrectorClonotypeEntry) null, parents
 
         while ((parents = iter.next())) {
             parents.each { parent ->
@@ -185,9 +187,9 @@ stm.values().each { children ->
     }
 }
 
-def sortedEntries = stm.values().flatten().sort { ClonotypeEntry it -> -it.count }
+def sortedEntries = stm.values().flatten().sort { CorrectorClonotypeEntry it -> -it.count }
 
-sortedEntries.reverseEach { ClonotypeEntry it ->
+sortedEntries.reverseEach { CorrectorClonotypeEntry it ->
     if (it.parent != null) {
         it.parent.append(it)
     }
@@ -196,7 +198,7 @@ sortedEntries.reverseEach { ClonotypeEntry it ->
 new File(outputFileName).withPrintWriter { pw ->
     pw.println(header.join("\t"))
 
-    sortedEntries.each { ClonotypeEntry it ->
+    sortedEntries.each { CorrectorClonotypeEntry it ->
         if (it.parent == null) {
             it.data[countColIndex] = it.count.toString()
             it.data[freqColIndex] = it.freq.toString()
