@@ -185,9 +185,9 @@ stm.values().each { children ->
     }
 }
 
-def sortedEntries = stm.values().flatten().sort { -it.count }
+def sortedEntries = stm.values().flatten().sort { ClonotypeEntry it -> -it.count }
 
-sortedEntries.reverseEach {
+sortedEntries.reverseEach { ClonotypeEntry it ->
     if (it.parent != null) {
         it.parent.append(it)
     }
@@ -196,8 +196,10 @@ sortedEntries.reverseEach {
 new File(outputFileName).withPrintWriter { pw ->
     pw.println(header.join("\t"))
 
-    sortedEntries.each {
+    sortedEntries.each { ClonotypeEntry it ->
         if (it.parent == null) {
+            it.data[countColIndex] = it.count.toString()
+            it.data[freqColIndex] = it.freq.toString()
             pw.println(it.data.join("\t"))
         }
     }
