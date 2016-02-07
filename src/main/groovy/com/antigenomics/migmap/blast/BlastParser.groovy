@@ -93,7 +93,8 @@ class BlastParser {
         }
 
         def regionMarkup = new RegionMarkup(cdr1Start, cdr1End, cdr2Start, cdr2End, cdr3Start, cdr3End)
-        def hasCdr3 = cdr3Start >= 0 && (cdr3End < 0 || cdr3End - cdr3Start >= MIN_CDR3_LEN),
+        def cdr3Len = cdr3End - cdr3Start
+        def hasCdr3 = cdr3Start >= 0 && (cdr3End < 0 || cdr3Len >= MIN_CDR3_LEN),
             complete = cdr3End >= 0 && hasCdr3
 
         // - Markup of V/D/J within CDR3
@@ -104,6 +105,11 @@ class BlastParser {
             vCdr3End = vAlignment.qend - cdr3Start
             vDel = vSegment.sequence.length() - vAlignment.send
 
+            if (jSegment != Segment.DUMMY_J) {
+                jCdr3Start = jAlignment.qstart - cdr3Start
+                jDel = jAlignment.sstart
+            }
+
             if (dSegment != Segment.DUMMY_D) {
                 dCdr3Start = dAlignment.qstart - cdr3Start
                 dCdr3End = dCdr3Start + dAlignment.qLength
@@ -111,9 +117,13 @@ class BlastParser {
                 dDel3 = dSegment.sequence.length() - dAlignment.send
             }
 
-            if (jSegment != Segment.DUMMY_J) {
-                jCdr3Start = jAlignment.qstart - cdr3Start
-                jDel = jAlignment.sstart
+            if (dCdr3Start < 0 || dCdr3End >= cdr3Len) {
+                // Handle rare D out of CDR3 cases
+                dSegment = Segment.DUMMY_D
+                dCdr3Start = -1
+                dCdr3End = -1
+                dDel5 = -1
+                dDel3 = -1
             }
         } else {
             noCdr3.incrementAndGet()
@@ -166,8 +176,8 @@ class BlastParser {
             dSegmentNames = hasD ? summary[1] : BLAST_NA
 
         boolean dFound = dSegmentNames != BLAST_NA,
-            vFound = vSegmentNames != BLAST_NA,
-            jFound = jSegmentNames != BLAST_NA
+                vFound = vSegmentNames != BLAST_NA,
+                jFound = jSegmentNames != BLAST_NA
 
         if (!vFound) {
             vNotFound.incrementAndGet()
@@ -175,18 +185,18 @@ class BlastParser {
         }
 
         Segment vSegment = segmentDatabase.segments[vSegmentNames.split(",").sort()[0]],
-            dSegment = dFound ? segmentDatabase.segments[dSegmentNames.split(",").sort()[0]] : Segment.DUMMY_D,
-            jSegment = jFound ? segmentDatabase.segments[jSegmentNames.split(",").sort()[0]] : Segment.DUMMY_J
+                dSegment = dFound ? segmentDatabase.segments[dSegmentNames.split(",").sort()[0]] : Segment.DUMMY_D,
+                jSegment = jFound ? segmentDatabase.segments[jSegmentNames.split(",").sort()[0]] : Segment.DUMMY_J
 
         // - Alignments for V, D and J segments, remember here and further BLAST coordinates are 1-based
 
         Alignment vAlignment = createAlignment(groomMatch(chunk =~
                 //                                            qstart     qseq        sstart     sseq
                 /# Hit table(?:.+\n)+V\t$vSegment.regexName\t([0-9]+)\t([ATGCN-]+)\t([0-9]+)\t([ATGCN-]+)/)),
-            dAlignment = dFound ? createAlignment(groomMatch(chunk =~
-                    /# Hit table(?:.+\n)+D\t$dSegment.regexName\t([0-9]+)\t([ATGCN-]+)\t([0-9]+)\t([ATGCN-]+)/)) : null,
-            jAlignment = jFound ? createAlignment(groomMatch(chunk =~
-                    /# Hit table(?:.+\n)+J\t$jSegment.regexName\t([0-9]+)\t([ATGCN-]+)\t([0-9]+)\t([ATGCN-]+)/)) : null
+                  dAlignment = dFound ? createAlignment(groomMatch(chunk =~
+                          /# Hit table(?:.+\n)+D\t$dSegment.regexName\t([0-9]+)\t([ATGCN-]+)\t([0-9]+)\t([ATGCN-]+)/)) : null,
+                  jAlignment = jFound ? createAlignment(groomMatch(chunk =~
+                          /# Hit table(?:.+\n)+J\t$jSegment.regexName\t([0-9]+)\t([ATGCN-]+)\t([0-9]+)\t([ATGCN-]+)/)) : null
 
         // Deduce CDR/FW markup
         // - CDR1,2 and CDR3(start only) coords
