@@ -23,7 +23,7 @@ import com.antigenomics.migmap.mapping.ReadMappingDetailsProvider
 import com.antigenomics.migmap.mapping.ReadMappingFilter
 
 def ALLOWED_SPECIES = [SegmentDatabase.SPECIES_ALIAS.keySet(), SegmentDatabase.SPECIES_ALIAS.values()].flatten(),
-    ALLOWED_CHAINS = ["TRA", "TRB", "TRG", "TRG", "IGH", "IGL", "IGK"],
+    ALLOWED_CHAINS = ["TRA", "TRB", "TRG", "TRD", "IGH", "IGL", "IGK"],
     HOME = new File(this.class.protectionDomain.codeSource.location.path).parent.replaceAll("%20", " "),
     DEFAULT_Q = "25", ERROR_LOG = "_migmap_error.log"
 
