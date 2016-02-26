@@ -33,15 +33,15 @@ class DSegmentTest {
 
     @Test
     void igblastOnlyTest() {
-        def seq = "GACACGGCCGTATATTTCTGTGCGAGGGATCAGGGGCCACGAGACCACCCCAGTTCATCGTTTTGGGGCCAGGGAACCCTGGTCACCGTC"
+        def seq = "GACACGGCCGTATATTTCTGTGCGAGGGATCAGGGGCCACGAGACCACCCCAGTTCATCGAATTGGGGCCAGGGAACCCTGGTCACCGTC"
         def read = toRead(seq)
         def chunk = toChunk(read)
         def mapping = parser.parse(chunk)
         def readMapping = blastInstance.createReadMapping(mapping, read)
 
-        assert readMapping.mapping.dSegment.name == "IGHD3-3*01"
-        assert readMapping.mapping.cdr3Markup.dStart == 60 - 18
-        assert readMapping.mapping.cdr3Markup.dEnd == 66 - 18
+        assert readMapping.mapping.dSegment.name == "IGHD1-14*01"
+        assert readMapping.mapping.cdr3Markup.dStart == 25
+        assert readMapping.mapping.cdr3Markup.dEnd == 30
     }
 
     @Ignore
