@@ -17,8 +17,10 @@
 package com.antigenomics.migmap.io
 
 import com.antigenomics.migmap.Util
+import com.milaboratory.primitivio.annotations.Serializable
 import groovy.transform.CompileStatic
 
+@Serializable
 class Read {
     final String header, seq, qual
 

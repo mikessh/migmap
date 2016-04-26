@@ -16,9 +16,11 @@
 
 package com.antigenomics.migmap.mapping
 
+import com.milaboratory.primitivio.annotations.Serializable
 import groovy.transform.CompileStatic
 
 @CompileStatic
+@Serializable
 class Cdr3Markup {
     final int vEnd, dStart, dEnd, jStart   // within CDR3 coordinates, used for output
 

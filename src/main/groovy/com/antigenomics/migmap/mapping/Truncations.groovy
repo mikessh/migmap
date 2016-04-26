@@ -16,9 +16,11 @@
 
 package com.antigenomics.migmap.mapping
 
+import com.milaboratory.primitivio.annotations.Serializable
 import groovy.transform.CompileStatic
 
 @CompileStatic
+@Serializable
 class Truncations {
     final int vDel, dDel5, dDel3, jDel
 

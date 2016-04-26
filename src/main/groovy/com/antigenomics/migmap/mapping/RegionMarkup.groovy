@@ -19,9 +19,11 @@ package com.antigenomics.migmap.mapping
 import com.antigenomics.migmap.mutation.Mutation
 import com.antigenomics.migmap.mutation.MutationType
 import com.antigenomics.migmap.mutation.SubRegion
+import com.milaboratory.primitivio.annotations.Serializable
 import groovy.transform.CompileStatic
 
 @CompileStatic
+@Serializable
 class RegionMarkup {
     final static RegionMarkup DUMMY = new RegionMarkup(-1, -1, -1, -1, -1, -1)
 

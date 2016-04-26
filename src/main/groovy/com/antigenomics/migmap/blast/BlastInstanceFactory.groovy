@@ -32,8 +32,10 @@ class BlastInstanceFactory {
     BlastInstanceFactory(String dataBundlePath,
                          String species, List<String> genes,
                          boolean allAlleles, boolean useKabat,
-                         String cusomDatabaseFileName = null) {
-        this.segmentDatabase = new SegmentDatabase(dataBundlePath, species, genes, allAlleles, cusomDatabaseFileName)
+                         String cusomDatabaseFileName = null,
+                         String databaseTempPath = null) {
+        this.segmentDatabase = new SegmentDatabase(dataBundlePath, species, genes, allAlleles,
+                cusomDatabaseFileName, databaseTempPath)
         this.parser = new BlastParser(segmentDatabase)
         this.species = species
         this.genes = genes

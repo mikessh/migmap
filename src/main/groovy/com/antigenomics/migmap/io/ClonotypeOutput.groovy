@@ -28,14 +28,17 @@ class ClonotypeOutput implements InputPort<ReadMapping> {
     final ReadMappingDetailsProvider readMappingDetailsProvider
     final ClonotypeAccumulator clonotypeAccumulator
     final PlainTextOutput plainTextOutput
+    final File serializedOutput
 
     ClonotypeOutput(PlainTextOutput plainTextOutput = StdOutput.INSTANCE,
-                    ReadMappingDetailsProvider readMappingDetailsProvider = ReadMappingDetailsProvider.DUMMY) {
+                    ReadMappingDetailsProvider readMappingDetailsProvider = ReadMappingDetailsProvider.DUMMY,
+                    File serializedOutput = null) {
         this.plainTextOutput = plainTextOutput
         this.clonotypeAccumulator = new ClonotypeAccumulator()
         this.readMappingDetailsProvider = readMappingDetailsProvider
         if (plainTextOutput != StdOutput.INSTANCE)
             plainTextOutput.put(Clonotype.OUTPUT_HEADER + readMappingDetailsProvider.header)
+        this.serializedOutput = serializedOutput
     }
 
     @Override
@@ -48,12 +51,21 @@ class ClonotypeOutput implements InputPort<ReadMapping> {
         Util.report("Sorting ${clonotypeAccumulator.clonotypeMap.size()} clonotype entries, " +
                 "writing output.", 2)
 
-        clonotypeAccumulator.clonotypeMap.collect {
+        List<Clonotype> clonotypes = clonotypeAccumulator.clonotypeMap.collect {
             new Clonotype(it.key, it.value, clonotypeAccumulator.total)
-        }.sort().each {
+        }.sort()
+
+        clonotypes.each {
             plainTextOutput.put(it.toString() + readMappingDetailsProvider.getDetailsString(it.representativeMapping))
         }
+
         plainTextOutput.close()
+
+        if (serializedOutput) {
+            def out = new ObjectOutputStream(new FileOutputStream(serializedOutput))
+            out.writeObject(clonotypes)
+            out.close()
+        }
 
         Util.report("Finished.", 2)
     }

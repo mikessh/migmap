@@ -16,9 +16,11 @@
 
 package com.antigenomics.migmap.blast
 
+import com.milaboratory.primitivio.annotations.Serializable
 import groovy.transform.CompileStatic
 
 @CompileStatic
+@Serializable
 class PSegments {
     final int pSegmentV, pSegmentJ, pSegmentD5, pSegmentD3
 

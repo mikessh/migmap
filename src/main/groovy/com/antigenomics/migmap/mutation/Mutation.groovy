@@ -17,9 +17,11 @@
 package com.antigenomics.migmap.mutation
 
 import com.antigenomics.migmap.genomic.Segment
+import com.milaboratory.primitivio.annotations.Serializable
 import groovy.transform.CompileStatic
 
 @CompileStatic
+@Serializable
 class Mutation {
     final int startInRead, endInRead
     final String ntFrom, ntTo

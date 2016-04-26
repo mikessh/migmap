@@ -20,9 +20,11 @@ import com.antigenomics.migmap.Util
 import com.antigenomics.migmap.blast.PSegments
 import com.antigenomics.migmap.io.Read
 import com.antigenomics.migmap.mutation.MutationFormatter
+import com.milaboratory.primitivio.annotations.Serializable
 import groovy.transform.CompileStatic
 
 @CompileStatic
+@Serializable
 class ReadMapping {
     final Read read
     final Mapping mapping

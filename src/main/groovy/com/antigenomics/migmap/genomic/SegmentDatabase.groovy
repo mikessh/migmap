@@ -21,9 +21,11 @@ import com.antigenomics.migmap.Util
 import com.antigenomics.migmap.blast.BlastInstanceFactory
 import com.antigenomics.migmap.io.Read
 import com.antigenomics.migmap.mapping.RegionMarkup
+import com.milaboratory.primitivio.annotations.Serializable
 import groovy.transform.CompileStatic
 
 @CompileStatic
+@Serializable
 class SegmentDatabase {
     private static final List<SegmentDatabase> DB_CACHE = new LinkedList<>()
     final String databaseTempPath
@@ -43,7 +45,8 @@ class SegmentDatabase {
     SegmentDatabase(String dataBundlePath,
                     String species, List<String> genes,
                     boolean allAlleles = true,
-                    String segmentsFilePath = null) {
+                    String segmentsFilePath = null,
+                    String databaseTempPath = null) {
         this.genes.addAll(genes)
 
         String speciesAlias = (SPECIES_ALIAS.containsKey(species) ? SPECIES_ALIAS[species] : species).toLowerCase()
@@ -93,7 +96,7 @@ class SegmentDatabase {
         }
 
         this.hasD = hasD
-        this.databaseTempPath = dataBundlePath + "/database-" + UUID.randomUUID().toString()
+        this.databaseTempPath = databaseTempPath ?: dataBundlePath + "/database-" + UUID.randomUUID().toString()
         this.vSegments = vSegments
         this.dSegments = dSegments
         this.jSegments = jSegments
