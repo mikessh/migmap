@@ -29,9 +29,23 @@ import java.util.concurrent.atomic.AtomicInteger
 
 class PipelineTest {
     private final BlastInstanceFactory factory = new BlastInstanceFactory("data/", "human", ["IGH"], true, false)
+    private final Pipeline pipeline1
+    private final ClonotypeOutput clonotypeOutput1
 
     PipelineTest() {
         factory.annotateV()
+
+        def reader = new FastqReader("sample.fastq.gz", true)
+        def filter = new ReadMappingFilter()
+        clonotypeOutput1 = new ClonotypeOutput(new PlainTextOutput(NullOutputStream.INSTANCE))
+        pipeline1 = new Pipeline(reader, factory,
+                new InputPortMerge(
+                        new ReadMappingOutput(new PlainTextOutput(NullOutputStream.INSTANCE),
+                                new ReadMappingDetailsProvider()),
+                        clonotypeOutput1),
+                filter)
+
+        pipeline1.run()
     }
 
     private static class NullOutputStream extends OutputStream {
@@ -44,23 +58,27 @@ class PipelineTest {
 
     @Test
     void sampleTest() {
-        def reader = new FastqReader("sample.fastq.gz", true)
-        def filter = new ReadMappingFilter()
+        assert pipeline1.inputCount == 1000
+        assert pipeline1.readMappingFilter.mappedRatio >= 0.95
+        assert pipeline1.readMappingFilter.noCdr3Ratio <= 0.1
+        assert pipeline1.readMappingFilter.incompleteRatio <= 0.1
+        assert pipeline1.readMappingFilter.nonCanonicalRatio <= 0.1
+    }
 
-        def pipeline = new Pipeline(reader, factory,
-                new InputPortMerge(
-                        new ReadMappingOutput(new PlainTextOutput(NullOutputStream.INSTANCE),
-                                new ReadMappingDetailsProvider()),
-                        new ClonotypeOutput(new PlainTextOutput(NullOutputStream.INSTANCE))),
-                filter)
+    @Test
+    void serializationTest() {
+        def bos = new ByteArrayOutputStream()
 
-        pipeline.run()
+        def clonotypes = clonotypeOutput1.clonotypeAccumulator.clonotypes
 
-        assert pipeline.inputCount == 1000
-        assert pipeline.readMappingFilter.mappedRatio >= 0.95
-        assert pipeline.readMappingFilter.noCdr3Ratio <= 0.1
-        assert pipeline.readMappingFilter.incompleteRatio <= 0.1
-        assert pipeline.readMappingFilter.nonCanonicalRatio <= 0.1
+        ClonotypeSerializer.save(clonotypes, bos)
+
+        def bis = new ByteArrayInputStream(bos.toByteArray())
+
+        def loadedClonotypes = ClonotypeSerializer.load(bis)
+
+        assert !loadedClonotypes.empty
+        assert clonotypes.size() == loadedClonotypes.size()
     }
 
     @Test

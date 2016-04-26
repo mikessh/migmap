@@ -61,7 +61,7 @@ class MutationFormatter {
                 startInRef = (int) (it.start / 3),
                 endInRef = (int) ((it.end - 1) / 3)
 
-            mutationStrings[order] += it.type.shortName + (int) (it.pos / 3) + ":" +
+            mutationStrings[order] += it.type.shortName + ((int) (it.pos / 3)).toString() + ":" +
                     (it.type == MutationType.Insertion ? "" : ref[startInRef..endInRef]) +
                     (it.type == MutationType.Substitution ? ">" : "") +
                     (it.type == MutationType.Deletion ? "" : query[startInQuery..endInQuery])
@@ -73,16 +73,16 @@ class MutationFormatter {
     static String mutateBack(String readSeq, List<Mutation> mutations) {
         List<String> mutatedSeq = readSeq.toCharArray().collect { it.toString() }
 
-        mutations.each {
-            switch (it.type) {
+        mutations.each { mut ->
+            switch (mut.type) {
                 case MutationType.Substitution:
-                    mutatedSeq[it.startInRead] = it.ntFrom
+                    mutatedSeq[mut.startInRead] = mut.ntFrom
                     break
                 case MutationType.Deletion:
-                    mutatedSeq[it.endInRead] = it.ntFrom + mutatedSeq[it.endInRead]
+                    mutatedSeq[mut.endInRead] = mut.ntFrom + mutatedSeq[mut.endInRead]
                     break
                 case MutationType.Insertion:
-                    (it.startInRead..<it.endInRead).each { mutatedSeq[it] = "" }
+                    (mut.startInRead..<mut.endInRead).each { int it -> mutatedSeq[it] = "" }
                     break
             }
         }

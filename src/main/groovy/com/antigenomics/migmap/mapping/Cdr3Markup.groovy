@@ -16,12 +16,10 @@
 
 package com.antigenomics.migmap.mapping
 
-import com.milaboratory.primitivio.annotations.Serializable
 import groovy.transform.CompileStatic
 
 @CompileStatic
-@Serializable
-class Cdr3Markup {
+class Cdr3Markup implements Serializable {
     final int vEnd, dStart, dEnd, jStart   // within CDR3 coordinates, used for output
 
     Cdr3Markup(int vEnd, int dStart, int dEnd, int jStart) {

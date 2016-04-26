@@ -31,6 +31,8 @@ dependencies {
 }
 
 test {
+    jvmArgs "-Xmx4G"
+
     if (!Os.isFamily(Os.FAMILY_WINDOWS)) {
         environment "PATH", "$System.env.PATH:/usr/local/bin/:/usr/local/ncbi/igblast/bin/"
     }

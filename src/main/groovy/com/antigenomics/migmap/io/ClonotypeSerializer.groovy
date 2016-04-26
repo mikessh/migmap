@@ -14,25 +14,18 @@
  * limitations under the License.
  */
 
-package com.antigenomics.migmap.blast
+package com.antigenomics.migmap.io
 
-import groovy.transform.CompileStatic
+import com.antigenomics.migmap.clonotype.Clonotype
 
-@CompileStatic
-class PSegments implements Serializable {
-    final int pSegmentV, pSegmentJ, pSegmentD5, pSegmentD3
-
-    PSegments(int pSegmentV, int pSegmentD5, int pSegmentD3, int pSegmentJ) {
-        this.pSegmentV = pSegmentV
-        this.pSegmentD5 = pSegmentD5
-        this.pSegmentD3 = pSegmentD3
-        this.pSegmentJ = pSegmentJ
+class ClonotypeSerializer {
+    static void save(List<Clonotype> clonotypes, OutputStream outputStream) {
+        def out = new ObjectOutputStream(outputStream)
+        out.writeObject(clonotypes)
+        out.close()
     }
 
-    static final String OUTPUT_HEADER = "pol.v\tpol.d.5\tpol.d.3\tpol.j"
-
-    @Override
-    String toString() {
-        [pSegmentV, pSegmentD5, pSegmentD3, pSegmentJ].join("\t")
+    static List<Clonotype> load(InputStream inputStream) {
+        new ObjectInputStream(inputStream).readObject() as List<Clonotype>
     }
 }

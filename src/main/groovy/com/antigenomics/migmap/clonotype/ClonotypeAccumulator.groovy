@@ -41,6 +41,10 @@ class ClonotypeAccumulator implements InputPort<ReadMapping> {
         }
     }
 
+    List<Clonotype> getClonotypes() {
+        clonotypeMap.collect { new Clonotype(it.key, it.value, total) }.sort()
+    }
+
     @Override
     void close() {
 

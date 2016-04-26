@@ -21,12 +21,10 @@ import com.antigenomics.migmap.Util
 import com.antigenomics.migmap.blast.BlastInstanceFactory
 import com.antigenomics.migmap.io.Read
 import com.antigenomics.migmap.mapping.RegionMarkup
-import com.milaboratory.primitivio.annotations.Serializable
 import groovy.transform.CompileStatic
 
 @CompileStatic
-@Serializable
-class SegmentDatabase {
+class SegmentDatabase implements Serializable {
     private static final List<SegmentDatabase> DB_CACHE = new LinkedList<>()
     final String databaseTempPath
     final Set<String> genes = new HashSet<>()

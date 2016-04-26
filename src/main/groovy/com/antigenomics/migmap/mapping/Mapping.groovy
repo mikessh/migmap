@@ -22,7 +22,7 @@ import com.antigenomics.migmap.mutation.MutationFormatter
 import groovy.transform.CompileStatic
 
 @CompileStatic
-class Mapping {
+class Mapping implements Serializable {
     final Segment vSegment, jSegment, dSegment
     final RegionMarkup regionMarkup
     final Cdr3Markup cdr3Markup

@@ -18,12 +18,10 @@ package com.antigenomics.migmap.genomic
 
 import com.antigenomics.migmap.Util
 import com.antigenomics.migmap.mapping.RegionMarkup
-import com.milaboratory.primitivio.annotations.Serializable
 import groovy.transform.CompileStatic
 
 @CompileStatic
-@Serializable
-class Segment implements Comparable<Segment> {
+class Segment implements Comparable<Segment>, Serializable {
     static
     final Segment DUMMY_J = new Segment(null, SegmentType.J, "DUMMY", Util.MY_NA, "AAAAAAAAAAAAAAAAAAAAAAAAA", -1),
                   DUMMY_D = new Segment(null, SegmentType.D, "DUMMY", Util.MY_NA, "AAAAAAAAAAAAAAAAAAAAAAAAA", -1)

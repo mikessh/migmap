@@ -20,12 +20,10 @@ import com.antigenomics.migmap.Util
 import com.antigenomics.migmap.blast.PSegments
 import com.antigenomics.migmap.io.Read
 import com.antigenomics.migmap.mutation.MutationFormatter
-import com.milaboratory.primitivio.annotations.Serializable
 import groovy.transform.CompileStatic
 
 @CompileStatic
-@Serializable
-class ReadMapping {
+class ReadMapping implements Serializable{
     final Read read
     final Mapping mapping
     final String cdr3nt, cdr3aa
