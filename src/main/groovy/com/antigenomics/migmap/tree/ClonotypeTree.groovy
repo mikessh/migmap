@@ -65,10 +65,11 @@ class ClonotypeTree {
                 def otherRepresentativeClone = nextClonotypeList.first()
                 def otherCdr3Nt = new NucleotideSequence(otherRepresentativeClone.cdr3nt)
 
-                if (!cdr3MatchWithoutGermlineNet.containsKey(otherCdr3Nt)) {
+                if (!cdr3MatchWithoutGermlineNet.containsKey(otherCdr3Nt) && !it.key.equals(otherCdr3Nt)) {
                     def alignment = niter.currentAlignment
 
-                    if (cdr3MatchWithoutGermlineMutations(it.value, otherRepresentativeClone, alignment)) {
+                    if (cdr3MatchWithoutGermlineMutations(it.value, otherRepresentativeClone,
+                            otherCdr3Nt, alignment)) {
                         cNode.children.add(otherCdr3Nt)
                     }
                 }
@@ -100,6 +101,7 @@ class ClonotypeTree {
 
         CNode(HashMap<NucleotideSequence, CNode> net, NucleotideSequence tag) {
             this.net = net
+            this.tag = tag
         }
 
         void assignParent(NucleotideSequence parent) {
@@ -110,25 +112,23 @@ class ClonotypeTree {
         }
     }
 
-
-
-    Map<NucleotideSequence, List<Clonotype>> groupByCdr3(List<Clonotype> clonotypes) {
-        def cdr3ClonotypeMap = new HashMap<NucleotideSequence, List<Clonotype>>()
-        clonotypes.each {
-            cdr3ClonotypeMap.putIfAbsent(new NucleotideSequence(it.cdr3nt), new ArrayList<Clonotype>())<< it
-        }
-        cdr3ClonotypeMap
-    }
-
-    void collapseGermlineMutationsInCdr3() {
-        def iter1 = cTree.nodeIterator(), iter2 = cTree.nodeIterator()
+    boolean inGermline(int position, Clonotype clonotype) {
+        clonotype.cdr3Markup.vEnd >= position || clonotype.cdr3Markup.jStart <= position ||
+                (clonotype.cdr3Markup.dEnd >= position && clonotype.cdr3Markup.dStart <= position)
     }
 
     boolean cdr3MatchWithoutGermlineMutations(Clonotype clonotype1, Clonotype clonotype2,
+            NucleotideSequence cdr3nt2,
                                               Alignment<NucleotideSequence> aln) {
-        if (aln.absoluteMutations.empty)
-            return false
+        def mut12 = aln.absoluteMutations, mut21 = aln.invert(cdr3nt2).absoluteMutations
 
-
+        // in germline in at least one of sequences
+        
+        for (int i = 0; i < mut12.size(); i++) {
+            if (!inGermline(mut12.getPositionByIndex(i), clonotype1) &&
+                    !inGermline(mut21.getPositionByIndex(i), clonotype2))
+                return false
+        }
+        true
     }
 }
