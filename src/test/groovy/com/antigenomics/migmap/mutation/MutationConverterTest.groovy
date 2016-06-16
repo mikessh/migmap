@@ -42,7 +42,7 @@ class MutationConverterTest {
 
         MutationConverter.annotateMutationAa(mutations, query, 0, 0)
 
-        assert MutationFormatter.toStringAA(mutations).split("\t") ==
+        assert MutationFormatter.toStringAA2(mutations).split("\t") ==
                 ['S1:V>L,S2:Q>E,S3:L>L,S4:V>V,S10:V>E',
                  'S26:Y>S,S27:T>T,S29:T>S,S31:Y>H,S32:Y>F',
                  'S48:G>G',
@@ -65,7 +65,7 @@ class MutationConverterTest {
 
         MutationConverter.annotateMutationAa(mutations, query, alignment.sstart, alignment.qstart)
 
-        assert MutationFormatter.toStringAA(mutations).split("\t") ==
+        assert MutationFormatter.toStringAA2(mutations).split("\t") ==
                 ['S1:V>L,S2:Q>E,S3:L>L,S4:V>V,S10:V>E',
                  'S26:Y>S,S27:T>T,S29:T>S,S31:Y>H,S32:Y>F',
                  'S48:G>G',
@@ -88,7 +88,7 @@ class MutationConverterTest {
 
         MutationConverter.annotateMutationAa(mutations, query, alignment.sstart, alignment.qstart)
 
-        assert MutationFormatter.toStringAA(mutations).split("\t") ==
+        assert MutationFormatter.toStringAA2(mutations).split("\t") ==
                 ['S1:V>L,S2:Q>E,S3:L>L,S4:V>V,S10:V>E',
                  'S26:Y>S,S27:T>T,S29:T>S,S31:Y>H,S32:Y>F',
                  'S48:G>G',
