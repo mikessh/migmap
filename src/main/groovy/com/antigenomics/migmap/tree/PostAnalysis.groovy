@@ -3,8 +3,6 @@ package com.antigenomics.migmap.tree
 import com.antigenomics.migmap.clonotype.Clonotype
 import com.antigenomics.migmap.mutation.Mutation
 
-import java.util.function.Function
-
 class PostAnalysis {
     final List<Clonotype> sample
 
@@ -17,12 +15,8 @@ class PostAnalysis {
 
         sample.each { Clonotype clonotype ->
             clonotype.mutations.each { Mutation mutation ->
-                def counter = mutationMap.computeIfAbsent(mutation, new Function<Mutation, Counter>() {
-                    @Override
-                    Counter apply(Mutation m) {
-                        new Counter()
-                    }
-                })
+                Counter counter
+                mutationMap.put(mutation, counter = (mutationMap[mutation] ?: new Counter()))
                 counter.update(clonotype)
             }
         }
