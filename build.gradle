@@ -30,6 +30,13 @@ dependencies {
     compile 'com.milaboratory:milib:1.2'
 }
 
+sourceSets {
+    test {
+        compileClasspath = files(main.output.resourcesDir, main.output.classesDir, configurations.testCompile)
+        runtimeClasspath = files(test.output.resourcesDir, test.output.classesDir, main.output.resourcesDir, main.output.classesDir, configurations.testRuntime)
+    }
+}
+
 test {
     jvmArgs "-Xmx4G"
 
@@ -37,15 +44,3 @@ test {
         environment "PATH", "$System.env.PATH:/usr/local/bin/:/usr/local/ncbi/igblast/bin/"
     }
 }
-
-
-task copyTestResources(type: Copy) {
-    from "${projectDir}/src/main/resources"
-    into "${buildDir}/classes/test"
-}
-processTestResources.dependsOn copyTestResources
-task copyTestResources2(type: Copy) {
-    from "${projectDir}/src/test/resources"
-    into "${buildDir}/classes/test"
-}
-processTestResources.dependsOn copyTestResources2
