@@ -42,6 +42,24 @@ class MutationFormatter {
         mutationStrings.join("\t")
     }
 
+    static String toStringAA2(List<Mutation> mutations) {
+        if (mutations.any { it.aaFrom == null })
+            return ""
+
+        def mutationStrings = [""] * SubRegion.REGION_LIST.length
+
+        mutations.each {
+            int order = it.subRegion.order
+
+            if (mutationStrings[order].length() > 0)
+                mutationStrings[order] += ","
+
+            mutationStrings[order] += it.toStringAa()
+        }
+
+        mutationStrings.join("\t")
+    }
+
     static String toStringAA(List<Mutation> mutations, String rawQuery, int vStartInRef, int vStartInQuery) {
         String ref = Util.translateLinear('N' * vStartInRef + mutateBack(rawQuery, mutations).substring(vStartInQuery)),
                query = Util.translateLinear('N' * vStartInRef + rawQuery.substring(vStartInQuery))
