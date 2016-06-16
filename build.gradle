@@ -31,9 +31,11 @@ dependencies {
 }
 
 sourceSets {
+    main {
+        output.resourcesDir = "build/classes/main"
+    }
     test {
-        compileClasspath = files(main.output.resourcesDir, main.output.classesDir, configurations.testCompile)
-        runtimeClasspath = files(test.output.resourcesDir, test.output.classesDir, main.output.resourcesDir, main.output.classesDir, configurations.testRuntime)
+        output.resourcesDir = "build/classes/test"
     }
 }
 
