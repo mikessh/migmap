@@ -23,6 +23,8 @@ import groovy.transform.CompileStatic
 class Mutation implements Serializable {
     final int startInRead, endInRead
     final String ntFrom, ntTo
+    String aaFrom, aaTo
+    int aaPos
 
     int start, end
     final MutationType type
@@ -79,6 +81,14 @@ class Mutation implements Serializable {
                 (type == MutationType.Insertion ? "" : ntFrom) +
                 (type == MutationType.Substitution ? ">" : "") +
                 (type == MutationType.Deletion ? "" : ntTo)
+    }
+
+    public String toStringAa() {
+        // insertion occur before "position", so that seq[position, ...] is shifted forward
+        type.shortName + aaPos + ":" +
+                (type == MutationType.Insertion ? "" : aaFrom) +
+                (type == MutationType.Substitution ? ">" : "") +
+                (type == MutationType.Deletion ? "" : aaTo)
     }
 
     boolean equals(o) {
