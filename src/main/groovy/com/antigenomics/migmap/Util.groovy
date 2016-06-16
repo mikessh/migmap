@@ -87,6 +87,7 @@ class Util {
 
     @CompileStatic
     static InputStream getStream(String fname, boolean resource) {
+        println Util.class.classLoader.getResources("").collect()
         resource ? Util.class.classLoader.getResourceAsStream(fname) : new FileInputStream(fname)
     }
 
