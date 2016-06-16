@@ -43,8 +43,9 @@ task copyTestResources(type: Copy) {
     from "${projectDir}/src/main/resources"
     into "${buildDir}/classes/test"
 }
+processTestResources.dependsOn copyTestResources
 task copyTestResources2(type: Copy) {
     from "${projectDir}/src/test/resources"
     into "${buildDir}/classes/test"
 }
-processTestResources.dependsOn copyTestResources copyTestResources2
+processTestResources.dependsOn copyTestResources2
