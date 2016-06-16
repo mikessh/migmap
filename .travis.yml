@@ -6,4 +6,4 @@ before_install:
   - wget https://github.com/mikessh/igblast-bin/raw/master/binaries/linux-x64/makeblastdb
 
 install:
-  - gradle clean build
+  - gradle clean test
