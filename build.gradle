@@ -1,5 +1,3 @@
-import org.apache.tools.ant.taskdefs.condition.Os
-
 apply plugin: 'java'
 apply plugin: 'groovy'
 apply plugin: 'application'
@@ -23,13 +21,6 @@ jar {
     }
 }
 
-dependencies {
-    compile 'org.codehaus.groovy:groovy-all:2.4.4'
-    compile 'junit:junit:4.12'
-    compile 'commons-cli:commons-cli:1.2'
-    compile 'com.milaboratory:milib:1.2'
-}
-
 sourceSets {
     test {
         resources {
@@ -38,10 +29,14 @@ sourceSets {
     }
 }
 
+dependencies {
+    compile 'org.codehaus.groovy:groovy-all:2.4.4'
+    compile 'junit:junit:4.12'
+    compile 'commons-cli:commons-cli:1.2'
+    compile 'com.milaboratory:milib:1.2'
+}
+
+
 test {
     jvmArgs "-Xmx4G"
-
-    if (!Os.isFamily(Os.FAMILY_WINDOWS)) {
-        environment "PATH", "$System.env.PATH:/usr/local/bin/:/usr/local/ncbi/igblast/bin/"
-    }
 }
