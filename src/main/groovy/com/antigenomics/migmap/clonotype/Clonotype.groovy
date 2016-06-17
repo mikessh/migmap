@@ -23,6 +23,7 @@ import com.antigenomics.migmap.mapping.Cdr3Markup
 import com.antigenomics.migmap.mapping.ReadMapping
 import com.antigenomics.migmap.mapping.Truncations
 import com.antigenomics.migmap.mutation.Mutation
+import com.antigenomics.migmap.mutation.MutationConverter
 import com.antigenomics.migmap.mutation.MutationFormatter
 import groovy.transform.CompileStatic
 
@@ -72,6 +73,8 @@ class Clonotype implements Comparable<Clonotype>, Serializable {
         this.inFrame = representativeMapping.inFrame
         this.noStop = representativeMapping.noStop
         this.canonical = representativeMapping.canonical
+
+        MutationConverter.annotateMutationAa(this)
     }
 
     @Override
@@ -92,10 +95,7 @@ class Clonotype implements Comparable<Clonotype>, Serializable {
          vSegment.toString(), dSegment.toString(), jSegment.toString(),
          cdr3nt, cdr3aa,
          MutationFormatter.toStringNT(mutations),
-         MutationFormatter.toStringAA(
-                 representativeMapping.mapping.mutations,
-                 representativeMapping.mapping.rc ? representativeMapping.read.rc.seq : representativeMapping.read.seq,
-                 representativeMapping.mapping.vStartInRef, representativeMapping.mapping.vStartInQuery),
+         MutationFormatter.toStringAA(mutations),
          Util.qualToString(cdrInsertQual), Util.qualToString(mutationQual),
          cdr3Markup, truncations, pSegments,
          hasCdr3, inFrame, noStop, complete, canonical].join("\t")

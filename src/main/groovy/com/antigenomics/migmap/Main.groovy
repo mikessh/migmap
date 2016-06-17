@@ -183,7 +183,7 @@ def inputPort = fastaFile ? new FastaReader(inputFileName) : new FastqReader(inp
 def outputPort = stdOutput ? StdOutput.INSTANCE : new FileOutput(outputFileName)
 def detailsProvider = new ReadMappingDetailsProvider(details)
 outputPort = byRead ? new ReadMappingOutput(outputPort, detailsProvider) : new ClonotypeOutput(outputPort, detailsProvider)
-def blastInstanceFactory = new BlastInstanceFactory(dataDir, species, genes, allAlleles, useKabat, customDatabaseFileName)
+def blastInstanceFactory = new BlastInstanceFactory(dataDir, species, genes, allAlleles, useKabat, customDatabaseFileName, null, byRead)
 
 if (!details.empty) {
     blastInstanceFactory.annotateV()

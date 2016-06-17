@@ -24,6 +24,7 @@ import com.antigenomics.migmap.io.Read
 import com.antigenomics.migmap.mapping.Mapping
 import com.antigenomics.migmap.mapping.ReadMapping
 import com.antigenomics.migmap.mutation.Mutation
+import com.antigenomics.migmap.mutation.MutationConverter
 import com.antigenomics.migmap.mutation.MutationType
 import groovy.transform.CompileStatic
 
@@ -36,15 +37,18 @@ class BlastInstance implements OutputPort<ReadMapping>, InputPort<Read> {
     final PrintWriter writer
     final BlastParser parser
     private final DSearcherBundle auxDSearcher
+    final boolean byRead
 
     protected boolean last = false
 
-    protected BlastInstance(Process proc, BlastParser parser, SegmentDatabase segmentDatabase) {
+    protected BlastInstance(Process proc, BlastParser parser, SegmentDatabase segmentDatabase,
+                            boolean byRead) {
         this.proc = proc
         this.reader = proc.in.newReader()
         this.writer = proc.out.newPrintWriter()
         this.parser = parser
         this.auxDSearcher = new DSearcherBundle(segmentDatabase)
+        this.byRead = byRead
     }
 
     static String getHeader(String chunk) {
@@ -183,11 +187,18 @@ class BlastInstance implements OutputPort<ReadMapping>, InputPort<Read> {
             pSegments = null
         }
 
-        return new ReadMapping(read, mapping,
+        ReadMapping readMapping = new ReadMapping(read, mapping,
                 cdr3nt, cdr3aa,
                 mutationQual, cdrInsertQual,
                 canonical, inFrame, noStop,
                 pSegments)
+
+
+        if(byRead) {
+            MutationConverter.annotateMutationAa(readMapping)
+        }
+
+        readMapping
     }
 
     @Override
@@ -214,7 +225,7 @@ class BlastInstance implements OutputPort<ReadMapping>, InputPort<Read> {
 
         int goodBases = seq.length() - seq.replaceAll(AMBIGUOUS_BASE, "").length()
 
-        if (goodBases / (double) seq.length() >= 0.7) {
+        if ((goodBases / (double) seq.length()) >= 0.7) {
             return false
         }
 

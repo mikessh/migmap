@@ -17,5 +17,5 @@
 package com.antigenomics.migmap.genomic
 
 enum SegmentType {
-    V, D, J
+    V, D, J, NDN
 }

@@ -67,10 +67,7 @@ class ReadMapping implements Serializable{
     String toString() {
         [read.header, cdr3nt, cdr3aa, Util.qualToString(cdrInsertQual), Util.qualToString(mutationQual),
          mapping.toString(),
-         MutationFormatter.toStringAA(
-                 mapping.mutations,
-                 mapping.rc ? read.rc.seq : read.seq,
-                 mapping.vStartInRef, mapping.vStartInQuery),
+         MutationFormatter.toStringAA(mapping.mutations),
          pSegments.toString(), canonical].join("\t")
     }
 }

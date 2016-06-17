@@ -1,7 +1,7 @@
 package com.antigenomics.migmap.tree
 
-/**
- * Created by mikesh on 6/14/2016.
- */
+import com.antigenomics.migmap.clonotype.Clonotype
+
 class Cdr3Germline {
+    final Clonotype representative
 }

@@ -27,20 +27,22 @@ class BlastInstanceFactory {
     final String species
     final List<String> genes
     final SegmentDatabase segmentDatabase
-    final boolean allAlleles, useKabat
+    final boolean allAlleles, useKabat, byRead
 
     BlastInstanceFactory(String dataBundlePath,
                          String species, List<String> genes,
                          boolean allAlleles, boolean useKabat,
-                         String cusomDatabaseFileName = null,
-                         String databaseTempPath = null) {
+                         String customDatabaseFileName = null,
+                         String databaseTempPath = null,
+                         boolean byRead = true) {
         this.segmentDatabase = new SegmentDatabase(dataBundlePath, species, genes, allAlleles,
-                cusomDatabaseFileName, databaseTempPath)
+                customDatabaseFileName, databaseTempPath)
         this.parser = new BlastParser(segmentDatabase)
         this.species = species
         this.genes = genes
         this.allAlleles = allAlleles
         this.useKabat = useKabat
+        this.byRead = byRead
 
         def seqtype = genes[0].startsWith("TR") ? "TCR" : "Ig"
 
@@ -79,6 +81,6 @@ class BlastInstanceFactory {
     }
 
     BlastInstance create() {
-        new BlastInstance(cmdLine.execute(env, dir), parser, segmentDatabase)
+        new BlastInstance(cmdLine.execute(env, dir), parser, segmentDatabase, byRead)
     }
 }

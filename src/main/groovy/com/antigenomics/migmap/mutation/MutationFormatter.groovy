@@ -17,6 +17,7 @@
 package com.antigenomics.migmap.mutation
 
 import com.antigenomics.migmap.Util
+import com.antigenomics.migmap.clonotype.Clonotype
 import groovy.transform.CompileStatic
 
 @CompileStatic
@@ -42,7 +43,7 @@ class MutationFormatter {
         mutationStrings.join("\t")
     }
 
-    static String toStringAA2(List<Mutation> mutations) {
+    static String toStringAA(List<Mutation> mutations) {
         if (mutations.any { it.aaFrom == null })
             return ""
 
@@ -58,53 +59,5 @@ class MutationFormatter {
         }
 
         mutationStrings.join("\t")
-    }
-
-    static String toStringAA(List<Mutation> mutations, String rawQuery, int vStartInRef, int vStartInQuery) {
-        String ref = Util.translateLinear('N' * vStartInRef + mutateBack(rawQuery, mutations).substring(vStartInQuery)),
-               query = Util.translateLinear('N' * vStartInRef + rawQuery.substring(vStartInQuery))
-
-        // assume mutations are sorted
-
-        def mutationStrings = [""] * SubRegion.REGION_LIST.length
-
-        mutations.each {
-            int order = it.subRegion.order
-
-            if (mutationStrings[order].length() > 0)
-                mutationStrings[order] += ","
-
-            int startInQuery = (int) ((it.startInRead - vStartInQuery + vStartInRef) / 3),
-                endInQuery = (int) ((it.endInRead - vStartInQuery + vStartInRef - 1) / 3),
-                startInRef = (int) (it.start / 3),
-                endInRef = (int) ((it.end - 1) / 3)
-
-            mutationStrings[order] += it.type.shortName + ((int) (it.pos / 3)).toString() + ":" +
-                    (it.type == MutationType.Insertion ? "" : ref[startInRef..endInRef]) +
-                    (it.type == MutationType.Substitution ? ">" : "") +
-                    (it.type == MutationType.Deletion ? "" : query[startInQuery..endInQuery])
-        }
-
-        mutationStrings.join("\t")
-    }
-
-    static String mutateBack(String readSeq, List<Mutation> mutations) {
-        List<String> mutatedSeq = readSeq.toCharArray().collect { it.toString() }
-
-        mutations.each { mut ->
-            switch (mut.type) {
-                case MutationType.Substitution:
-                    mutatedSeq[mut.startInRead] = mut.ntFrom
-                    break
-                case MutationType.Deletion:
-                    mutatedSeq[mut.endInRead] = mut.ntFrom + mutatedSeq[mut.endInRead]
-                    break
-                case MutationType.Insertion:
-                    (mut.startInRead..<mut.endInRead).each { int it -> mutatedSeq[it] = "" }
-                    break
-            }
-        }
-
-        mutatedSeq.join("")
     }
 }
