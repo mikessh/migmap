@@ -92,14 +92,14 @@ class Util {
 
     @CompileStatic
     private static InputStream resourceGetHelper(String fname) {
-        println new File("build/resources/main/").listFiles().collect { File it -> it.name }
         def stream = Util.class.classLoader.getResourceAsStream(fname)
         if (!stream) {
-            return new File("build/resources/main/" + fname).exists() ?
-                    new FileInputStream("build/resources/main/" + fname) :
-                    new FileInputStream("build/resources/test/" + fname)
+            fname = ["./build/resources/main/" + fname,
+                     "./build/resources/test/" + fname].find { String it -> new File(it).exists()}
+            return new FileInputStream(fname)
+        } else {
+            return stream
         }
-        stream
     }
 
     @CompileStatic
