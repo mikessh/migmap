@@ -76,6 +76,10 @@ cli._(longOpt: "by-read",
                 "[default = assemble clonotypes and output clonotype abundance table]")
 cli._(longOpt: "unmapped", args: 1, argName: "fastq[.gz]",
         "Output unmapped reads in specified file.")
+cli._(longOpt: "write-binary", args: 1, argName: "file",
+        "Serialize clonotype list to the specified file. Not compatible with by-read output. " +
+                "The resulting file is used by built-in post-analysis routines of migmap package " +
+                "(hypermutation pattern analysis and clonal tree construction).")
 
 // Misc
 cli.h("Display this help message")
@@ -96,7 +100,11 @@ def inputFileName = opt.arguments()[0], outputFileName = opt.arguments()[1],
     customDatabaseFileName = (String) (opt.'custom-database' ?: null)
 
 def fastaFile = ["fasta", "fa", "fasta.gz", "fa.gz"].any { inputFileName.endsWith(it) },
-    stdOutput = outputFileName == "-", byRead = (boolean) opt.'by-read'
+    stdOutput = outputFileName == "-", byRead = (boolean) opt.'by-read', writeBinary = (String) opt.'write-binary'
+
+if (byRead && writeBinary) {
+    Util.error("By-read and write-binary options are incompatible.", 3)
+}
 
 if (!new File(inputFileName).exists()) {
     Util.error("Input file $inputFileName does not exist.", 3)
@@ -214,6 +222,11 @@ try {
             pw.println(inputFileName + "\t" + outputFileName + "\t" + args.join(" ") + "\t" +
                     filter.toString())
         }
+    }
+
+    if (writeBinary) {
+        ClonotypeSerializer.save((outputPort as ClonotypeOutput).clonotypeAccumulator.clonotypes,
+                new FileOutputStream(writeBinary))
     }
 
     Util.report("Finished.", 2)

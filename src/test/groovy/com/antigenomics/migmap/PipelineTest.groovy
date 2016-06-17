@@ -22,6 +22,7 @@ import com.antigenomics.migmap.io.*
 import com.antigenomics.migmap.mapping.ReadMapping
 import com.antigenomics.migmap.mapping.ReadMappingDetailsProvider
 import com.antigenomics.migmap.mapping.ReadMappingFilter
+import com.antigenomics.migmap.tree.PostAnalysis
 import org.junit.AfterClass
 import org.junit.Test
 
@@ -63,6 +64,22 @@ class PipelineTest {
         assert pipeline1.readMappingFilter.noCdr3Ratio <= 0.1
         assert pipeline1.readMappingFilter.incompleteRatio <= 0.1
         assert pipeline1.readMappingFilter.nonCanonicalRatio <= 0.1
+    }
+
+    @Test
+    void shmStatTest() {
+        def bos = new ByteArrayOutputStream()
+        def clonotypes = clonotypeOutput1.clonotypeAccumulator.clonotypes
+
+        ClonotypeSerializer.save(clonotypes, bos)
+
+        def bis = new ByteArrayInputStream(bos.toByteArray())
+
+        def loadedClonotypes = ClonotypeSerializer.load(bis)
+
+        def postAnalysis = new PostAnalysis(loadedClonotypes)
+
+        postAnalysis.generateHypermutationTable("temp.txt")
     }
 
     @Test
