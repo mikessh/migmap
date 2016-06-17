@@ -12,10 +12,12 @@ class MutationConverter {
     }
 
     static void annotateMutationAa(ReadMapping readMapping) {
-        annotateMutationAa(
-                readMapping.mapping.mutations,
-                readMapping.mapping.rc ? readMapping.read.rc.seq : readMapping.read.seq,
-                readMapping.mapping.vStartInRef, readMapping.mapping.vStartInQuery)
+        if (readMapping.mapping) {
+            annotateMutationAa(
+                    readMapping.mapping.mutations,
+                    readMapping.mapping.rc ? readMapping.read.rc.seq : readMapping.read.seq,
+                    readMapping.mapping.vStartInRef, readMapping.mapping.vStartInQuery)
+        }
     }
 
     static void annotateMutationAa(List<Mutation> mutations, String rawQuery, int vStartInRef, int vStartInQuery) {

@@ -123,7 +123,7 @@ Util.report("Annotating V segments...", 2)
 
 def vReferencePoints = new HashMap<Integer, Integer>()
 
-def blastInstanceFactory = new BlastInstanceFactory(dataDir, species, genes, true, useKabat)
+def blastInstanceFactory = new BlastInstanceFactory(dataDir, species, genes, true, useKabat, null, null, false)
 
 def instance = blastInstanceFactory.create()
 
