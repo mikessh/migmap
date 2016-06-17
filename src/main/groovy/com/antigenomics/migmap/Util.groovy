@@ -87,7 +87,18 @@ class Util {
 
     @CompileStatic
     static InputStream getStream(String fname, boolean resource) {
-        resource ? Util.class.classLoader.getResourceAsStream(fname) : new FileInputStream(fname)
+        resource ? resourceGetHelper(fname) : new FileInputStream(fname)
+    }
+
+    @CompileStatic
+    private static InputStream resourceGetHelper(String fname) {
+        def stream = Util.class.classLoader.getResourceAsStream(fname)
+        if (!stream) {
+            return new File("build/resources/main/" + fname).exists() ?
+                    new FileInputStream("build/resources/main/" + fname) :
+                    new FileInputStream("build/resources/test/" + fname)
+        }
+        stream
     }
 
     @CompileStatic
