@@ -6,6 +6,7 @@ before_install:
   - chmod +x igblastn
   - wget https://github.com/mikessh/igblast-bin/raw/master/binaries/linux-x64/makeblastdb
   - chmod +x makeblastdb
+  
 
 install:
   - gradle clean build --stacktrace --debug
