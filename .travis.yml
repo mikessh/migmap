@@ -2,8 +2,8 @@ language:
   - groovy
 
 before_install:
-  - wget https://github.com/mikessh/igblast-bin/raw/master/binaries/linux-x64/igblastn
-  - wget https://github.com/mikessh/igblast-bin/raw/master/binaries/linux-x64/makeblastdb
+  - wget https://github.com/mikessh/igblast-bin/raw/master/binaries/linux-x64/igblastn && chmod +x igblastn
+  - wget https://github.com/mikessh/igblast-bin/raw/master/binaries/linux-x64/makeblastdb && chmod +x makeblastdb
 
 install:
   - gradle clean build --stacktrace --debug

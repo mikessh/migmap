@@ -44,7 +44,10 @@ test {
 
     test {
         if (!Os.isFamily(Os.FAMILY_WINDOWS)) {
-            environment "PATH", "$System.env.PATH:/usr/local/bin/:/usr/local/ncbi/igblast/bin/:$System.env.TRAVIS_BUILD_DIR"
+            environment "PATH", "$System.env.PATH:/usr/local/bin/:/usr/local/ncbi/igblast/bin/"
+            if (System.env.TRAVIS_BUILD_DIR) {
+                environment "PATH", "$System.env.PATH:$System.env.TRAVIS_BUILD_DIR"
+            }
         }
     }
 }
