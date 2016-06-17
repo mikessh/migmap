@@ -24,7 +24,7 @@ jar {
 sourceSets {
     test {
         resources {
-            srcDir 'src/test/resources/'
+            srcDir = ['src/test/resources/', 'src/main/resources/']
         }
     }
 }
