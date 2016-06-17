@@ -92,6 +92,8 @@ class Util {
 
     @CompileStatic
     private static InputStream resourceGetHelper(String fname) {
+        println new File(".").absolutePath
+        println new File(".").listFiles().collect { File it -> it.name }
         def stream = Util.class.classLoader.getResourceAsStream(fname)
         if (!stream) {
             return new File("build/resources/main/" + fname).exists() ?
