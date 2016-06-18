@@ -79,7 +79,11 @@ class PipelineTest {
 
         def postAnalysis = new PostAnalysis(loadedClonotypes)
 
-        postAnalysis.generateHypermutationTable("temp.txt")
+        postAnalysis.generateHypermutationTable("temp.shm.txt")
+
+        assert new File("temp.shm.txt").readLines().size() == 20414
+
+        new File("temp.shm.txt").delete()
     }
 
     @Test
