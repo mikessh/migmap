@@ -8,4 +8,4 @@ before_install:
   - chmod +x makeblastdb
 
 install:
-  - gradle clean build
+  - gradle clean build --debug
