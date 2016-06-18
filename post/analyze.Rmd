@@ -1,0 +1,101 @@
+---
+title: "Untitled"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+library(ggplot2)
+prefix <- "raji_R12"
+df <- read.table(paste(prefix, "shm.txt", sep = "."), header=T, sep="\t")
+```
+
+```{r}
+df$region = factor(df$region, c("FR1","CDR1","FR2","CDR2","FR3","CDR3","FR4"))
+df$replacement <- ifelse(df$mutation.type != "Substitution", "Indel",
+                  ifelse(as.character(df$from.aa) != as.character(df$to.aa), "Replacement", "Silent"))
+```
+
+```{r}
+library(plyr)
+
+df.s1 <- ddply(df, c("clonotype.v","clonotype.j","segment","segment.name","region",
+                     "mutation.type","pos.nt","from.nt","to.nt","pos.aa","from.aa","to.aa",
+                     "replacement", "total.clonotypes", "total.count", "total.freq"),
+              summarize,
+              count.clonotypes = sum(count.clonotypes),
+              count.reads = sum(count.reads),
+              count.freq = sum(count.freq))
+
+s2.cols <- c("segment","segment.name","region",
+                     "mutation.type","pos.nt","from.nt","to.nt","pos.aa","from.aa","to.aa",
+                     "replacement", "total.clonotypes", "total.count", "total.freq")
+
+df.s2 <- ddply(df.s1, s2.cols,
+              summarize,
+              count.clonotypes = sum(count.clonotypes),
+              count.reads = sum(count.reads),
+              count.freq = sum(count.freq))
+```
+
+```{r}
+df.s2 <- ddply(df.s2, .(segment.name), transform, 
+              is.allele = count.clonotypes > 5 & 
+              count.clonotypes / total.clonotypes > 0.5 &
+              count.freq / total.freq > 0.5)
+
+df <- merge(df, df.s2, by.x = s2.cols, by.y = s2.cols,
+            all.x = T, suffixes = c("", "y"))
+df.s1 <- merge(df.s1, df.s2, by.x = s2.cols, by.y = s2.cols,
+               all.x = T, suffixes = c("", "y"))
+```
+
+
+```{r}
+ggplot(df.s2, aes(x=count.freq)) + 
+  geom_histogram(aes(fill=replacement)) + 
+  scale_x_log10() + scale_fill_brewer(palette = "Set1") + theme_bw()
+
+df <- subset(df, !is.allele)
+df.s1 <- subset(df.s1, !is.allele)
+df.s2 <- subset(df.s2, !is.allele)
+```
+
+```{r}
+ggplot(df.s2) + 
+  #geom_boxplot(aes(x=region, group=interaction(region, replacement), y = count.freq, fill = replacement)) +
+  geom_point(aes(y=count.freq, color=replacement, x=pos.aa, size=count.clonotypes), alpha=0.5) +
+  scale_color_brewer(palette = "Set1") +
+  facet_grid(~region, scales="free_x") +
+  scale_y_log10() +
+  theme_bw()
+```
+
+```{r}
+df <- ddply(df, .(clonotype.id), transform,
+              sr = sum(count.freq[which(replacement == "Silent")]) / sum(count.freq[which(replacement == "Replacement")]))
+
+ggplot(df, aes(x=clonotype.id, y=count.freq, color=sr)) + 
+  geom_point(alpha=0.5) + scale_y_log10() + 
+  scale_color_gradient2(low = "#ca0020", mid="#f7f7f7", high = "#0571b0", midpoint = 1, na.value = "#0571b0") +
+  theme_bw()
+```
+
+```{r}
+df.s1 <- ddply(df.s1, .(clonotype.v, clonotype.j), transform,
+               sr = sum(count.freq[which(replacement == "Silent")]) / sum(count.freq[which(replacement == "Replacement")]))
+
+ggplot(df.s1, aes(x=clonotype.v, y=clonotype.j, color=sr, size=count.clonotypes)) + 
+  geom_point() +
+  scale_color_gradient2(low = "#ca0020", mid="#f7f7f7", high = "#0571b0", midpoint = 1, na.value = "#0571b0") +
+  theme_bw()
+```
