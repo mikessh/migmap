@@ -81,7 +81,7 @@ class PipelineTest {
 
         postAnalysis.generateHypermutationTable("temp.shm.txt")
 
-        assert new File("temp.shm.txt").readLines().size() == 20414
+        assert new File("temp.shm.txt").readLines().size() == 8865
 
         new File("temp.shm.txt").delete()
     }
