@@ -14,30 +14,27 @@
  * limitations under the License.
  */
 
-package com.antigenomics.migmap.tree
+package com.antigenomics.migmap.analysis
 
+import com.antigenomics.migmap.Util
 import com.antigenomics.migmap.clonotype.Clonotype
+import com.antigenomics.migmap.mutation.Mutation
+import com.antigenomics.migmap.mutation.MutationFormatter
 import com.milaboratory.core.alignment.Alignment
-import com.milaboratory.core.sequence.NucleotideAlphabet
 import com.milaboratory.core.sequence.NucleotideSequence
 import com.milaboratory.core.tree.SequenceTreeMap
 import com.milaboratory.core.tree.TreeSearchParameters
 import com.milaboratory.util.Factory
 
 class ClonotypeTree {
-    final List<Clonotype> sample
-    final List<List<Clonotype>> nodes = new ArrayList<>()
+    static final TreeSearchParameters germOnlyDiffSearchParams = new TreeSearchParameters(5, 0, 0, 5)
 
-    final TreeSearchParameters germOnlyDiffSearchParams = new TreeSearchParameters(10, 5, 5, 10)
-
-    ClonotypeTree(List<Clonotype> clonotypes) {
-        this.sample = clonotypes
-    }
-
-    private Collection<List<Clonotype>> preGroup() {
+    // Grouping by CDR3
+    static Collection<List<Clonotype>> groupClonotypesByCdr3(Iterable<Clonotype> sample) {
         def cTree = new SequenceTreeMap<NucleotideSequence, List<Clonotype>>(NucleotideSequence.ALPHABET)
         def cdr3RepresentativeMap = new HashMap<NucleotideSequence, Clonotype>()
 
+        Util.report("- Pre-group by CDR3")
         sample.each {
             def cdr3Nt = new NucleotideSequence(it.cdr3nt)
             cdr3RepresentativeMap.putIfAbsent(cdr3Nt, it)
@@ -51,8 +48,8 @@ class ClonotypeTree {
             lst << it
         }
 
+        Util.report("- Finding CDR3 differences explained by SHMs in germline region")
         def cdr3MatchWithoutGermlineNet = new HashMap<NucleotideSequence, CNode>()
-
         cdr3RepresentativeMap.each {
             def niter = cTree.getNeighborhoodIterator(it.key, germOnlyDiffSearchParams)
             def cNode
@@ -74,6 +71,7 @@ class ClonotypeTree {
             }
         }
 
+        Util.report("- Aggregating")
         cdr3MatchWithoutGermlineNet.each {
             if (!it.value.parent) {
                 it.value.assignParent(it.key)
@@ -91,7 +89,7 @@ class ClonotypeTree {
         groupedMap.values()
     }
 
-    private class CNode {
+    private static class CNode {
         final HashMap<NucleotideSequence, CNode> net
         final List<NucleotideSequence> children = new ArrayList<>()
         final NucleotideSequence tag
@@ -128,5 +126,65 @@ class ClonotypeTree {
                 return false
         }
         true
+    }
+
+    // Graph
+
+    static List<Edge> getEdges(List<Clonotype> clonotypes) {
+        // Try connect clonotypes
+        def edgeList = new ArrayList<Edge>()
+        def parentNodeMap = new HashMap<Clonotype, Set<Clonotype>>()
+        for (int i = 0; i < clonotypes.size(); i++) {
+            for (int j = i + 1; j < clonotypes.size(); j++) {
+                def edge = connect(clonotypes[i], clonotypes[j])
+                if (edge) {
+                    edgeList.add(edge)
+                    def parentList
+                    parentNodeMap.put(edge.to,
+                            parentList = (parentNodeMap[edge.to] ?: new HashSet<>()))
+                    parentList.add(edge.from)
+                }
+            }
+        }
+
+        // Remove redundancy
+        edgeList.findAll { edge ->
+            //
+            //      2 <-- 3
+            //      ^     ^
+            //       \   /
+            //         1
+            //
+            // remove 1->2
+            // any parent(2) that is not 1 has 1 as parent
+            !parentNodeMap[edge.to].any { it != edge.from && hasParent(parentNodeMap[it], edge.from) }
+        }
+    }
+
+    private static boolean hasParent(Set<Clonotype> clonotypes, Clonotype clonotype) {
+        clonotypes && clonotypes.contains(clonotype)
+    }
+
+    static Set<String> getIntersection(List<Mutation> mutations1, List<Mutation> mutations2) {
+        def set = new HashSet<String>(mutations1*.toString())
+        new HashSet<>(mutations2*.toString().findAll { set.contains(it.toString()) })
+    }
+
+    static Edge connect(Clonotype clonotype1, Clonotype clonotype2) {
+        def mutations1 = clonotype1.mutations,
+            mutations2 = clonotype2.mutations
+
+        def intersection = mutations1.size() > mutations2.size() ?
+                getIntersection(mutations1, mutations2) : getIntersection(mutations2, mutations1)
+
+        intersection.size() == mutations1.size() ?
+                new Edge(clonotype1, clonotype2, mutations2.findAll {
+                    !intersection.contains(it)
+                }) :
+                (intersection.size() == mutations2.size() ?
+                        new Edge(clonotype2, clonotype1, mutations1.findAll {
+                            !intersection.contains(it)
+                        }) :
+                        null)
     }
 }

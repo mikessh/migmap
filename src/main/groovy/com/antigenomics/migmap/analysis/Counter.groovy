@@ -1,4 +1,4 @@
-package com.antigenomics.migmap.tree
+package com.antigenomics.migmap.analysis
 
 import com.antigenomics.migmap.clonotype.Clonotype
 

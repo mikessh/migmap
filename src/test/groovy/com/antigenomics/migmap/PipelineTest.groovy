@@ -22,7 +22,7 @@ import com.antigenomics.migmap.io.*
 import com.antigenomics.migmap.mapping.ReadMapping
 import com.antigenomics.migmap.mapping.ReadMappingDetailsProvider
 import com.antigenomics.migmap.mapping.ReadMappingFilter
-import com.antigenomics.migmap.tree.PostAnalysis
+import com.antigenomics.migmap.analysis.Analysis
 import org.junit.AfterClass
 import org.junit.Test
 
@@ -77,7 +77,7 @@ class PipelineTest {
 
         def loadedClonotypes = ClonotypeSerializer.load(bis)
 
-        def postAnalysis = new PostAnalysis(loadedClonotypes)
+        def postAnalysis = new Analysis(loadedClonotypes)
 
         postAnalysis.generateHypermutationTable("temp.shm.txt")
 
