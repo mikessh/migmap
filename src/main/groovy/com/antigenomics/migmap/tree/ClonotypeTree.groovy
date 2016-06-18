@@ -32,8 +32,6 @@ class ClonotypeTree {
 
     ClonotypeTree(List<Clonotype> clonotypes) {
         this.sample = clonotypes
-
-
     }
 
     private Collection<List<Clonotype>> preGroup() {
@@ -93,7 +91,7 @@ class ClonotypeTree {
         groupedMap.values()
     }
 
-   private class CNode {
+    private class CNode {
         final HashMap<NucleotideSequence, CNode> net
         final List<NucleotideSequence> children = new ArrayList<>()
         final NucleotideSequence tag
@@ -112,18 +110,18 @@ class ClonotypeTree {
         }
     }
 
-    boolean inGermline(int position, Clonotype clonotype) {
+    static boolean inGermline(int position, Clonotype clonotype) {
         clonotype.cdr3Markup.vEnd >= position || clonotype.cdr3Markup.jStart <= position ||
                 (clonotype.cdr3Markup.dEnd >= position && clonotype.cdr3Markup.dStart <= position)
     }
 
-    boolean cdr3MatchWithoutGermlineMutations(Clonotype clonotype1, Clonotype clonotype2,
-            NucleotideSequence cdr3nt2,
-                                              Alignment<NucleotideSequence> aln) {
+    static boolean cdr3MatchWithoutGermlineMutations(Clonotype clonotype1, Clonotype clonotype2,
+                                                     NucleotideSequence cdr3nt2,
+                                                     Alignment<NucleotideSequence> aln) {
         def mut12 = aln.absoluteMutations, mut21 = aln.invert(cdr3nt2).absoluteMutations
 
         // in germline in at least one of sequences
-        
+
         for (int i = 0; i < mut12.size(); i++) {
             if (!inGermline(mut12.getPositionByIndex(i), clonotype1) &&
                     !inGermline(mut21.getPositionByIndex(i), clonotype2))

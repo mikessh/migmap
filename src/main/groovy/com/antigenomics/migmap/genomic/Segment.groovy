@@ -26,6 +26,10 @@ class Segment implements Comparable<Segment>, Serializable {
     final Segment DUMMY_J = new Segment(null, SegmentType.J, "DUMMY", Util.MY_NA, "AAAAAAAAAAAAAAAAAAAAAAAAA", -1),
                   DUMMY_D = new Segment(null, SegmentType.D, "DUMMY", Util.MY_NA, "AAAAAAAAAAAAAAAAAAAAAAAAA", -1)
 
+    static boolean isDummy(Segment segment) {
+        segment == null || segment.name == Util.MY_NA
+    }
+
     final String gene, name, sequence, regexName
     final SegmentDatabase parent
     final int referencePoint
