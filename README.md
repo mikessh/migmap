@@ -24,17 +24,19 @@ IgBlast is an excellent  of V-(D)-J mapping tool able to correctly map even seve
 
 Present wrapper adds the following capabilities to IgBlast:
 
-- Run on FASTQ data
+- Run on FASTQ data.
 
-- Use a comprehensive V/D/J segment database for human, mouse, rat, rabbit and rhesus monkey
+- Use a comprehensive V/D/J segment database for human, mouse, rat, rabbit and rhesus monkey.
 
-- Speed-up by piping reads to IgBlast and parsing the output in parallel as the built-in ``--num-threads`` argument doesn't offer much optimization
+- Speed-up by piping reads to IgBlast and parsing the output in parallel as the built-in ``--num-threads`` argument doesn't offer much optimization.
 
-- Assemble clonotypes, apply various filtering options such as quality filtering for CDR3 N-regions and mutations, non-coding sequence filtering, etc
+- Assemble clonotypes, apply various filtering options such as quality filtering for CDR3 N-regions and mutations, non-coding sequence filtering, etc.
 
-- Reporting mutations (including indels) in V, D and J segments, grouped by CDR/FW region, both on nucleotide and amino-acid level
+- Reporting mutations (including indels) in V, D and J segments, grouped by CDR/FW region, both on nucleotide and amino-acid level.
 
-- Frequency and parsimony-based error correction
+- Frequency and parsimony-based error correction.
+
+- Includes a post-analysis module for quantification of somatic hypermutations and building clonotype trees, output compatible with [VDJtools](https://github.com/mikessh/vdjtools) post-analysis software.
 
 
 ## Pre-requisites
@@ -106,6 +108,29 @@ Choose the closest receptor(s) and species, however don't worry as the Variable 
 Next, run MiGMAP with ``--custom-database my_segments_with_refs.txt`` selecting same receptor(s) and species as before.
 
 To convert references in IMGT format into MIGEC/MiGMAP reference format use [imgtparser](https://github.com/antigenomics/imgtparser).
+
+### Post-analysis
+
+**IMPORTANT** MIGEC built-in analysis module requires saving a binary version of output file, which can be done by running
+
+```bash
+java -Xmx8G -jar migmap.jar -R IGH -S human --write-binary out.bin sample.fastq.gz out.txt
+```
+
+Note that ``--write-binary`` option cannot be used together with ``--by-read``.
+
+To summarize somatic hypermutations and generate clonotype trees run
+
+```bash
+java -Xmx8G -jar migmap.jar com.antigenomics.migmap.Analyze out.bin out
+```
+
+Which will generate several text files with ``out`` prefix:
+
+- ``out.shm.txt`` a flat file with all mutations present in sample that can be processed with ``post/analyze_shm.Rmd`` [R markdown](http://rmarkdown.rstudio.com/) template.
+- ``out.net.txt``, ``out.node.txt`` and ``out.edge.txt`` (network, node and edge properties) that can be imported to [Cytoscape](http://www.cytoscape.org/) using ``Import>Table>`` menu.
+
+For more details and an example analysis of hypermutating Raji cell repertoire go to ``post/`` folder in this repository (or click [here](https://github.com/mikessh/migmap/tree/develop/post)).
 
 
 ## Output format
