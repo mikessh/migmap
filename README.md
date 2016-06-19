@@ -120,7 +120,7 @@ To convert references in IMGT format into MIGEC/MiGMAP reference format use [img
 
 ### Post-analysis
 
-**IMPORTANT** MIGEC built-in analysis module requires saving a binary version of output file, which can be done by running
+**IMPORTANT** MIGMAP built-in analysis module requires saving a binary version of output file, which can be done by running
 
 ```bash
 java -Xmx8G -jar migmap.jar -R IGH -S human --write-binary out.bin sample.fastq.gz out.txt
