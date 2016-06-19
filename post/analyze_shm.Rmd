@@ -96,7 +96,6 @@ The plot below shows distribution of individual mutations across IG regions: y a
 
 ```{r}
 ggplot(df.s2) + 
-  #geom_boxplot(aes(x=region, group=interaction(region, replacement), y = count.freq, fill = replacement)) +
   geom_point(aes(y=count.freq, color=replacement, x=pos.aa, size=count.freq/count.clonotypes), alpha=0.5) +
   scale_color_brewer(name = "Type", palette = "Set1") +
   facet_grid(~region, scales="free_x") +
