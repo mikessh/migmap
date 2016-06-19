@@ -127,7 +127,7 @@ df.s1 <- ddply(df.s1, .(clonotype.v, clonotype.j), transform,
                sr = sum(count.freq[which(replacement == "Silent")]) / sum(count.freq[which(replacement == "Replacement")]))
 
 ggplot(df, aes(x=clonotype.v, y=clonotype.j, color=sr, size=count.freq)) + 
-  geom_jitter() + xlab("") + ylab("") +
+  geom_jitter(alpha=0.7) + xlab("") + ylab("") + scale_size(name = "Frequency") +
   scale_color_gradient2(name = "S:R ratio", 
                         low = "#ca0020", mid="#f7f7f7", high = "#0571b0", midpoint = 1, na.value = "#0571b0") +
   theme_bw()
