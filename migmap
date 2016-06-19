@@ -86,7 +86,7 @@ do
             shift
             ;;
         *)
-            migmapArgs+=(${key})
+            migmapArgs+=("${key}")
             ;;
     esac
 done
