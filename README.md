@@ -43,16 +43,21 @@ Present wrapper adds the following capabilities to IgBlast:
 
 ## Pre-requisites
 
-[Java v1.8](http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html) is required to run MIGMAP. Users should then install [IgBlast v1.4.0](http://www.ncbi.nlm.nih.gov/igblast/faq.html#standalone) binaries that are appropriate for their system and make sure that ``igblastn`` and ``makeblastdb`` are added to ``$PATH`` or the directory that contains binaries is specified using ``--blast-dir /path/to/bin/`` argument during MiGMAP execution. Note that IgBlast v1.4.0 binaries can also be downloaded from [here](https://github.com/mikessh/igblast-bin).
+[Java v1.8](http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html) is required to run MIGMAP. Users should then install [IgBlast v1.4.0](http://www.ncbi.nlm.nih.gov/igblast/faq.html#standalone) binaries that are appropriate for their system and make sure that ``igblastn`` and ``makeblastdb`` are added to ``$PATH`` or the directory that contains binaries is specified using ``--blast-dir /path/to/bin/`` argument during MiGMAP execution. IgBlast v1.4.0 binaries can also be downloaded from [here](https://github.com/mikessh/igblast-bin).
 
 A data folder named ``data/`` containing binary databases required for IgBlast to work is provided in the release bundle. It can also explicitly specify its path with ``--blast-dir /path/to/bin/`` for troubleshooting purposes.
 
 
 ## Installation
 
-See [latest release](https://github.com/mikessh/migmap/releases/latest) section for MiGMAP package.
+See [latest release](https://github.com/mikessh/migmap/releases/latest) section for MiGMAP package. For Windows you need to both install IgBlast and download the latest release. For MacOS and Linux, MIGMAP can be easily installed using [Homebrew/Linuxbrew](http://brew.sh) (no need to download anything/manually install IgBlast):
 
-MiGMAP can be also compiled from sources using [Gradle](https://gradle.org/) with ``gradle build``. Note that in order for tests to pass IgBlast binaries should be in ``$PATH`` variable, you may need to modify following part of ``build.gradle`` 
+```bash
+brew tap mikessh/repseq
+brew install migmap-macos # or migmap-linux
+```
+
+MiGMAP can be compiled from sources using [Gradle](https://gradle.org/) with ``gradle build``. Note that in order for tests to pass IgBlast binaries should be in ``$PATH`` variable, you may need to modify following part of ``build.gradle`` 
 
 ```gradle
 test {
