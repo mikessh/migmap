@@ -73,8 +73,10 @@ test {
 To see the full list of MiGMAP options run 
 
 ```bash
-java -jar migmap.jar -h
+java -jar migmap.jar -h ...
 ```
+
+The memory limit can be extended by using ``-Xmx`` argument (e.g. ``-Xmx8G``). In case installed using **Homebrew** the command to execute MIGMAP is simply ``migmap ...``.
 
 The following command will process ``sample.fastq.gz`` file containing Human Immunoglobulin Heavy Chain reads, assemble clonotypes and store them in ``out.txt``:
 
