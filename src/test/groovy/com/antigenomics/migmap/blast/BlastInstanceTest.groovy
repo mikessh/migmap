@@ -76,6 +76,8 @@ class BlastInstanceTest {
 
         println chunk
 
+        instance.close()
+
         assert instance.proc.exitValue() == 0
     }
 
