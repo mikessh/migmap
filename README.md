@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/mikessh/migec.svg?branch=master)](https://travis-ci.org/mikessh/migmap.svg?branch=master)
+
 #  MiGMAP: mapper for full-length T- and B-cell repertoire sequencing
 
 In a nutshell, this software is a smart wrapper for [IgBlast](http://www.ncbi.nlm.nih.gov/igblast/igblast.cgi) V-(D)-J mapping tool designed to facilitate analysis immune receptor libraries profiled using high-throughput sequencing.
@@ -130,7 +132,7 @@ Which will generate several text files with ``out`` prefix:
 - ``out.shm.txt`` a flat file with all mutations present in sample that can be processed with ``post/analyze_shm.Rmd`` [R markdown](http://rmarkdown.rstudio.com/) template.
 - ``out.net.txt``, ``out.node.txt`` and ``out.edge.txt`` (network, node and edge properties) that can be imported to [Cytoscape](http://www.cytoscape.org/) using ``Import>Table>`` menu.
 
-For more details and an example analysis of hypermutating Raji cell repertoire go to ``post/`` folder in this repository (or click [here](https://github.com/mikessh/migmap/tree/develop/post)).
+For more details and an example analysis of hypermutating Raji cell repertoire go to ``post/`` folder in this repository (or click [here](https://github.com/mikessh/migmap/tree/master/post)).
 
 
 ## Output format

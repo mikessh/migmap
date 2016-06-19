@@ -21,18 +21,18 @@ This folder contains analysis results for IGH repertoire of hypermutating Raji c
 
 ### Analysis of somatic hypermutation profile
 
-![Rmd SHM analysis](https://github.com/mikessh/migmap/blob/develop/post/analyze_shm.png)
+![Rmd SHM analysis](https://github.com/mikessh/migmap/blob/master/post/analyze_shm.png)
 
 Files:
 
 - ``raji_R12.shm.txt`` - mutation table
 - ``analyze_shm.Rmd`` - analysis template
 
-The whole analysis template is stored in R markdown format, which means it can be loaded to [Rstudio](http://rmarkdown.rstudio.com/), customized and executed. Detailed explanation of all analysis steps and plots is embedded into the template. An example PDF output is shown in ``analyze_shm.pdf`` (click [here](https://github.com/mikessh/migmap/blob/develop/post/analyze_shm.pdf) to view it).
+The whole analysis template is stored in R markdown format, which means it can be loaded to [Rstudio](http://rmarkdown.rstudio.com/), customized and executed. Detailed explanation of all analysis steps and plots is embedded into the template. An example PDF output is shown in ``analyze_shm.pdf`` (click [here](https://github.com/mikessh/migmap/blob/master/post/analyze_shm.pdf) to view it).
 
 ### Clonotype tree
 
-![Rmd SHM analysis](https://github.com/mikessh/migmap/blob/develop/post/raji.png)
+![Rmd SHM analysis](https://github.com/mikessh/migmap/blob/master/post/raji.png)
 
 Files:
 
@@ -67,4 +67,4 @@ Apply an ``Edge weighted Spring Embedded Layout`` from the ``Layout`` menu, use 
 
 ### Clonotype network
 
-**Under development** The concept is a network showing each CDR3 with its children (edges are weighted by hypermutation load/S:R ratio) and edges between distinct CDR3 which are likely hypermutations. E.g. a single mutation within "N" region of CDR3 and consequent match of 5 "N" nucleotides between two different CDR3 tells that they are more likely a result of hypermutation than of independent V-D-J recombination.
+**Under masterment** The concept is a network showing each CDR3 with its children (edges are weighted by hypermutation load/S:R ratio) and edges between distinct CDR3 which are likely hypermutations. E.g. a single mutation within "N" region of CDR3 and consequent match of 5 "N" nucleotides between two different CDR3 tells that they are more likely a result of hypermutation than of independent V-D-J recombination.
