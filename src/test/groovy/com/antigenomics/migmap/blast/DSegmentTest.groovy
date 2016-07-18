@@ -16,8 +16,8 @@
 
 package com.antigenomics.migmap.blast
 
+import com.antigenomics.migmap.PipelineResults
 import com.antigenomics.migmap.genomic.Segment
-import com.antigenomics.migmap.genomic.SegmentDatabase
 import org.junit.AfterClass
 import org.junit.Ignore
 import org.junit.Test
@@ -28,7 +28,7 @@ class DSegmentTest {
     final BlastInstance blastInstance
 
     DSegmentTest() {
-        blastInstance = new BlastInstanceFactory("data/", "human", ["IGH"], true, false).create()
+        blastInstance = PipelineResults.INSTANCE.factory.create()
     }
 
     @Test
@@ -67,7 +67,8 @@ class DSegmentTest {
     }
 
     @AfterClass
-    static void tearDown() {
-        SegmentDatabase.clearTemporaryFiles()
+    void tearDown() {
+        blastInstance.put(null)
+        blastInstance.close()
     }
 }

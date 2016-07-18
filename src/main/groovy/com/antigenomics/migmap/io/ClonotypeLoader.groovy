@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.antigenomics.migmap.post
+package com.antigenomics.migmap.io
 
 import com.antigenomics.migmap.blast.PSegments
 import com.antigenomics.migmap.clonotype.Clonotype

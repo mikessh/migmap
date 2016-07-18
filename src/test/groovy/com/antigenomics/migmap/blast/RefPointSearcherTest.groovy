@@ -16,7 +16,7 @@
 
 package com.antigenomics.migmap.blast
 
-import com.antigenomics.migmap.genomic.SegmentDatabase
+import com.antigenomics.migmap.PipelineResults
 import org.junit.AfterClass
 import org.junit.Test
 
@@ -26,7 +26,7 @@ class RefPointSearcherTest {
     final BlastInstance blastInstance
 
     RefPointSearcherTest() {
-        blastInstance = new BlastInstanceFactory("data/", "human", ["IGH"], true, false).create()
+        blastInstance = PipelineResults.INSTANCE.factory.create()
     }
 
     @Test
@@ -105,7 +105,8 @@ class RefPointSearcherTest {
     }
 
     @AfterClass
-    static void tearDown() {
-        SegmentDatabase.clearTemporaryFiles()
+    void tearDown() {
+        blastInstance.put(null)
+        blastInstance.close()
     }
 }

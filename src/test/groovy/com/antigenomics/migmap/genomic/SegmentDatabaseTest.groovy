@@ -80,9 +80,4 @@ class SegmentDatabaseTest {
 
         assert factory.segmentDatabase.annotatedV + 2 == factory.segmentDatabase.vSegments // known 2 unannotateable cases
     }
-
-    @AfterClass
-    static void tearDown() {
-        SegmentDatabase.clearTemporaryFiles()
-    }
 }

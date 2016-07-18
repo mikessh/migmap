@@ -84,5 +84,4 @@ class PSegmentTest {
 
         assert pSegments.pSegmentJ == 27
     }
-
 }

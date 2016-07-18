@@ -16,9 +16,8 @@
 
 package com.antigenomics.migmap.blast
 
-import com.antigenomics.migmap.genomic.SegmentDatabase
+import com.antigenomics.migmap.PipelineResults
 import com.antigenomics.migmap.io.Read
-import org.junit.AfterClass
 import org.junit.Test
 
 class BlastInstanceTest {
@@ -47,8 +46,7 @@ class BlastInstanceTest {
 
     @Test
     void singleQueryTest() {
-        def factory = new BlastInstanceFactory("data/", "human", ["IGH"], true, false)
-        def instance = factory.create()
+        def instance = PipelineResults.INSTANCE.factory.create()
 
         def read = new Read(
                 "@MIG UMI:GGATATGCCGCTC:8",
@@ -84,8 +82,7 @@ class BlastInstanceTest {
     @Test
     void multiQueryTest() {
         int nQueries = 100
-        def factory = new BlastInstanceFactory("data/", "human", ["IGH"], true, false)
-        def instance = factory.create()
+        def instance = PipelineResults.INSTANCE.factory.create()
 
         def readsIds = new HashSet<String>()
 
@@ -109,10 +106,5 @@ class BlastInstanceTest {
         assert intersection.size() == nQueries
 
         assert instance.proc.exitValue() == 0
-    }
-
-    @AfterClass
-    static void tearDown() {
-        SegmentDatabase.clearTemporaryFiles()
     }
 }

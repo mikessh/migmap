@@ -16,10 +16,9 @@
 
 package com.antigenomics.migmap.mutation
 
+import com.antigenomics.migmap.PipelineResults
 import com.antigenomics.migmap.blast.Alignment
-import com.antigenomics.migmap.genomic.SegmentDatabase
 import com.antigenomics.migmap.mapping.RegionMarkup
-import org.junit.AfterClass
 import org.junit.Test
 
 import static com.antigenomics.migmap.mutation.SubRegion.*
@@ -56,9 +55,7 @@ class MutationExtractorTest {
                 "GCACAGAAGTTTCAGGGCAGGGTCACCATGACCAGGGACACGTCCATGACCACAATCTACATGGAGCTGAGCGGACTCACATCTGACGAC" +
                 "ACGGCCGTGTATTTTTGTACCAGA"
 
-        def segmentDatabase = new SegmentDatabase("data/", "human", ["IGH"])
-
-        def segment = segmentDatabase.segments["IGHV1-2*02"]
+        def segment = PipelineResults.INSTANCE.segmentDatabase.segments["IGHV1-2*02"]
         def regionMarkup = new RegionMarkup(75, 99, 150, 174, 287, 288)
         def alignment = new Alignment(0, query, 0, segment.sequence.substring(0, query.length()))
         def mutations = new MutationExtractor(segment, alignment, regionMarkup).mutations
@@ -73,10 +70,5 @@ class MutationExtractorTest {
         mutations.eachWithIndex { it, i ->
             assert it.subRegion == expectedSubRegions[i]
         }
-    }
-
-    @AfterClass
-    static void tearDown() {
-        SegmentDatabase.clearTemporaryFiles()
     }
 }

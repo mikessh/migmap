@@ -375,9 +375,4 @@ class BlastParserTest {
         assert mapping.dSegment.name == "."
         assert mapping.jSegment.name == "."
     }
-
-    @AfterClass
-    static void tearDown() {
-        SegmentDatabase.clearTemporaryFiles()
-    }
 }

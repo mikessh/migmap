@@ -194,9 +194,4 @@ class ReadMappingDetailsProviderTest {
 
         instance.close()
     }
-
-    @AfterClass
-    static void tearDown() {
-        SegmentDatabase.clearTemporaryFiles()
-    }
 }

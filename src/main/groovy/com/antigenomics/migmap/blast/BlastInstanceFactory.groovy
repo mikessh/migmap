@@ -31,7 +31,7 @@ class BlastInstanceFactory {
 
     BlastInstanceFactory(String dataBundlePath,
                          String species, List<String> genes,
-                         boolean allAlleles, boolean useKabat,
+                         boolean allAlleles = true, boolean useKabat = false,
                          String customDatabaseFileName = null,
                          String databaseTempPath = null,
                          boolean byRead = true) {
