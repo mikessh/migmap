@@ -1,19 +1,23 @@
 import org.apache.tools.ant.taskdefs.condition.Os
 
+apply plugin: 'java'
 apply plugin: 'groovy'
+apply plugin: 'application'
 
-mainClassName = 'com.antigenomics.migmap.Main'
+group = 'com.antigenomics'
+name = 'migmap'
+version = '1.1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
 }
 
 jar {
-    baseName = 'migmap'
-    version = '1.1.0-SNAPSHOT'
+    baseName = name
+    version = version
 
     manifest {
-        attributes "Main-Class": "$mainClassName"
+        attributes "Main-Class": "${group}.${name}.Main"
     }
 
     from {
