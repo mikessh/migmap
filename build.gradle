@@ -1,8 +1,6 @@
 import org.apache.tools.ant.taskdefs.condition.Os
 
-apply plugin: 'java'
 apply plugin: 'groovy'
-apply plugin: 'application'
 
 mainClassName = 'com.antigenomics.migmap.Main'
 

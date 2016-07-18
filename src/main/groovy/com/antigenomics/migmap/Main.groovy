@@ -100,9 +100,10 @@ def inputFileName = opt.arguments()[0], outputFileName = opt.arguments()[1],
     customDatabaseFileName = (String) (opt.'custom-database' ?: null)
 
 def fastaFile = ["fasta", "fa", "fasta.gz", "fa.gz"].any { inputFileName.endsWith(it) },
-    stdOutput = outputFileName == "-", byRead = (boolean) opt.'by-read', writeBinary = (String) opt.'write-binary'
+    stdOutput = outputFileName == "-", byRead = (boolean) opt.'by-read',
+    writeBinary = opt.'write-binary'
 
-if (byRead && writeBinary) {
+if (byRead && writeBinary != null) {
     Util.error("By-read and write-binary options are incompatible.", 3)
 }
 
@@ -224,7 +225,7 @@ try {
         }
     }
 
-    if (writeBinary) {
+    if (writeBinary != null) {
         ClonotypeSerializer.save((outputPort as ClonotypeOutput).clonotypeAccumulator.clonotypes,
                 new FileOutputStream(writeBinary))
     }
