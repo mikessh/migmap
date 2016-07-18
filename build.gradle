@@ -4,20 +4,16 @@ apply plugin: 'java'
 apply plugin: 'groovy'
 apply plugin: 'application'
 
-group = 'com.antigenomics'
-name = 'migmap'
-version = '1.1.0-SNAPSHOT'
-
 repositories {
     mavenCentral()
 }
 
 jar {
-    baseName = name
-    version = version
+    baseName = "migmap"
+    version = "1.1.0-SNAPSHOT"
 
     manifest {
-        attributes "Main-Class": "${group}.${name}.Main"
+        attributes "Main-Class": "com.antigenomics.migmap.Main"
     }
 
     from {
