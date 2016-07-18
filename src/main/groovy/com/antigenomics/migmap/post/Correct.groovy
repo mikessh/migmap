@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.antigenomics.migmap
+package com.antigenomics.migmap.post
 
+import com.antigenomics.migmap.Util
 import com.antigenomics.migmap.mutation.Mutation
 import com.milaboratory.core.sequence.NucleotideSequence
 import com.milaboratory.core.tree.SequenceTreeMap
 import com.milaboratory.core.tree.TreeSearchParameters
 import com.milaboratory.util.Factory
-import groovy.transform.Canonical
 
 def DEFAULT_ERROR_RATE = "0.01", DEFAULT_DEPTH = "2"
 
@@ -91,20 +91,6 @@ def parseColumns = {
     }
 }
 
-@Canonical
-class CorrectorClonotypeEntry {
-    int count
-    float freq
-    List<String> data
-    NucleotideSequence seq
-    CorrectorClonotypeEntry parent
-    Set<Mutation> mutations = new HashSet<>()
-
-    void append(CorrectorClonotypeEntry other) {
-        count += other.count
-        freq += other.freq
-    }
-}
 
 def stm = new SequenceTreeMap<NucleotideSequence, List<CorrectorClonotypeEntry>>(NucleotideSequence.ALPHABET)
 def searchParams = new TreeSearchParameters(depth, depth, depth, depth)

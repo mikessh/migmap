@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package com.antigenomics.migmap.analysis
+package com.antigenomics.migmap.post.analysis
 
 import com.antigenomics.migmap.Util
 import com.antigenomics.migmap.clonotype.Clonotype
 import com.antigenomics.migmap.mutation.Mutation
-import com.antigenomics.migmap.mutation.MutationFormatter
 import com.milaboratory.core.alignment.Alignment
 import com.milaboratory.core.sequence.NucleotideSequence
 import com.milaboratory.core.tree.SequenceTreeMap
