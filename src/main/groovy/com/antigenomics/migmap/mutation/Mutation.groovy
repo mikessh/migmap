@@ -31,7 +31,7 @@ class Mutation implements Serializable {
     Segment parent
     SubRegion subRegion
 
-    static Mutation fromString(String signature) {
+    static Mutation fromString(String signature, String aaSignature = null) {
         MutationType type = MutationType.byShortName(signature[0])
 
         def tmp = signature.substring(1).split(":")
@@ -51,7 +51,28 @@ class Mutation implements Serializable {
                 ntTo = tmp[1]
                 break
         }
-        new Mutation(type, pos, -1, -1, -1, ntFrom, ntTo)
+
+        def mutation = new Mutation(type, pos, pos, -1, -1, ntFrom, ntTo)
+
+        if (aaSignature) {
+            def fromToAA = signature.split(":")[1].split(">")
+            switch (type) {
+                case MutationType.Substitution:
+                    mutation.aaFrom = fromToAA[0]
+                    mutation.aaTo = fromToAA[1]
+                    break
+                case MutationType.Deletion:
+                    mutation.aaFrom = fromToAA[0]
+                    mutation.aaTo = ""
+                    break
+                case MutationType.Insertion:
+                    mutation.aaFrom = ""
+                    mutation.aaTo = fromToAA[0]
+                    break
+            }
+        }
+
+        mutation
     }
 
     Mutation(MutationType type,

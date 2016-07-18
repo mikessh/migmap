@@ -16,8 +16,6 @@
 
 package com.antigenomics.migmap.mutation
 
-import com.antigenomics.migmap.Util
-import com.antigenomics.migmap.clonotype.Clonotype
 import groovy.transform.CompileStatic
 
 @CompileStatic

@@ -41,6 +41,34 @@ class Clonotype implements Comparable<Clonotype>, Serializable {
     final PSegments pSegments
     final ReadMapping representativeMapping
 
+    Clonotype(String cdr3nt, String cdr3aa,
+              Segment vSegment, Segment dSegment, Segment jSegment,
+              List<Mutation> mutations,
+              long count, double freq,
+              byte[] cdrInsertQual, byte[] mutationQual,
+              boolean hasCdr3, boolean complete, boolean inFrame, boolean noStop, boolean canonical,
+              Cdr3Markup cdr3Markup, Truncations truncations, PSegments pSegments) {
+        this.cdr3nt = cdr3nt
+        this.cdr3aa = cdr3aa
+        this.vSegment = vSegment
+        this.dSegment = dSegment
+        this.jSegment = jSegment
+        this.mutations = mutations
+        this.count = count
+        this.freq = freq
+        this.cdrInsertQual = cdrInsertQual
+        this.mutationQual = mutationQual
+        this.hasCdr3 = hasCdr3
+        this.complete = complete
+        this.inFrame = inFrame
+        this.noStop = noStop
+        this.canonical = canonical
+        this.cdr3Markup = cdr3Markup
+        this.truncations = truncations
+        this.pSegments = pSegments
+        this.representativeMapping = null
+    }
+
     Clonotype(ClonotypeKey key, ClonotypeData data, long total) {
         this.representativeMapping = key.representativeMapping
         this.cdr3nt = representativeMapping.cdr3nt
