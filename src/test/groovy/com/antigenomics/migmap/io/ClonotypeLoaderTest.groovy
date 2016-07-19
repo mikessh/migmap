@@ -16,12 +16,46 @@
 
 package com.antigenomics.migmap.io
 
+import com.antigenomics.migmap.mutation.SubRegion
 import com.antigenomics.migmap.pipeline.PipelineTestCache
 import com.antigenomics.migmap.clonotype.Clonotype
 import com.antigenomics.migmap.mutation.Mutation
 import org.junit.Test
 
 class ClonotypeLoaderTest {
+    @Test
+    void decodeMutationTest() {
+        def ntMut = "S5:G>A,S8:G>C,S41:T>G,S67:C>A,S70:C>T,S71:C>T"
+        def aaMut = "S1:V>V,S2:Q>H,S13:P>P,S22:A>E,S23:A>V,S23:A>V"
+
+        def mutations = ClonotypeLoader.decodeMutations(ntMut, aaMut, SubRegion.FR1)
+
+        assert ntMut == mutations.collect { it.toString() }.join(",")
+        assert aaMut == mutations.collect { it.toStringAa() }.join(",")
+    }
+
+    @Test
+    void decodeMutationSingleTest() {
+        def ntMut = "S5:G>A"
+        def aaMut = "S1:V>V"
+
+        def mutations = ClonotypeLoader.decodeMutations(ntMut, aaMut, SubRegion.FR1)
+
+        assert ntMut == mutations.collect { it.toString() }.join(",")
+        assert aaMut == mutations.collect { it.toStringAa() }.join(",")
+    }
+
+    @Test
+    void decodeMutationEmptyTest() {
+        def ntMut = ""
+        def aaMut = ""
+
+        def mutations = ClonotypeLoader.decodeMutations(ntMut, aaMut, SubRegion.FR1)
+
+        assert ntMut == mutations.collect { it.toString() }.join(",")
+        assert aaMut == mutations.collect { it.toStringAa() }.join(",")
+    }
+
     @Test
     void loadSavedTest() {
         def originalClonotypes = PipelineTestCache.INSTANCE.clonotypes

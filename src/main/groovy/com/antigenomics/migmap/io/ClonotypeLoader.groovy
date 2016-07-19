@@ -110,23 +110,38 @@ class ClonotypeLoader {
     static List<Mutation> decodeMutations(String[] splitLine) {
         def mutations = new ArrayList<Mutation>()
         SubRegion.REGION_LIST.each { SubRegion subRegion ->
-            def ntMutationStr = splitLine[columnIndexMap["mutations.nt." + subRegion.toString()]].trim()
+            def ntMutationStr = splitLine[columnIndexMap["mutations.nt." + subRegion.toString()]].trim(),
+                aaMutationStr = splitLine[columnIndexMap["mutations.aa." + subRegion.toString()]].trim()
 
-            if (ntMutationStr.length() > 0) {
-                def ntMutations = ntMutationStr.split(","),
-                    aaMutations = splitLine[columnIndexMap["mutations.aa." + subRegion.toString()]].trim().split(",")
-
-                for (int i = 0; i < ntMutations.length; i++) {
-                    def ntMutation = ntMutations[i],
-                        aaMutation = aaMutations[i]
-
-                    def mutation = Mutation.fromString(ntMutation, aaMutation)
-
-                    mutation.subRegion = subRegion
-                    // todo: Parent segment (need segment database and some special coding magick)
-                }
-            }
+            def regionMutations = decodeMutations(ntMutationStr, aaMutationStr, subRegion)
+            mutations.addAll(regionMutations)
         }
+        mutations
+    }
+
+    static List<Mutation> decodeMutations(String ntString,
+                                          String aaString,
+                                          SubRegion subRegion) {
+        def mutations = new ArrayList<Mutation>()
+
+        if (ntString.length() == 0)
+            return mutations
+
+        def ntMutations = ntString.split(","),
+            aaMutations = aaString.split(",")
+
+        for (int i = 0; i < ntMutations.length; i++) {
+            def ntMutation = ntMutations[i],
+                aaMutation = aaMutations[i]
+
+            def mutation = Mutation.fromString(ntMutation, aaMutation)
+
+            mutation.subRegion = subRegion
+            // todo: Parent segment (need segment database and some special coding magick)
+
+            mutations.add(mutation)
+        }
+
         mutations
     }
 

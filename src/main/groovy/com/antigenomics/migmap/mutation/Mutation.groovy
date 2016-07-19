@@ -55,7 +55,7 @@ class Mutation implements Serializable {
         def mutation = new Mutation(type, pos, pos, -1, -1, ntFrom, ntTo)
 
         if (aaSignature) {
-            def fromToAA = signature.split(":")[1].split(">")
+            def fromToAA = aaSignature.split(":")[1].split(">")
             switch (type) {
                 case MutationType.Substitution:
                     mutation.aaFrom = fromToAA[0]
@@ -70,6 +70,7 @@ class Mutation implements Serializable {
                     mutation.aaTo = fromToAA[0]
                     break
             }
+            mutation.aaPos = (int) (pos / 3i)
         }
 
         mutation
