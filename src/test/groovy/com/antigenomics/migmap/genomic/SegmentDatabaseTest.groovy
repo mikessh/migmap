@@ -17,7 +17,6 @@
 package com.antigenomics.migmap.genomic
 
 import com.antigenomics.migmap.blast.BlastInstanceFactory
-import org.junit.AfterClass
 import org.junit.Test
 
 class SegmentDatabaseTest {

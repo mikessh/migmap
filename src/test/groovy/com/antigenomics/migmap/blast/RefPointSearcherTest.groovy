@@ -16,31 +16,23 @@
 
 package com.antigenomics.migmap.blast
 
-import com.antigenomics.migmap.PipelineResults
-import org.junit.AfterClass
 import org.junit.Test
 
 import static com.antigenomics.migmap.blast.BlastTestUtil.*
 
 class RefPointSearcherTest {
-    final BlastInstance blastInstance
-
-    RefPointSearcherTest() {
-        blastInstance = PipelineResults.INSTANCE.factory.create()
-    }
-
     @Test
     void cdr3EndTest() {
         def seq = "CAGGTGCAGCTGCAGGAGTCGGGCCCAGGACTGGTAAAGCCTTCGGAGACCCTGTCCCTCACCTGCGGTGTCTCTGGTTACTCCATAAGCAGTGGTTACTACTGGGCCTGGATCCGGCAGCCCCCAGGGAAGGGGCTGGAGTGGGTTGCGACTATCTATCATGATGGAAGATCCTACTACAACCCGTCCCTGGAAAGTCGAGTCACCATATCAGTAGACACGTCCAAGAACCAGTTCTCCCTGAGGCTGACTTCTGTGACCGCCGCAGACACGGCCGTATATTTCTGTGCGAGGGATCAGGGGCCACGAGACCACCCCAGTTCATCGTTTTGGGGCCAGGGAACCCTGGTCACCGTCTCCTCA"
         def read = toRead(seq)
         def chunk = toChunk(read)
 
-        def mapping = parser.parse(chunk)
+        def mapping = toMapping(chunk)
         assert mapping.hasCdr3
         assert mapping.complete
         assert mapping.regionMarkup.cdr3End == 333
 
-        def readMapping = blastInstance.createReadMapping(mapping, read)
+        def readMapping = toReadMapping(mapping, read)
         assert readMapping.canonical
         assert readMapping.cdr3nt == "TGTGCGAGGGATCAGGGGCCACGAGACCACCCCAGTTCATCGTTTTGG"
     }
@@ -51,9 +43,9 @@ class RefPointSearcherTest {
         def read = toRead(seq)
         def chunk = toChunk(read)
 
-        def mapping = parser.parse(chunk)
+        def mapping = toMapping(chunk)
 
-        def readMapping = blastInstance.createReadMapping(mapping, read)
+        def readMapping = toReadMapping(mapping, read)
         assert readMapping.cdr3nt == "TGCACCACCTATGGTTATTATTACTATTACGGCATGGACGTCTGG"
     }
 
@@ -63,9 +55,9 @@ class RefPointSearcherTest {
         def read = toRead(seq)
         def chunk = toChunk(read)
 
-        def mapping = parser.parse(chunk)
+        def mapping = toMapping(chunk)
 
-        def readMapping = blastInstance.createReadMapping(mapping, read)
+        def readMapping = toReadMapping(mapping, read)
         assert readMapping.cdr3nt == "TGTCTTGGTGACAACGGCCATTGG"
     }
 
@@ -99,14 +91,8 @@ class RefPointSearcherTest {
                 "J\tIGHJ6*04\t415\tTTACTACTACTACTACGGTATGGACGTCTGG\t2\tTTACTACTACTACTACGGTATGGACGTCTGG\n" +
                 "# BLAST processed 1 queries"
 
-        def mapping = blastInstance.parser.parse(chunk)
+        def mapping = toMapping(chunk)
 
         assert mapping.complete
-    }
-
-    @AfterClass
-    void tearDown() {
-        blastInstance.put(null)
-        blastInstance.close()
     }
 }

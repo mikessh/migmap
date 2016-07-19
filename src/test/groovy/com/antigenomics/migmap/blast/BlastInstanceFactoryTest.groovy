@@ -17,10 +17,8 @@
 package com.antigenomics.migmap.blast
 
 import com.antigenomics.migmap.ExecutionUtil
-import com.antigenomics.migmap.PipelineResults
+import com.antigenomics.migmap.PipelineTestCache
 import com.antigenomics.migmap.Util
-import com.antigenomics.migmap.genomic.SegmentDatabase
-import org.junit.AfterClass
 import org.junit.Test
 
 class BlastInstanceFactoryTest {
@@ -33,7 +31,7 @@ class BlastInstanceFactoryTest {
 
     @Test
     void createTest() {
-        def instances = (1..Util.N_THREADS).collect { PipelineResults.INSTANCE.factory.create() }
+        def instances = (1..Util.N_THREADS).collect { PipelineTestCache.INSTANCE.factory.create() }
         instances.each { BlastInstance it -> it.put(null); it.close() }
     }
 }

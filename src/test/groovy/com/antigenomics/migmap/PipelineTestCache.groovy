@@ -27,8 +27,8 @@ import com.antigenomics.migmap.io.ReadMappingOutput
 import com.antigenomics.migmap.mapping.ReadMappingDetailsProvider
 import com.antigenomics.migmap.mapping.ReadMappingFilter
 
-class PipelineResults {
-    static final PipelineResults INSTANCE = new PipelineResults()
+class PipelineTestCache {
+    static final PipelineTestCache INSTANCE = new PipelineTestCache()
 
     final BlastInstanceFactory factory = new BlastInstanceFactory("data/", "human", ["IGH"])
     final Pipeline pipeline
@@ -37,7 +37,7 @@ class PipelineResults {
     final File byReadOutputFile = new File("byread.tmp.txt"),
                clonotypeOutputFile = new File("clonotypes.tmp.txt")
 
-    private PipelineResults() {
+    private PipelineTestCache() {
         factory.annotateV()
 
         def reader = new FastqReader("sample.fastq.gz", true)

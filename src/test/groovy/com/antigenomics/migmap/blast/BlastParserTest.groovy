@@ -17,11 +17,8 @@
 package com.antigenomics.migmap.blast
 
 import com.antigenomics.migmap.genomic.SegmentDatabase
-import com.antigenomics.migmap.mapping.ReadMapping
 import com.antigenomics.migmap.mutation.MutationType
 import com.antigenomics.migmap.mutation.SubRegion
-import org.junit.AfterClass
-import org.junit.Ignore
 import org.junit.Test
 
 import static com.antigenomics.migmap.blast.BlastTestUtil.*
@@ -29,9 +26,6 @@ import static com.antigenomics.migmap.blast.BlastTestUtil.*
 class BlastParserTest {
     @Test
     void exactTest() {
-        def segmentDatabase = new SegmentDatabase("data/", "human", ["IGH"])
-        def parser = new BlastParser(segmentDatabase)
-
         def chunk = "# IGBLASTN 2.2.29+\n" +
                 "# Query: @MIG UMI:GGATATGCCGCTC:8|TAAGAGGGCAGTGGTATCAACGCAGAGTACGGATATTCTGAGGTCCGCTCTCTTGGGGGGCTTTCTGAGAGTCGTGGATCTCATGTGCAAGAAAATGAAGCACCTGTGGTTCTTCCTCCTGCTGGTGGCGGCTCCCAGATGGGTCCTGTCCCAGCTGCAGCTGCAGGAGTCGGGCCCAGGACTGGTGAAGCCCTCGGAGACCCTGTCCCTCAGGTGCACTGTCTCTGGGGGCTCCATGACAAGAACTACTGACTACTGGGGCTGGGTCCGCCAGCCCCCAGGGAAGGGACTGGAGTGGATTGCAAGTGTCTCTTATAGTGGGAGCACCACCTACAACCCGTCCCGGAAGAGTCGAGTCACAATCTCCCTAGACCCGTCCAGGAACGAACTCTCCCTGGAACTGAGGTCCATGACCGCCGCAGACACGGCTGTGTATTTCTGTGCGAGGTGGCTTGGGGAAGACATTCGGACCTTTGACTCCTGGGGCCAGGGAACCCTGGTCACCGTCTCTAA|#'.IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIBIBIIIIIIIIIIIIIIIIIIIIIBIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIBIIBIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIBIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIBIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIBIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIB;IIIIIIIIIIII.''\n" +
                 "# Database: data//database-66ede6f0-a68a-4931-bd32-5cabd404d955/v data//database-66ede6f0-a68a-4931-bd32-5cabd404d955/d data//database-66ede6f0-a68a-4931-bd32-5cabd404d955/j\n" +
@@ -59,7 +53,7 @@ class BlastParserTest {
                 "D\tIGHD6-19*01\t448\tGTGGCT\t11\tGTGGCT\n" +
                 "J\tIGHJ4*02\t472\tCTTTGACTCCTGGGGCCAGGGAACCCTGGTCACCGTCTC\t5\tCTTTGACTACTGGGGCCAGGGAACCCTGGTCACCGTCTC"
 
-        def mapping = parser.parse(chunk)
+        def mapping = toMapping(chunk)
 
         assert mapping.vSegment.name == "IGHV4-39*01"
         assert mapping.dSegment.name == "IGHD6-19*01"
@@ -123,10 +117,7 @@ class BlastParserTest {
                 "J\tIGHJ4*02\t51\tCTTTGACTCCTGGGGCCAGGGAACCCTGGTCACCGTCTC\t5\tCTTTGACTACTGGGGCCAGGGAACCCTGGTCACCGTCTC\n" +
                 "# BLAST processed 1 queries"
 
-        def segmentDatabase = new SegmentDatabase("data/", "human", ["IGH"])
-        def parser = new BlastParser(segmentDatabase)
-
-        def mapping = parser.parse(chunk)
+        def mapping = toMapping(chunk)
         def mutations = mapping.mutations
 
         assert mutations.size() == 3
@@ -179,10 +170,7 @@ class BlastParserTest {
                 "J\tIGHJ6*02\t395\tACGGTATGGACGTCTGGGGCCAAGGGACCACGGTCACCGTCTCCTCA\t16\tACGGTATGGACGTCTGGGGCCAAGGGACCACGGTCACCGTCTCCTCA\n" +
                 "# BLAST processed 1 queries"
 
-        def segmentDatabase = new SegmentDatabase("data/", "human", ["IGH"])
-        def parser = new BlastParser(segmentDatabase)
-
-        def mapping = parser.parse(chunk)
+        def mapping = toMapping(chunk)
         def mutations = mapping.mutations
 
         assert mutations[0].subRegion == SubRegion.CDR2
@@ -232,10 +220,7 @@ class BlastParserTest {
                 "J\tIGHJ5*02\t310\tAACTGGCTCGACCCCTGGGGCCAGGGAACCCTGGTCACTGTCTCCTCA\t3\tAACTGGTTCGACCCCTGGGGCCAGGGAACCCTGGTCACCGTCTCCTCA\n" +
                 "# BLAST processed 1 queries"
 
-        def segmentDatabase = new SegmentDatabase("data/", "human", ["IGH"])
-        def parser = new BlastParser(segmentDatabase)
-
-        def mapping = parser.parse(chunk)
+        def mapping = toMapping(chunk)
         def mutations = mapping.mutations
 
         def dels = mutations.findAll { it.type == MutationType.Deletion }
@@ -246,9 +231,6 @@ class BlastParserTest {
 
     @Test
     void truncationTest() {
-        def segmentDatabase = new SegmentDatabase("data/", "human", ["IGH"])
-        def parser = new BlastParser(segmentDatabase)
-
         def chunk = "# IGBLASTN 2.2.29+\n" +
                 "# Query: @MIG UMI:GGATATGCCGCTC:8|TAAGAGGGCAGTGGTATCAACGCAGAGTACGGATATTCTGAGGTCCGCTCTCTTGGGGGGCTTTCTGAGAGTCGTGGATCTCATGTGCAAGAAAATGAAGCACCTGTGGTTCTTCCTCCTGCTGGTGGCGGCTCCCAGATGGGTCCTGTCCCAGCTGCAGCTGCAGGAGTCGGGCCCAGGACTGGTGAAGCCCTCGGAGACCCTGTCCCTCAGGTGCACTGTCTCTGGGGGCTCCATGACAAGAACTACTGACTACTGGGGCTGGGTCCGCCAGCCCCCAGGGAAGGGACTGGAGTGGATTGCAAGTGTCTCTTATAGTGGGAGCACCACCTACAACCCGTCCCGGAAGAGTCGAGTCACAATCTCCCTAGACCCGTCCAGGAACGAACTCTCCCTGGAACTGAGGTCCATGACCGCCGCAGACACGGCTGTGTATTTCTGTGCGAGGTGGCTTGGGGAAGACATTCGGACCTTTGACTCCTGGGGCCAGGGAACCCTGGTCACCGTCTCTAA|#'.IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIBIBIIIIIIIIIIIIIIIIIIIIIBIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIBIIBIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIBIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIBIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIBIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIB;IIIIIIIIIIII.''\n" +
                 "# Database: data//database-66ede6f0-a68a-4931-bd32-5cabd404d955/v data//database-66ede6f0-a68a-4931-bd32-5cabd404d955/d data//database-66ede6f0-a68a-4931-bd32-5cabd404d955/j\n" +
@@ -276,7 +258,7 @@ class BlastParserTest {
                 "D\tIGHD6-19*01\t448\tGTGGCT\t11\tGTGGCT\n" +
                 "J\tIGHJ4*02\t472\tCTTTGACTCCTGGGGCCAGGGAACCCTGGTCACCGTCTC\t5\tCTTTGACTACTGGGGCCAGGGAACCCTGGTCACCGTCTC"
 
-        def mapping = parser.parse(chunk)
+        def mapping = toMapping(chunk)
 
         assert mapping.truncations.vDel == 3
         assert mapping.truncations.dDel5 == 10
@@ -299,7 +281,7 @@ class BlastParserTest {
         def read = toRead(seq)
         def chunk = toChunk(read)
 
-        def mapping = parser.parse(chunk)
+        def mapping = toMapping(chunk)
 
         assert !mapping.hasCdr3
         assert !mapping.complete

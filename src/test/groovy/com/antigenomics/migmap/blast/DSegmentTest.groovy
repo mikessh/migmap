@@ -16,28 +16,20 @@
 
 package com.antigenomics.migmap.blast
 
-import com.antigenomics.migmap.PipelineResults
 import com.antigenomics.migmap.genomic.Segment
-import org.junit.AfterClass
 import org.junit.Ignore
 import org.junit.Test
 
 import static com.antigenomics.migmap.blast.BlastTestUtil.*
 
 class DSegmentTest {
-    final BlastInstance blastInstance
-
-    DSegmentTest() {
-        blastInstance = PipelineResults.INSTANCE.factory.create()
-    }
-
     @Test
     void igblastOnlyTest() {
         def seq = "GACACGGCCGTATATTTCTGTGCGAGGGATCAGGGGCCACGAGACCACCCCAGTTCATCGAATTGGGGCCAGGGAACCCTGGTCACCGTC"
         def read = toRead(seq)
         def chunk = toChunk(read)
-        def mapping = parser.parse(chunk)
-        def readMapping = blastInstance.createReadMapping(mapping, read)
+        def mapping = toMapping(chunk)
+        def readMapping = toReadMapping(mapping, read)
 
         assert readMapping.mapping.dSegment.name == "IGHD1-14*01"
         assert readMapping.mapping.cdr3Markup.dStart == 25
@@ -57,18 +49,12 @@ class DSegmentTest {
         def seq = "GACACGGCCGTATATTTCTGTGCGAGGGATCAGGGGCCACGAGCCGGCCAGGGAACCCTGGTCACCGTC"
         def read = toRead(seq)
         def chunk = toChunk(read)
-        def mapping = parser.parse(chunk)
-        def readMapping = blastInstance.createReadMapping(mapping, read)
+        def mapping = toMapping(chunk)
+        def readMapping = toReadMapping(mapping, read)
 
         assert mapping.dSegment == Segment.DUMMY_D
         assert readMapping.mapping.dSegment.name == "IGHD2-15*01"
         assert readMapping.mapping.cdr3Markup.dStart == 8
         assert readMapping.mapping.cdr3Markup.dEnd == 12
-    }
-
-    @AfterClass
-    void tearDown() {
-        blastInstance.put(null)
-        blastInstance.close()
     }
 }

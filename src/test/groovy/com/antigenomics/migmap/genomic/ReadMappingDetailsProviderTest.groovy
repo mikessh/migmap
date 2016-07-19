@@ -19,7 +19,6 @@ package com.antigenomics.migmap.genomic
 import com.antigenomics.migmap.blast.BlastInstanceFactory
 import com.antigenomics.migmap.io.Read
 import com.antigenomics.migmap.mapping.ReadMappingDetailsProvider
-import org.junit.AfterClass
 import org.junit.Test
 
 class ReadMappingDetailsProviderTest {

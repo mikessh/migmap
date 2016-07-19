@@ -16,7 +16,7 @@
 
 package com.antigenomics.migmap.blast
 
-import com.antigenomics.migmap.PipelineResults
+import com.antigenomics.migmap.PipelineTestCache
 import com.antigenomics.migmap.io.Read
 import org.junit.Test
 
@@ -46,7 +46,7 @@ class BlastInstanceTest {
 
     @Test
     void singleQueryTest() {
-        def instance = PipelineResults.INSTANCE.factory.create()
+        def instance = PipelineTestCache.INSTANCE.factory.create()
 
         def read = new Read(
                 "@MIG UMI:GGATATGCCGCTC:8",
@@ -82,7 +82,7 @@ class BlastInstanceTest {
     @Test
     void multiQueryTest() {
         int nQueries = 100
-        def instance = PipelineResults.INSTANCE.factory.create()
+        def instance = PipelineTestCache.INSTANCE.factory.create()
 
         def readsIds = new HashSet<String>()
 
@@ -104,6 +104,8 @@ class BlastInstanceTest {
 
         assert extractedIds.size() == nQueries
         assert intersection.size() == nQueries
+
+        instance.close()
 
         assert instance.proc.exitValue() == 0
     }

@@ -1,6 +1,6 @@
 package com.antigenomics.migmap.mutation
 
-import com.antigenomics.migmap.PipelineResults
+import com.antigenomics.migmap.PipelineTestCache
 import com.antigenomics.migmap.blast.Alignment
 import com.antigenomics.migmap.mapping.RegionMarkup
 import org.junit.Test
@@ -33,7 +33,7 @@ class MutationConverterTest {
                 "GCACAGAAGTTTCAGGGCAGGGTCACCATGACCAGGGACACGTCCATGACCACAATCTACATGGAGCTGAGCGGACTCACATCTGACGAC" +
                 "ACGGCCGTGTATTTTTGTACCAGA"
 
-        def segment = PipelineResults.INSTANCE.segmentDatabase.segments["IGHV1-2*02"]
+        def segment = PipelineTestCache.INSTANCE.segmentDatabase.segments["IGHV1-2*02"]
         def regionMarkup = new RegionMarkup(75, 99, 150, 174, 287, 288)
         def alignment = new Alignment(0, query, 0, segment.sequence.substring(0, query.length()))
         def mutations = new MutationExtractor(segment, alignment, regionMarkup).mutations
@@ -56,7 +56,7 @@ class MutationConverterTest {
                 "GCACAGAAGTTTCAGGGCAGGGTCACCATGACCAGGGACACGTCCATGACCACAATCTACATGGAGCTGAGCGGACTCACATCTGACGAC" +
                 "ACGGCCGTGTATTTTTGTACCAGA"
 
-        def segment = PipelineResults.INSTANCE.segmentDatabase.segments["IGHV1-2*02"]
+        def segment = PipelineTestCache.INSTANCE.segmentDatabase.segments["IGHV1-2*02"]
         def regionMarkup = new RegionMarkup(75 - 2, 99 - 2, 150 - 2, 174 - 2, 287 - 2, 288 - 2)
         def alignment = new Alignment(0, query, 2, segment.sequence.substring(2, 2 + query.length()))
         def mutations = new MutationExtractor(segment, alignment, regionMarkup).mutations
@@ -79,7 +79,7 @@ class MutationConverterTest {
                 "GCACAGAAGTTTCAGGGCAGGGTCACCATGACCAGGGACACGTCCATGACCACAATCTACATGGAGCTGAGCGGACTCACATCTGACGAC" +
                 "ACGGCCGTGTATTTTTGTACCAGA"
 
-        def segment = PipelineResults.INSTANCE.segmentDatabase.segments["IGHV1-2*02"]
+        def segment = PipelineTestCache.INSTANCE.segmentDatabase.segments["IGHV1-2*02"]
         def regionMarkup = new RegionMarkup(75 - 1, 99 - 1, 150 - 1, 174 - 1, 287 - 1, 288 - 1)
         def alignment = new Alignment(1, query.substring(1), 2, segment.sequence.substring(2, 2 + query.length() - 1))
         def mutations = new MutationExtractor(segment, alignment, regionMarkup).mutations

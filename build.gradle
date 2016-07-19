@@ -36,7 +36,6 @@ dependencies {
     compile 'com.milaboratory:milib:1.2'
 }
 
-
 test {
     jvmArgs "-Xmx4G"
 

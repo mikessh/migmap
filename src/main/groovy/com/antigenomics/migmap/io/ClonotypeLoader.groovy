@@ -68,11 +68,11 @@ class ClonotypeLoader {
         polJInd = columnIndexMap["pol.j"]
     }
 
-    static List<Clonotype> load(String plainTextOutput) {
+    static List<Clonotype> load(File plainTextOutputFile) {
         def clonotypes = new ArrayList<Clonotype>()
         boolean firstLine = true
 
-        new File(plainTextOutput).splitEachLine("\t") { splitLine ->
+        plainTextOutputFile.splitEachLine("\t") { splitLine ->
             if (firstLine) {
                 if (!splitLine.join("\t").startsWith(Clonotype.OUTPUT_HEADER)) {
                     throw new RuntimeException("Bad clonotype table header")

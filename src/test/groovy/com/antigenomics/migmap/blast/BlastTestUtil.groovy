@@ -16,24 +16,35 @@
 
 package com.antigenomics.migmap.blast
 
-import com.antigenomics.migmap.genomic.SegmentDatabase
+import com.antigenomics.migmap.PipelineTestCache
 import com.antigenomics.migmap.io.Read
+import com.antigenomics.migmap.mapping.Mapping
+import com.antigenomics.migmap.mapping.ReadMapping
 
 class BlastTestUtil {
-    final static SegmentDatabase segmentDatabase = new SegmentDatabase("data/", "human", ["IGH"])
-    final static BlastParser parser = new BlastParser(segmentDatabase)
+    private static final BlastInstance _instance
+    static {
+        _instance = PipelineTestCache.INSTANCE.factory.create()
+        _instance.put(null)
+        _instance.close()
+    }
+
+    static Mapping toMapping(String chunk) {
+        _instance.parser.parse(chunk)
+    }
+
+    static ReadMapping toReadMapping(Mapping mapping, Read read) {
+        _instance.createReadMapping(mapping, read)
+    }
 
     static Read toRead(String seq) {
         new Read("@test", seq, "I" * seq.length())
     }
 
     static String toChunk(Read read) {
-        def factory = new BlastInstanceFactory("data/", "human", ["IGH"], true, false)
-        def instance = factory.create()
-
+        def instance = PipelineTestCache.INSTANCE.factory.create()
         instance.put(read)
         instance.put(null)
-
         instance.nextChunk()
     }
 }

@@ -24,7 +24,7 @@ import org.junit.Test
 
 import java.util.concurrent.atomic.AtomicInteger
 
-import static com.antigenomics.migmap.PipelineResults.INSTANCE
+import static PipelineTestCache.INSTANCE
 
 class PipelineTest {
     private static class NullOutputStream extends OutputStream {
