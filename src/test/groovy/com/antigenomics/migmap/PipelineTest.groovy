@@ -16,6 +16,7 @@
 
 package com.antigenomics.migmap
 
+import com.antigenomics.migmap.blast.BlastInstanceFactory
 import com.antigenomics.migmap.io.*
 import com.antigenomics.migmap.mapping.ReadMapping
 import com.antigenomics.migmap.mapping.ReadMappingDetailsProvider
@@ -86,7 +87,8 @@ class PipelineTest {
     void fastaTest() {
         def reader = new FastaReader("sample.fasta.gz", true)
 
-        def pipeline = new Pipeline(reader, INSTANCE.factory,
+        def pipeline = new Pipeline(reader,
+                new BlastInstanceFactory("data/", "human", ["IGH"]),
                 DummyInputPort.INSTANCE,
                 ReadMappingFilter.createDummy())
 
@@ -103,7 +105,8 @@ class PipelineTest {
         def badDCount = new AtomicInteger(),
             wrongMappingCount = new AtomicInteger()
 
-        def pipeline = new Pipeline(reader, INSTANCE.factory,
+        def pipeline = new Pipeline(reader,
+                new BlastInstanceFactory("data/", "human", ["IGH"]),
                 new InputPort<ReadMapping>() {
                     @Override
                     void put(ReadMapping obj) {
@@ -134,7 +137,8 @@ class PipelineTest {
 
         def filter = new ReadMappingFilter((byte) 20, true, true, true, true)
 
-        def pipeline = new Pipeline(reader, INSTANCE.factory,
+        def pipeline = new Pipeline(reader,
+                new BlastInstanceFactory("data/", "human", ["IGH"]),
                 new ReadMappingOutput(new PlainTextOutput(NullOutputStream.INSTANCE),
                         new ReadMappingDetailsProvider()),
                 filter)

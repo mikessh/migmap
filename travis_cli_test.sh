@@ -1,6 +1,6 @@
-MIGMAP="java -Xmx4G -jar `ls build/libs/migmap-*.jar`"
-$MIGMAP -S human -R IGH src/test/resources/sample.fastq.gz out.txt
-$MIGMAP -S human -R IGH --by-read src/test/resources/sample.fastq.gz - > out2.txt
+MIGMAP="java -Xmx4G -jar `ls build/libs/migmap-*.jar` --blast-dir . --data-dir data/ -S human -R IGH"
+$MIGMAP src/test/resources/sample.fastq.gz out.txt
+$MIGMAP --by-read src/test/resources/sample.fastq.gz - > out2.txt
 
 for f in out.txt out2.txt
 do
