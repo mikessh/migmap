@@ -16,7 +16,7 @@
 
 package com.antigenomics.migmap.mutation
 
-import com.antigenomics.migmap.Util
+import com.antigenomics.migmap.pipeline.Util
 import com.antigenomics.migmap.blast.Alignment
 import com.antigenomics.migmap.genomic.Segment
 import com.antigenomics.migmap.mapping.RegionMarkup

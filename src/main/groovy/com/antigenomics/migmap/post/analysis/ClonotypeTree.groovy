@@ -16,7 +16,7 @@
 
 package com.antigenomics.migmap.post.analysis
 
-import com.antigenomics.migmap.Util
+import com.antigenomics.migmap.pipeline.Util
 import com.antigenomics.migmap.clonotype.Clonotype
 import com.antigenomics.migmap.mutation.Mutation
 import com.milaboratory.core.alignment.Alignment

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.antigenomics.migmap
+package com.antigenomics.migmap.pipeline
 
 class ExecutionUtil {
     static final boolean WIN = System.properties['os.name'].toLowerCase().contains('windows')

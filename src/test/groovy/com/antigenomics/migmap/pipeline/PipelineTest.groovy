@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.antigenomics.migmap
+package com.antigenomics.migmap.pipeline
 
+import com.antigenomics.migmap.blast.BlastTestUtil
 import com.antigenomics.migmap.io.*
 import com.antigenomics.migmap.mapping.ReadMapping
 import com.antigenomics.migmap.mapping.ReadMappingDetailsProvider
@@ -23,8 +24,6 @@ import com.antigenomics.migmap.mapping.ReadMappingFilter
 import org.junit.Test
 
 import java.util.concurrent.atomic.AtomicInteger
-
-import static PipelineTestCache.INSTANCE
 
 class PipelineTest {
     private static class NullOutputStream extends OutputStream {
@@ -37,11 +36,11 @@ class PipelineTest {
 
     @Test
     void sampleTest() {
-        assert INSTANCE.pipeline.inputCount == 1000
-        assert INSTANCE.pipeline.readMappingFilter.mappedRatio >= 0.95
-        assert INSTANCE.pipeline.readMappingFilter.noCdr3Ratio <= 0.1
-        assert INSTANCE.pipeline.readMappingFilter.incompleteRatio <= 0.1
-        assert INSTANCE.pipeline.readMappingFilter.nonCanonicalRatio <= 0.1
+        assert PipelineTestCache.INSTANCE.pipeline.inputCount == 1000
+        assert PipelineTestCache.INSTANCE.pipeline.readMappingFilter.mappedRatio >= 0.95
+        assert PipelineTestCache.INSTANCE.pipeline.readMappingFilter.noCdr3Ratio <= 0.1
+        assert PipelineTestCache.INSTANCE.pipeline.readMappingFilter.incompleteRatio <= 0.1
+        assert PipelineTestCache.INSTANCE.pipeline.readMappingFilter.nonCanonicalRatio <= 0.1
     }
 
     /*
@@ -87,7 +86,7 @@ class PipelineTest {
         def reader = new FastaReader("sample.fasta.gz", true)
 
         def pipeline = new Pipeline(reader,
-                INSTANCE.factory,
+                BlastTestUtil.blastInstanceFactory,
                 DummyInputPort.INSTANCE,
                 ReadMappingFilter.createDummy())
 
@@ -105,7 +104,7 @@ class PipelineTest {
             wrongMappingCount = new AtomicInteger()
 
         def pipeline = new Pipeline(reader,
-                INSTANCE.factory,
+                BlastTestUtil.blastInstanceFactory,
                 new InputPort<ReadMapping>() {
                     @Override
                     void put(ReadMapping obj) {
@@ -137,7 +136,7 @@ class PipelineTest {
         def filter = new ReadMappingFilter((byte) 20, true, true, true, true)
 
         def pipeline = new Pipeline(reader,
-                INSTANCE.factory,
+                BlastTestUtil.blastInstanceFactory,
                 new ReadMappingOutput(new PlainTextOutput(NullOutputStream.INSTANCE),
                         new ReadMappingDetailsProvider()),
                 filter)

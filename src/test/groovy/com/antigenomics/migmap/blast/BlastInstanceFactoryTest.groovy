@@ -16,9 +16,8 @@
 
 package com.antigenomics.migmap.blast
 
-import com.antigenomics.migmap.ExecutionUtil
-import com.antigenomics.migmap.PipelineTestCache
-import com.antigenomics.migmap.Util
+import com.antigenomics.migmap.pipeline.ExecutionUtil
+import com.antigenomics.migmap.pipeline.Util
 import org.junit.Test
 
 class BlastInstanceFactoryTest {
@@ -31,7 +30,9 @@ class BlastInstanceFactoryTest {
 
     @Test
     void createTest() {
-        def instances = (1..Util.N_THREADS).collect { PipelineTestCache.INSTANCE.factory.create() }
+        def factory = new BlastInstanceFactory("data/", "human", ["IGH"])
+
+        def instances = (1..Util.N_THREADS).collect { factory.create() }
         instances.each { BlastInstance it -> it.put(null); it.close() }
     }
 }

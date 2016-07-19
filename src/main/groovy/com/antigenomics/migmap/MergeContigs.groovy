@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.antigenomics.migmap.post
+package com.antigenomics.migmap
 
-import com.antigenomics.migmap.Util
-import groovy.transform.Canonical
+import com.antigenomics.migmap.pipeline.Util
+import com.antigenomics.migmap.post.ContigMergerClonotypeEntry
 
 def cli = new CliBuilder(usage: "MergeContigs [options] clonotype_table.txt output.txt")
 

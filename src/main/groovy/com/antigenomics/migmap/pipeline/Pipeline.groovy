@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.antigenomics.migmap
+package com.antigenomics.migmap.pipeline
 
 import com.antigenomics.migmap.blast.BlastInstance
 import com.antigenomics.migmap.blast.BlastInstanceFactory

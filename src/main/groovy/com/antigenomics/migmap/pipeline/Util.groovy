@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.antigenomics.migmap
+package com.antigenomics.migmap.pipeline
 
 import com.antigenomics.migmap.genomic.SegmentDatabase
 import groovy.transform.CompileStatic

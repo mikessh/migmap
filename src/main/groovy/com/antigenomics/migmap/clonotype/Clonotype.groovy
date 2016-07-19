@@ -16,7 +16,7 @@
 
 package com.antigenomics.migmap.clonotype
 
-import com.antigenomics.migmap.Util
+import com.antigenomics.migmap.pipeline.Util
 import com.antigenomics.migmap.blast.PSegments
 import com.antigenomics.migmap.genomic.Segment
 import com.antigenomics.migmap.mapping.Cdr3Markup

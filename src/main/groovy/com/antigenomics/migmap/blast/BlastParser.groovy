@@ -28,8 +28,8 @@ import groovy.transform.CompileStatic
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.regex.Pattern
 
-import static com.antigenomics.migmap.Util.BLAST_NA
-import static com.antigenomics.migmap.Util.groomMatch
+import static com.antigenomics.migmap.pipeline.Util.BLAST_NA
+import static com.antigenomics.migmap.pipeline.Util.groomMatch
 
 @CompileStatic
 class BlastParser {

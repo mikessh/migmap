@@ -16,8 +16,8 @@
 
 package com.antigenomics.migmap.genomic
 
-import com.antigenomics.migmap.ExecutionUtil
-import com.antigenomics.migmap.Util
+import com.antigenomics.migmap.pipeline.ExecutionUtil
+import com.antigenomics.migmap.pipeline.Util
 import com.antigenomics.migmap.blast.BlastInstanceFactory
 import com.antigenomics.migmap.io.Read
 import com.antigenomics.migmap.mapping.RegionMarkup

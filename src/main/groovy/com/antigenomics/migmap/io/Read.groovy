@@ -16,7 +16,7 @@
 
 package com.antigenomics.migmap.io
 
-import com.antigenomics.migmap.Util
+import com.antigenomics.migmap.pipeline.Util
 import groovy.transform.CompileStatic
 
 class Read implements Serializable {

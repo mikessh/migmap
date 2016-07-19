@@ -16,7 +16,7 @@
 
 package com.antigenomics.migmap.io
 
-import com.antigenomics.migmap.PipelineTestCache
+import com.antigenomics.migmap.pipeline.PipelineTestCache
 import com.antigenomics.migmap.clonotype.Clonotype
 import com.antigenomics.migmap.mutation.Mutation
 import org.junit.Test

@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.antigenomics.migmap
+package com.antigenomics.migmap.pipeline
 
-import com.antigenomics.migmap.blast.BlastInstanceFactory
 import com.antigenomics.migmap.clonotype.Clonotype
-import com.antigenomics.migmap.genomic.SegmentDatabase
+import com.antigenomics.migmap.blast.BlastTestUtil
 import com.antigenomics.migmap.io.ClonotypeOutput
 import com.antigenomics.migmap.io.FastqReader
 import com.antigenomics.migmap.io.InputPortMerge
@@ -30,7 +29,6 @@ import com.antigenomics.migmap.mapping.ReadMappingFilter
 class PipelineTestCache {
     static final PipelineTestCache INSTANCE = new PipelineTestCache()
 
-    final BlastInstanceFactory factory = new BlastInstanceFactory("data/", "human", ["IGH"])
     final Pipeline pipeline
     final ClonotypeOutput clonotypeOutput
 
@@ -38,12 +36,11 @@ class PipelineTestCache {
                clonotypeOutputFile = new File("clonotypes.tmp.txt")
 
     private PipelineTestCache() {
-        factory.annotateV()
-
         def reader = new FastqReader("sample.fastq.gz", true)
         def filter = new ReadMappingFilter()
         clonotypeOutput = new ClonotypeOutput(new PlainTextOutput(new FileOutputStream(clonotypeOutputFile)))
-        pipeline = new Pipeline(reader, factory,
+        pipeline = new Pipeline(reader,
+                BlastTestUtil.blastInstanceFactory,
                 new InputPortMerge(
                         new ReadMappingOutput(new PlainTextOutput(new FileOutputStream(byReadOutputFile)),
                                 new ReadMappingDetailsProvider()),
@@ -58,9 +55,5 @@ class PipelineTestCache {
 
     List<Clonotype> getClonotypes() {
         clonotypeOutput.clonotypeAccumulator.clonotypes
-    }
-
-    SegmentDatabase getSegmentDatabase() {
-        factory.segmentDatabase
     }
 }

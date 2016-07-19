@@ -16,7 +16,6 @@
 
 package com.antigenomics.migmap.blast
 
-import com.antigenomics.migmap.PipelineTestCache
 import com.antigenomics.migmap.io.Read
 import org.junit.Test
 
@@ -46,7 +45,8 @@ class BlastInstanceTest {
 
     @Test
     void singleQueryTest() {
-        def instance = PipelineTestCache.INSTANCE.factory.create()
+        def factory = new BlastInstanceFactory("data/", "human", ["IGH"])
+        def instance = factory.create()
 
         def read = new Read(
                 "@MIG UMI:GGATATGCCGCTC:8",
@@ -82,7 +82,8 @@ class BlastInstanceTest {
     @Test
     void multiQueryTest() {
         int nQueries = 100
-        def instance = PipelineTestCache.INSTANCE.factory.create()
+        def factory = new BlastInstanceFactory("data/", "human", ["IGH"])
+        def instance = factory.create()
 
         def readsIds = new HashSet<String>()
 

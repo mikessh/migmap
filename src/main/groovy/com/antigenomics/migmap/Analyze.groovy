@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.antigenomics.migmap.post
+package com.antigenomics.migmap
 
 import com.antigenomics.migmap.io.ClonotypeSerializer
 import com.antigenomics.migmap.post.analysis.Analysis

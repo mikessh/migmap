@@ -18,6 +18,8 @@ package com.antigenomics.migmap
 
 import com.antigenomics.migmap.blast.BlastInstanceFactory
 import com.antigenomics.migmap.io.Read
+import com.antigenomics.migmap.pipeline.ExecutionUtil
+import com.antigenomics.migmap.pipeline.Util
 
 import java.util.regex.Pattern
 

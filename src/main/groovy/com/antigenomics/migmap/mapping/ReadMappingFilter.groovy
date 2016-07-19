@@ -17,7 +17,7 @@
 
 package com.antigenomics.migmap.mapping
 
-import com.antigenomics.migmap.Util
+import com.antigenomics.migmap.pipeline.Util
 import com.antigenomics.migmap.io.DummyInputPort
 import com.antigenomics.migmap.io.InputPort
 import com.antigenomics.migmap.io.Read

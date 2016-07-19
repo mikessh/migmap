@@ -19,7 +19,7 @@ package com.antigenomics.migmap.blast
 import com.antigenomics.migmap.genomic.Segment
 import groovy.transform.CompileStatic
 
-import static com.antigenomics.migmap.Util.GAP
+import static com.antigenomics.migmap.pipeline.Util.GAP
 
 @CompileStatic
 class RefPointSearcher {

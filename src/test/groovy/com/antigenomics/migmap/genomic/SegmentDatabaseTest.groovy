@@ -66,7 +66,7 @@ class SegmentDatabaseTest {
 
     @Test
     void annotationTestIG() {
-        def factory = new BlastInstanceFactory("data/", "human", ["IGH", "IGK", "IGL"], true, false)
+        def factory = new BlastInstanceFactory("data/", "human", ["IGH", "IGK", "IGL"])
         factory.annotateV()
 
         assert factory.segmentDatabase.annotatedV == factory.segmentDatabase.vSegments
@@ -74,7 +74,7 @@ class SegmentDatabaseTest {
 
     @Test
     void annotationTestTR() {
-        def factory = new BlastInstanceFactory("data/", "human", ["TRA", "TRB", "TRG", "TRD"], true, false)
+        def factory = new BlastInstanceFactory("data/", "human", ["TRA", "TRB", "TRG", "TRD"])
         factory.annotateV()
 
         assert factory.segmentDatabase.annotatedV + 2 == factory.segmentDatabase.vSegments // known 2 unannotateable cases

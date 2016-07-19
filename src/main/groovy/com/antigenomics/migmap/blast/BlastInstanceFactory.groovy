@@ -16,7 +16,7 @@
 
 package com.antigenomics.migmap.blast
 
-import com.antigenomics.migmap.ExecutionUtil
+import com.antigenomics.migmap.pipeline.ExecutionUtil
 import com.antigenomics.migmap.genomic.SegmentDatabase
 
 class BlastInstanceFactory {

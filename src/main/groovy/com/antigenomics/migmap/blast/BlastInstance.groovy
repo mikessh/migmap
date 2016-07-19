@@ -16,7 +16,7 @@
 
 package com.antigenomics.migmap.blast
 
-import com.antigenomics.migmap.Util
+import com.antigenomics.migmap.pipeline.Util
 import com.antigenomics.migmap.genomic.SegmentDatabase
 import com.antigenomics.migmap.io.InputPort
 import com.antigenomics.migmap.io.OutputPort
@@ -31,7 +31,7 @@ import groovy.transform.CompileStatic
 import java.util.regex.Pattern
 
 class BlastInstance implements OutputPort<ReadMapping>, InputPort<Read> {
-    final Queue<Read> reads = new LinkedList<>()
+    final Queue<Read> reads = new LinkedList<>() // todo: optimize?
     final Process proc
     final BufferedReader reader
     final PrintWriter writer
@@ -193,8 +193,7 @@ class BlastInstance implements OutputPort<ReadMapping>, InputPort<Read> {
                 canonical, inFrame, noStop,
                 pSegments)
 
-
-        if(byRead) {
+        if (byRead) {
             MutationConverter.annotateMutationAa(readMapping)
         }
 

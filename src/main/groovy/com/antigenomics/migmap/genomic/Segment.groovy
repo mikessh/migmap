@@ -16,7 +16,7 @@
 
 package com.antigenomics.migmap.genomic
 
-import com.antigenomics.migmap.Util
+import com.antigenomics.migmap.pipeline.Util
 import com.antigenomics.migmap.mapping.RegionMarkup
 import groovy.transform.CompileStatic
 

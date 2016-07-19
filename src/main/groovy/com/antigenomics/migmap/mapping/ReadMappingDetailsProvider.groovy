@@ -19,7 +19,7 @@ package com.antigenomics.migmap.mapping
 import com.antigenomics.migmap.io.Read
 import groovy.transform.CompileStatic
 
-import static com.antigenomics.migmap.Util.translateLinear
+import static com.antigenomics.migmap.pipeline.Util.translateLinear
 import static java.lang.Math.max
 
 class ReadMappingDetailsProvider {

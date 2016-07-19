@@ -16,7 +16,7 @@
 
 package com.antigenomics.migmap.blast
 
-import com.antigenomics.migmap.Util
+import com.antigenomics.migmap.pipeline.Util
 import groovy.transform.CompileStatic
 
 @CompileStatic

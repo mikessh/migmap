@@ -21,6 +21,9 @@ import com.antigenomics.migmap.genomic.SegmentDatabase
 import com.antigenomics.migmap.io.*
 import com.antigenomics.migmap.mapping.ReadMappingDetailsProvider
 import com.antigenomics.migmap.mapping.ReadMappingFilter
+import com.antigenomics.migmap.pipeline.ExecutionUtil
+import com.antigenomics.migmap.pipeline.Pipeline
+import com.antigenomics.migmap.pipeline.Util
 
 def ALLOWED_SPECIES = [SegmentDatabase.SPECIES_ALIAS.keySet(), SegmentDatabase.SPECIES_ALIAS.values()].flatten(),
     ALLOWED_CHAINS = ["TRA", "TRB", "TRG", "TRD", "IGH", "IGL", "IGK"],

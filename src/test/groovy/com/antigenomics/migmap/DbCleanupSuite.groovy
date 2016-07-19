@@ -24,19 +24,28 @@ import com.antigenomics.migmap.blast.RefPointSearcherTest
 import com.antigenomics.migmap.genomic.ReadMappingDetailsProviderTest
 import com.antigenomics.migmap.genomic.SegmentDatabase
 import com.antigenomics.migmap.genomic.SegmentDatabaseTest
+import com.antigenomics.migmap.mutation.MutationConverterTest
+import com.antigenomics.migmap.mutation.MutationExtractorTest
+import com.antigenomics.migmap.mutation.MutationFormatterTest
+import com.antigenomics.migmap.pipeline.PipelineTest
 import org.junit.AfterClass
 import org.junit.runner.RunWith
 import org.junit.runners.Suite
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses([PipelineTest.class,
+@Suite.SuiteClasses([
         BlastInstanceFactoryTest.class,
         BlastParserTest.class,
         DSegmentTest.class,
         PSegmentTest.class,
         RefPointSearcherTest.class,
         ReadMappingDetailsProviderTest.class,
-        SegmentDatabaseTest.class])
+        SegmentDatabaseTest.class,
+        MutationConverterTest.class,
+        MutationExtractorTest.class,
+        MutationFormatterTest.class,
+        PipelineTest.class
+])
 class DbCleanupSuite {
     @AfterClass
     static void tearDown() {

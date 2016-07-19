@@ -36,7 +36,7 @@ class DSegmentTest {
         assert readMapping.mapping.cdr3Markup.dEnd == 30
     }
 
-    /*@Ignore
+    @Ignore
     @Test
     void dRecoveryTest() {
         //         ................A........--------------------------------------------
@@ -56,5 +56,5 @@ class DSegmentTest {
         assert readMapping.mapping.dSegment.name == "IGHD2-15*01"
         assert readMapping.mapping.cdr3Markup.dStart == 8
         assert readMapping.mapping.cdr3Markup.dEnd == 12
-    }*/
+    }
 }
