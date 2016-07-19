@@ -24,6 +24,7 @@ import com.antigenomics.migmap.mapping.Cdr3Markup
 import com.antigenomics.migmap.mapping.Truncations
 import com.antigenomics.migmap.mutation.Mutation
 import com.antigenomics.migmap.mutation.SubRegion
+import com.antigenomics.migmap.pipeline.Util
 import groovy.transform.CompileStatic
 
 @CompileStatic
@@ -59,8 +60,8 @@ class ClonotypeLoader {
         dEndInCdr3Ind = columnIndexMap["d.end.in.cdr3"]
         jStartInCdr3Ind = columnIndexMap["j.start.in.cdr3"]
         vDelInd = columnIndexMap["v.del"]
-        dDel5Ind = columnIndexMap["d.del.3"]
-        dDel3Ind = columnIndexMap["d.del.5"]
+        dDel5Ind = columnIndexMap["d.del.5"]
+        dDel3Ind = columnIndexMap["d.del.3"]
         jDelInd = columnIndexMap["j.del"]
         polVInd = columnIndexMap["pol.v"]
         polD5Ind = columnIndexMap["pol.d.5"]
@@ -82,9 +83,9 @@ class ClonotypeLoader {
                 def clonotype = new Clonotype(
                         splitLine[cdr3ntInd],
                         splitLine[cdr3aaInd],
-                        decodeSegment(splitLine[vInd]),
-                        decodeSegment(splitLine[dInd]),
-                        decodeSegment(splitLine[jInd]),
+                        decodeSegment(splitLine[vInd], SegmentType.V),
+                        decodeSegment(splitLine[dInd], SegmentType.D),
+                        decodeSegment(splitLine[jInd], SegmentType.J),
                         decodeMutations(splitLine),
                         splitLine[countInd].toLong(),
                         splitLine[freqInd].toDouble(),
@@ -166,8 +167,16 @@ class ClonotypeLoader {
                 splitLine[polJInd].toInteger())
     }
 
-    static Segment decodeSegment(String name) {
+    static Segment decodeSegment(String name, SegmentType segmentType) {
         // todo: use SegmentDatabase
+        name = name.trim()
+
+        if (name.length() == 0 || name == Util.MY_NA) {
+            if (segmentType == SegmentType.V)
+                throw new RuntimeException("Variable segment field cannot be blank")
+            return segmentType == SegmentType.D ? Segment.DUMMY_D : Segment.DUMMY_J
+        }
+
         new Segment(null, SegmentType.valueOf(name[3]), name[0..2], name, null, -1)
     }
 }
