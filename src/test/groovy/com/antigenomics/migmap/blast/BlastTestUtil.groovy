@@ -50,8 +50,10 @@ class BlastTestUtil {
 
     static String toChunk(Read read) {
         def instance = blastInstanceFactory.create()
+
         instance.put(read)
         instance.put(null)
+
         instance.nextChunk()
     }
 

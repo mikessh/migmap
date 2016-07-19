@@ -49,6 +49,6 @@ import org.junit.runners.Suite
 class DbCleanupSuite {
     @AfterClass
     static void tearDown() {
-        SegmentDatabase.clearTemporaryFiles()
+       // SegmentDatabase.clearTemporaryFiles()
     }
 }
