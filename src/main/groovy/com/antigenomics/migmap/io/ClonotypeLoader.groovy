@@ -110,17 +110,21 @@ class ClonotypeLoader {
     static List<Mutation> decodeMutations(String[] splitLine) {
         def mutations = new ArrayList<Mutation>()
         SubRegion.REGION_LIST.each { SubRegion subRegion ->
-            def ntMutations = splitLine[columnIndexMap["mutations.nt." + subRegion.toString()]].split(","),
-                aaMutations = splitLine[columnIndexMap["mutations.aa." + subRegion.toString()]].split(",")
+            def ntMutationStr = splitLine[columnIndexMap["mutations.nt." + subRegion.toString()]].trim()
 
-            for (int i = 0; i < ntMutations.length; i++) {
-                def ntMutation = ntMutations[i],
-                    aaMutation = aaMutations[i]
+            if (ntMutationStr.length() > 0) {
+                def ntMutations = ntMutationStr.split(","),
+                    aaMutations = splitLine[columnIndexMap["mutations.aa." + subRegion.toString()]].trim().split(",")
 
-                def mutation = Mutation.fromString(ntMutation, aaMutation)
+                for (int i = 0; i < ntMutations.length; i++) {
+                    def ntMutation = ntMutations[i],
+                        aaMutation = aaMutations[i]
 
-                mutation.subRegion = subRegion
-                // todo: Parent segment (need segment database and some special coding magick)
+                    def mutation = Mutation.fromString(ntMutation, aaMutation)
+
+                    mutation.subRegion = subRegion
+                    // todo: Parent segment (need segment database and some special coding magick)
+                }
             }
         }
         mutations

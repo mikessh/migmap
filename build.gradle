@@ -47,4 +47,10 @@ test {
             }
         }
     }
+
+    addShutdownHook {
+        new File("data/").listFiles().findAll { it.name.startsWith("database-") }.each {
+            it.deleteDir()
+        }
+    }
 }
