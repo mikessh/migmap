@@ -9,6 +9,6 @@ do
     fi
 done
 
-java -Xmx4G -cp `ls build/libs/migmap-*.jar` com.antigenomics.migmap.Analyze raji.txt
+java -Xmx4G -cp `ls build/libs/migmap-*.jar` com.antigenomics.migmap.Analyze -S human -R IGH raji.txt
 
 ls -lh
