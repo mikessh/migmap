@@ -18,6 +18,7 @@ package com.antigenomics.migmap.pipeline
 
 import com.antigenomics.migmap.clonotype.Clonotype
 import com.antigenomics.migmap.blast.BlastTestUtil
+import com.antigenomics.migmap.genomic.SegmentDatabase
 import com.antigenomics.migmap.io.ClonotypeOutput
 import com.antigenomics.migmap.io.FastqReader
 import com.antigenomics.migmap.io.InputPortMerge
@@ -31,6 +32,7 @@ class PipelineTestCache {
 
     final Pipeline pipeline
     final ClonotypeOutput clonotypeOutput
+    final SegmentDatabase segmentDatabase
 
     final File byReadOutputFile = new File("byread.tmp.txt"),
                clonotypeOutputFile = new File("clonotypes.tmp.txt")
@@ -48,6 +50,8 @@ class PipelineTestCache {
                 filter)
 
         pipeline.run()
+
+        segmentDatabase = pipeline.blastInstanceFactory.segmentDatabase
 
         clonotypeOutputFile.deleteOnExit()
         byReadOutputFile.deleteOnExit()

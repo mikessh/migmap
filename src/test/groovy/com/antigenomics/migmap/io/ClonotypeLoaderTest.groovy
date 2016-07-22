@@ -28,7 +28,7 @@ class ClonotypeLoaderTest {
         def ntMut = "S5:G>A,S8:G>C,S41:T>G,S67:C>A,S70:C>T,S71:C>T"
         def aaMut = "S1:V>V,S2:Q>H,S13:P>P,S22:A>E,S23:A>V,S23:A>V"
 
-        def mutations = ClonotypeLoader.decodeMutations(ntMut, aaMut, SubRegion.FR1)
+        def mutations = ClonotypeLoader.decodeMutations(ntMut, aaMut, SubRegion.FR1, null, null, null, null)
 
         assert ntMut == mutations.collect { it.toString() }.join(",")
         assert aaMut == mutations.collect { it.toStringAa() }.join(",")
@@ -39,7 +39,7 @@ class ClonotypeLoaderTest {
         def ntMut = "S5:G>A"
         def aaMut = "S1:V>V"
 
-        def mutations = ClonotypeLoader.decodeMutations(ntMut, aaMut, SubRegion.FR1)
+        def mutations = ClonotypeLoader.decodeMutations(ntMut, aaMut, SubRegion.FR1, null, null, null, null)
 
         assert ntMut == mutations.collect { it.toString() }.join(",")
         assert aaMut == mutations.collect { it.toStringAa() }.join(",")
@@ -50,7 +50,7 @@ class ClonotypeLoaderTest {
         def ntMut = ""
         def aaMut = ""
 
-        def mutations = ClonotypeLoader.decodeMutations(ntMut, aaMut, SubRegion.FR1)
+        def mutations = ClonotypeLoader.decodeMutations(ntMut, aaMut, SubRegion.FR1, null, null, null, null)
 
         assert ntMut == mutations.collect { it.toString() }.join(",")
         assert aaMut == mutations.collect { it.toStringAa() }.join(",")
@@ -60,7 +60,8 @@ class ClonotypeLoaderTest {
     void loadSavedTest() {
         def originalClonotypes = PipelineTestCache.INSTANCE.clonotypes
 
-        def loadedClonotypes = ClonotypeLoader.load(PipelineTestCache.INSTANCE.clonotypeOutputFile)
+        def loadedClonotypes = ClonotypeLoader.load(PipelineTestCache.INSTANCE.clonotypeOutputFile,
+                PipelineTestCache.INSTANCE.segmentDatabase)
 
         assert originalClonotypes.size() == loadedClonotypes.size()
 

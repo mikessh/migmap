@@ -19,6 +19,7 @@ package com.antigenomics.migmap.io
 import com.antigenomics.migmap.blast.PSegments
 import com.antigenomics.migmap.clonotype.Clonotype
 import com.antigenomics.migmap.genomic.Segment
+import com.antigenomics.migmap.genomic.SegmentDatabase
 import com.antigenomics.migmap.genomic.SegmentType
 import com.antigenomics.migmap.mapping.Cdr3Markup
 import com.antigenomics.migmap.mapping.Truncations
@@ -69,7 +70,8 @@ class ClonotypeLoader {
         polJInd = columnIndexMap["pol.j"]
     }
 
-    static List<Clonotype> load(File plainTextOutputFile) {
+    static List<Clonotype> load(File plainTextOutputFile,
+                                SegmentDatabase segmentDatabase) {
         def clonotypes = new ArrayList<Clonotype>()
         boolean firstLine = true
 
@@ -80,13 +82,19 @@ class ClonotypeLoader {
                 }
                 firstLine = false
             } else {
+                def vSegm = decodeSegment(splitLine[vInd], SegmentType.V, segmentDatabase),
+                    dSegm = decodeSegment(splitLine[dInd], SegmentType.D, segmentDatabase),
+                    jSegm = decodeSegment(splitLine[jInd], SegmentType.J, segmentDatabase),
+                    cdr3Markup = decodeCdr3Markup(splitLine)
+
                 def clonotype = new Clonotype(
                         splitLine[cdr3ntInd],
                         splitLine[cdr3aaInd],
-                        decodeSegment(splitLine[vInd], SegmentType.V),
-                        decodeSegment(splitLine[dInd], SegmentType.D),
-                        decodeSegment(splitLine[jInd], SegmentType.J),
-                        decodeMutations(splitLine),
+                        vSegm,
+                        dSegm,
+                        jSegm,
+                        decodeMutations(splitLine, vSegm, dSegm, jSegm,
+                                cdr3Markup),
                         splitLine[countInd].toLong(),
                         splitLine[freqInd].toDouble(),
                         null,
@@ -96,7 +104,7 @@ class ClonotypeLoader {
                         splitLine[noStopInd].toBoolean(),
                         splitLine[completeInd].toBoolean(),
                         splitLine[canonicalInd].toBoolean(),
-                        decodeCdr3Markup(splitLine),
+                        cdr3Markup,
                         decodeTruncations(splitLine),
                         decodePSegments(splitLine)
                 )
@@ -108,13 +116,19 @@ class ClonotypeLoader {
         clonotypes
     }
 
-    static List<Mutation> decodeMutations(String[] splitLine) {
+    static List<Mutation> decodeMutations(String[] splitLine,
+                                          Segment vSegm,
+                                          Segment dSegm,
+                                          Segment jSegm,
+                                          Cdr3Markup cdr3Markup) {
         def mutations = new ArrayList<Mutation>()
         SubRegion.REGION_LIST.each { SubRegion subRegion ->
             def ntMutationStr = splitLine[columnIndexMap["mutations.nt." + subRegion.toString()]].trim(),
                 aaMutationStr = splitLine[columnIndexMap["mutations.aa." + subRegion.toString()]].trim()
 
-            def regionMutations = decodeMutations(ntMutationStr, aaMutationStr, subRegion)
+            def regionMutations = decodeMutations(ntMutationStr, aaMutationStr, subRegion,
+                    vSegm, dSegm, jSegm,
+                    cdr3Markup)
             mutations.addAll(regionMutations)
         }
         mutations
@@ -122,7 +136,11 @@ class ClonotypeLoader {
 
     static List<Mutation> decodeMutations(String ntString,
                                           String aaString,
-                                          SubRegion subRegion) {
+                                          SubRegion subRegion,
+                                          Segment vSegm,
+                                          Segment dSegm,
+                                          Segment jSegm,
+                                          Cdr3Markup cdr3Markup) {
         def mutations = new ArrayList<Mutation>()
 
         if (ntString.length() == 0)
@@ -138,7 +156,23 @@ class ClonotypeLoader {
             def mutation = Mutation.fromString(ntMutation, aaMutation)
 
             mutation.subRegion = subRegion
-            // todo: Parent segment (need segment database and some special coding magick)
+
+            // Define parent segment
+
+            if (subRegion == SubRegion.CDR3) {
+                int mutationPosRel = mutation.pos - vSegm.referencePoint + 3
+                if (mutationPosRel <= cdr3Markup.vEnd) {
+                    mutation.parent = vSegm
+                } else if (mutationPosRel >= cdr3Markup.jStart) {
+                    mutation.parent = jSegm
+                } else {
+                    mutation.parent = dSegm
+                }
+            } else if (subRegion == SubRegion.FR4) {
+                mutation.parent = jSegm
+            } else {
+                mutation.parent = vSegm
+            }
 
             mutations.add(mutation)
         }
@@ -167,8 +201,7 @@ class ClonotypeLoader {
                 splitLine[polJInd].toInteger())
     }
 
-    static Segment decodeSegment(String name, SegmentType segmentType) {
-        // todo: use SegmentDatabase
+    static Segment decodeSegment(String name, SegmentType segmentType, SegmentDatabase segmentDatabase) {
         name = name.trim()
 
         if (name.length() == 0 || name == Util.MY_NA) {
@@ -177,6 +210,6 @@ class ClonotypeLoader {
             return segmentType == SegmentType.D ? Segment.DUMMY_D : Segment.DUMMY_J
         }
 
-        new Segment(null, SegmentType.valueOf(name[3]), name[0..2], name, null, -1)
+        segmentDatabase.segments[name]
     }
 }
