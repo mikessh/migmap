@@ -34,9 +34,9 @@ class ClonotypeTree {
         def cdr3RepresentativeMap = new HashMap<NucleotideSequence, Clonotype>()
 
         Util.report("- Pre-group by CDR3")
-        sample.each {
-            def cdr3Nt = new NucleotideSequence(it.cdr3nt)
-            cdr3RepresentativeMap.putIfAbsent(cdr3Nt, it)
+        sample.each { Clonotype clonotype ->
+            def cdr3Nt = new NucleotideSequence(clonotype.cdr3nt)
+            cdr3RepresentativeMap.putIfAbsent(cdr3Nt, clonotype)
             def lst = cTree.createIfAbsent(cdr3Nt, new Factory<List<Clonotype>>() {
                 @Override
                 List<Clonotype> create() {
@@ -44,7 +44,7 @@ class ClonotypeTree {
                     list
                 }
             })
-            lst << it
+            lst << clonotype
         }
 
         Util.report("- Finding CDR3 differences explained by SHMs in germline region")

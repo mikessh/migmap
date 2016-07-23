@@ -9,6 +9,10 @@ do
     fi
 done
 
-java -Xmx4G -cp `ls build/libs/migmap-*.jar` com.antigenomics.migmap.Analyze -S human -R IGH raji.txt raji
+MIGMAP_MODULE="java -Xmx4G -cp `ls build/libs/migmap-*.jar`"
+
+$MIGMAP_MODULE com.antigenomics.migmap.MergeContigs -S human -R IGH raji.txt raji_mc.txt
+$MIGMAP_MODULE com.antigenomics.migmap.Correct raji_mc.txt raji_mc_corr.txt
+$MIGMAP_MODULE com.antigenomics.migmap.Analyze -S human -R IGH raji_mc_corr.txt raji
 
 ls -lh
