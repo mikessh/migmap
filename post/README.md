@@ -1,17 +1,9 @@
 ## Post-analysis of MIGMAP output
 
-**IMPORTANT** MIGMAP built-in analysis module requires saving a binary version of output file, which can be done by running
-
-```bash
-java -Xmx8G -jar migmap.jar -R IGH -S human --write-binary out.bin sample.fastq.gz out.txt
-```
-
-Note that ``--write-binary`` option cannot be used together with ``--by-read``.
-
 To summarize somatic hypermutations and generate clonotype trees run
 
 ```bash
-java -Xmx8G -jar migmap.jar com.antigenomics.migmap.Analyze out.bin out
+java -Xmx8G -jar migmap.jar com.antigenomics.migmap.Analyze -S human -R IGH raji_R12.fastq raji_R12
 ```
 
 This folder contains analysis results for IGH repertoire of hypermutating Raji cell line:
