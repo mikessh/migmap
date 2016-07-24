@@ -24,7 +24,7 @@ import com.milaboratory.core.tree.SequenceTreeMap
 import com.milaboratory.core.tree.TreeSearchParameters
 import com.milaboratory.util.Factory
 
-def DEFAULT_ERROR_RATE = "0.01", DEFAULT_DEPTH = "2"
+def DEFAULT_ERROR_RATE = "0.01", DEFAULT_DEPTH = "1"
 
 def cli = new CliBuilder(usage: "Correct [options] clonotype_table.txt output.txt")
 

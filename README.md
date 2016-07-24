@@ -2,7 +2,7 @@
 
 #  MiGMAP: mapper for full-length T- and B-cell repertoire sequencing
 
-In a nutshell, this software is a smart wrapper for [IgBlast](http://www.ncbi.nlm.nih.gov/igblast/igblast.cgi) V-(D)-J mapping tool designed to facilitate analysis immune receptor libraries profiled using high-throughput sequencing.
+In a nutshell, this software is a smart wrapper for [IgBlast](http://www.ncbi.nlm.nih.gov/igblast/igblast.cgi) V-(D)-J mapping tool designed to facilitate analysis immune receptor libraries profiled using high-throughput sequencing. This package includes additional experimental modules for contig assembly, error correction and immunoglobulin lineage tree construction.
 
 The software is distributed as an executable JAR file and a data bundle.
 
@@ -65,7 +65,6 @@ test {
 }
 ```
 
-
 ## Execution
 
 ### General
@@ -76,40 +75,99 @@ To see the full list of MiGMAP options run
 java -jar migmap.jar -h ...
 ```
 
-The memory limit can be extended by using ``-Xmx`` argument (e.g. ``-Xmx8G``). In case installed using **Homebrew** the command to execute MIGMAP is simply ``migmap ...``.
+The memory limit can be extended by using ``-Xmx`` argument (``-Xmx8G`` will be sufficient in most cases). In case installed using **Homebrew** the command to execute MIGMAP is simply ``migmap ...``.
 
-The following command will process ``sample.fastq.gz`` file containing Human Immunoglobulin Heavy Chain reads, assemble clonotypes and store them in ``out.txt``:
+The following command will process ``sample.fastq.gz`` file containing human Immunoglobulin Heavy Chain reads, assemble clonotypes and store them in ``out.txt``:
 
 ```bash
-java -Xmx8G -jar migmap.jar -R IGH -S human sample.fastq.gz out.txt
+java -jar migmap.jar -R IGH -S human sample.fastq.gz out.txt
 ```
 
-MiGMAP can be also run in per-read mode and allows piping results, e.g.:
+MIGMAP accepts both FASTQ and FASTA input files, raw and GZIP-compressed. MiGMAP can be also run in per-read mode and allows piping results, e.g.:
 
 ```bash
-java -Xmx8G -jar migmap.jar --by-read -R IGH -S human sample.fastq.gz - | grep "IGHV1-8" > out.txt
+java -jar migmap.jar --by-read -R IGH -S human sample.fastq.gz - | grep "IGHV1-8" > out.txt
 ```
 
 Several receptor chains can be specified, e.g. ``-R IGH,IGK,IGL``. It is always recommended to map to complete set of TCR or IG genes and filter contaminations (e.g. TRA<>TRB) later.
 
-### Error correction
+The list of possible options is the following:
 
-To merge erroneous variants to their parent clonotypes, execute 
+
+Option              | Definition
+--------------------|------------------------------------------------------------------------
+``--blast-dir`` | Path to folder that contains ``igblastn`` and ``makeblastdb`` binaries, by default assume they are added to ``$PATH`` and execute them directly.
+``--data-dir`` | Path to folder that contains the data bundle (``internal_data/`` and ``optional_file/`` directories). By default it the package is provided with MIGMAP binaries, that is ``install_dir/data/``.
+``--custom-database`` | Path to a custom segments database. By default will use built-in database. See ``segments.txt`` and **Using your own references** for details.
+``-n`` | Number of reads to analyze before stopping. Will analyze all reads by default
+``-p`` | Number of threads to use. By default will use all available threads.
+``--report`` | Path to the file that is going to store MIGMAP report (extraction and filtering efficiency for current input, etc). Will append report line if file exists.
+``-R`` | **REQUIRED** Receptor gene and chain. Several chains can be specified, separated with commas. Allowed values are: ``IGH,IGL,IGK,TRA,TRB,TRG,TRD``.
+``-S`` | **REQUIRED** Species, allowed values: ``human,mouse,rat,rabbit,rhesus_monkey``
+``--all-alleles`` | Will use all alleles provided in the antigen receptor segment database. By default uses only major allele (``*01`` according to IMGT).
+``--use-kabat`` | Will use KABAT nomenclature for FR/CDR region markup. Uses IMGT nomenclature by default.
+``--allow-incomplete`` | Report clonotypes with partial CDR3 mapping (lacking J germline part, etc). By default those are no included into the output.
+``--allow-no-cdr3`` | Report clonotypes with no CDR3 mapping. By default those are no included into the output.
+``--allow-noncoding`` | Report clonotypes that have either stop codon or frameshift in their receptor sequence. By default those are no included into the output.
+``--allow-noncanonical`` | Report clonotypes that have non-canonical CDR3 (do not start with C or end with F/W residues). By default those are no included into the output.
+``-q`` | Quality threshold, ``2-40`` defaults to ``25``. Filter out reads that have at least one error or N-nucleotide with a quality value below the corresponding threshold.
+``--details`` | Specifies the nucleotide and amino acid sequences for certain FR/CDR regions that will be added to the output. Allowed values: ``fr1X,cdr1X,fr2X,cdr2X,fr3X,cdr3X,fr4X,contigX`` where ``X`` stands for ``nt`` or ``aa``. By default all those fileds are included
+``--by-read`` | Will output mapping results for each read (see **Output format** below, excluding frequency and count fields) and read headers.
+``--unmapped`` | Specifies a file to store unmapped reads.
+
+
+### Additional routines
+
+There are several built-in routines implementing common result processing and analysis tasks. Note that one should use ``-cp`` instead of ``-jar`` when executing the module and specify full package name, as shown below. When using ``-cp`` (classpath) for execution always make sure that the path to executable JAR file is set correctly, otherwise JVM will throw some uninformative error message.
+
+#### Merging contigs
+
+``MergeContigs`` routine of MIGMAP merges clonotypes that are represented by embedded contigs. MIGMAP uses CDR3 nucleotide sequence, V and J segment names and mutation list to define a unique clonotype signature. Therefore in case of variable IG/TCR sequence coverage (can be a result of intrinsic library properties and/or read trimming) there is a chance of ambigous clonotypes: e.g. in case two reads coming from a clonotype with a mutation in FR1 region and one of the reads doesn't cover the FR1 two clonotypes will be reported by MIGMAP. To resolve these ambiguities run ``MergeContigs`` utility as follows:
 
 ```bash
-java -Xmx8G -cp migmap.jar com.antigenomics.migmap.Correct out.txt corrected.txt
+java -cp migmap.jar com.antigenomics.migmap.MergeContigs out.txt out_merged.txt
 ```
 
-When using ``-cp`` (classpath) for execution always make sure that the path to executable jar is set correctly, otherwise JVM will throw some uninformative error message.
+This routine will generate a list of clonotypes represented by the set of longest completely overlapping contigs. Note: make sure that you haven't manually excluded ``contignt`` feature from output as in such case the routine will fail.
 
-As always, to see the list of available options run the above command with ``-h`` argument. Minimal parent-to-child ratio allowed per one mismatch can be tweaked using the ``-r`` option. Note that error correction only works for clonotype tables, not by-read output.
+#### Error correction
+
+PCR and sequencing errors, as well as hot-spot PCR errors in case of UMI correct data can generate a great deal of artificial (erroneous) clonotypes, especially in case of full-length IG sequence analysis. To filter erroneous sub-variants and append their read count to corresponding parent clonotypes, execute 
+
+```bash
+java -cp migmap.jar com.antigenomics.migmap.Correct out.txt corrected.txt
+```
+
+There are three error correction options that can be set by user:
+- Minimal parent-to-child read ratio allowed per one mismatch can be tweaked using the ``-r`` option
+- Number of mismatches between parent variant and its error to consider when looking for erroneous subvariants (aka search depth). By default this is set to ``1`` assuming uniform mutation process, i.e. if there is a pair of clonotypes that differ by 2 mismatches due to PCR/sequencing errors, intermediate variants should be present as well.
+- ``--contig`` mode that will work with entire contigs and ignore region context (germline/CDR3 mutations). This option is recommended for full-length IG data analysis and should not be used for short reads.
+
+The algorithm can deal with errors in CDR3 region as well as correctly resolve networks of erroneous sub-variants.
+
+Note that error correction only works for clonotype tables, not by-read output. This step should be ideally executed after ``MergeContigs`` routine.
+
+#### Post-analysis
+
+To summarize somatic hypermutations and generate clonotype trees run
+
+```bash
+java -jar migmap.jar com.antigenomics.migmap.Analyze -S species -R gene out.txt out
+```
+
+Species and receptor parameters are required and should be the same as the ones used in initial MIGMAP analysis. This module will generate several text files with ``out`` prefix:
+
+- ``out.shm.txt`` a flat file with all mutations present in sample that can be processed with ``post/analyze_shm.Rmd`` [R markdown](http://rmarkdown.rstudio.com/) template.
+- ``out.net.txt``, ``out.node.txt`` and ``out.edge.txt`` (network, node and edge properties) that can be imported to [Cytoscape](http://www.cytoscape.org/) using ``Import>Table>`` menu.
+
+For more details and an example analysis of hypermutating Raji cell repertoire go to ``post/`` folder in this repository (or click [here](https://github.com/mikessh/migmap/tree/master/post)).
 
 ### Using your own references
 
 It is possible to use your own references with MiGMAP, given they are in the same format as [internal reference file](https://github.com/mikessh/migmap/blob/master/src/main/resources/segments.txt). Note that you do **not** need to set the reference points, just put ``-1`` in corresponding column and run 
 
 ```bash
-java -Xmx8G -cp migmap.jar com.antigenomics.migmap.AnnotateSegments -S mouse -R TRB my_segments.txt my_segments_with_refs.txt
+java -cp migmap.jar com.antigenomics.migmap.AnnotateSegments -S mouse -R TRB my_segments.txt my_segments_with_refs.txt
 ```
 
 Here you are required to set the receptor(s) (``-R``) and species (``-S``), run the command with ``-h`` to see the list of available options.
@@ -117,30 +175,6 @@ Choose the closest receptor(s) and species, however don't worry as the Variable 
 Next, run MiGMAP with ``--custom-database my_segments_with_refs.txt`` selecting same receptor(s) and species as before.
 
 To convert references in IMGT format into MIGEC/MiGMAP reference format use [imgtparser](https://github.com/antigenomics/imgtparser).
-
-### Post-analysis
-
-**IMPORTANT** MIGMAP built-in analysis module requires saving a binary version of output file, which can be done by running
-
-```bash
-java -Xmx8G -jar migmap.jar -R IGH -S human --write-binary out.bin sample.fastq.gz out.txt
-```
-
-Note that ``--write-binary`` option cannot be used together with ``--by-read``.
-
-To summarize somatic hypermutations and generate clonotype trees run
-
-```bash
-java -Xmx8G -jar migmap.jar com.antigenomics.migmap.Analyze out.bin out
-```
-
-Which will generate several text files with ``out`` prefix:
-
-- ``out.shm.txt`` a flat file with all mutations present in sample that can be processed with ``post/analyze_shm.Rmd`` [R markdown](http://rmarkdown.rstudio.com/) template.
-- ``out.net.txt``, ``out.node.txt`` and ``out.edge.txt`` (network, node and edge properties) that can be imported to [Cytoscape](http://www.cytoscape.org/) using ``Import>Table>`` menu.
-
-For more details and an example analysis of hypermutating Raji cell repertoire go to ``post/`` folder in this repository (or click [here](https://github.com/mikessh/migmap/tree/master/post)).
-
 
 ## Output format
 
@@ -201,4 +235,4 @@ canonical           | *true* if CDR3 region starts with C residue and ends with 
 
 Note that all coordinates are 0-based.
 
-In case the ``--details ...`` option is specified, corresponding columns will be added to output. E.g. ``--details cdr1nt,contigaa`` will add CDR1 nucleotide sequence and translated complete receptor sequence to the table.
+In case the ``--details ...`` option is specified, corresponding columns will be added to output. E.g. ``--details cdr1nt,contigaa`` will add CDR1 nucleotide sequence and translated complete receptor sequence to the table. By default, all nucleotide and amino acid sequences for FR/CDR regions and entire contigs are added.
