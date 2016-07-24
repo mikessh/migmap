@@ -25,86 +25,93 @@ import com.milaboratory.core.tree.SequenceTreeMap
 import com.milaboratory.core.tree.TreeSearchParameters
 import com.milaboratory.util.Factory
 
+import java.util.concurrent.ConcurrentHashMap
+
 class ClonotypeTree {
     static final TreeSearchParameters germOnlyDiffSearchParams = new TreeSearchParameters(5, 0, 0, 5)
 
     // Grouping by CDR3
-    static Collection<List<Clonotype>> groupClonotypesByCdr3(Iterable<Clonotype> sample) {
-        def cTree = new SequenceTreeMap<NucleotideSequence, List<Clonotype>>(NucleotideSequence.ALPHABET)
-        def cdr3RepresentativeMap = new HashMap<NucleotideSequence, Clonotype>()
+    static List<List<Clonotype>> groupClonotypesByCdr3(Iterable<Clonotype> sample) {
+        def cTree = new SequenceTreeMap<NucleotideSequence,
+                CdrNode>(NucleotideSequence.ALPHABET)
 
         Util.report("- Pre-group by CDR3")
         sample.each { Clonotype clonotype ->
             def cdr3Nt = new NucleotideSequence(clonotype.cdr3nt)
-            cdr3RepresentativeMap.putIfAbsent(cdr3Nt, clonotype)
-            def lst = cTree.createIfAbsent(cdr3Nt, new Factory<List<Clonotype>>() {
+            def cdrNode = cTree.createIfAbsent(cdr3Nt, new Factory<CdrNode>() {
                 @Override
-                List<Clonotype> create() {
-                    def list = new ArrayList<Clonotype>()
-                    list
+                CdrNode create() {
+                    new CdrNode(clonotype)
                 }
             })
-            lst << clonotype
+            cdrNode.clonotypes.add(clonotype)
         }
 
         Util.report("- Finding CDR3 differences explained by SHMs in germline region")
-        def cdr3MatchWithoutGermlineNet = new HashMap<NucleotideSequence, CNode>()
-        cdr3RepresentativeMap.each {
-            def niter = cTree.getNeighborhoodIterator(it.key, germOnlyDiffSearchParams)
-            def cNode
-            cdr3MatchWithoutGermlineNet.put(it.key, cNode = new CNode(cdr3MatchWithoutGermlineNet, it.key))
 
-            def nextClonotypeList
-            while ((nextClonotypeList = niter.next()) != null) {
-                def otherRepresentativeClone = nextClonotypeList.first()
-                def otherCdr3Nt = new NucleotideSequence(otherRepresentativeClone.cdr3nt)
+        def cdrNodeMappingsMap = new ConcurrentHashMap<CdrNode, Set<CdrNode>>()
 
-                if (!cdr3MatchWithoutGermlineNet.containsKey(otherCdr3Nt) && !it.key.equals(otherCdr3Nt)) {
+        cTree.values().eachParallel { CdrNode cdrNode ->
+            def niter = cTree.getNeighborhoodIterator(cdrNode.cdr3,
+                    germOnlyDiffSearchParams)
+
+            def prevCdr3Hash = new HashSet<NucleotideSequence>()
+            prevCdr3Hash.add(cdrNode.cdr3)
+            def mappings = new HashSet<CdrNode>()
+
+            def nextCdrNode
+            while ((nextCdrNode = niter.next()) != null) {
+                if (!prevCdr3Hash.contains(nextCdrNode.cdr3)) {
+                    prevCdr3Hash.add(nextCdrNode.cdr3)
+
                     def alignment = niter.currentAlignment
 
-                    if (cdr3MatchWithoutGermlineMutations(it.value, otherRepresentativeClone,
-                            otherCdr3Nt, alignment)) {
-                        cNode.children.add(otherCdr3Nt)
+                    if (cdr3MatchWithoutGermlineMutations(cdrNode.representative,
+                            nextCdrNode.representative,
+                            nextCdrNode.cdr3,
+                            alignment)) {
+                        mappings.add(nextCdrNode)
                     }
                 }
             }
+            cdrNodeMappingsMap.put(cdrNode, mappings)
         }
 
         Util.report("- Aggregating")
-        cdr3MatchWithoutGermlineNet.each {
-            if (!it.value.parent) {
-                it.value.assignParent(it.key)
+        def usedNodes = new HashSet<CdrNode>()
+
+        def addMappings = { Set<CdrNode> nodes ->
+            def origSize = nodes.size()
+
+            nodes.collect().each {
+                nodes.addAll(cdrNodeMappingsMap[it])
+            }
+
+            origSize < nodes.size()
+        }
+
+        def groupedClonotypes = new ArrayList<List<Clonotype>>()
+
+        cdrNodeMappingsMap.keySet().each {
+            if (!usedNodes.contains(it)) {
+                def mappings = new HashSet<CdrNode>()
+                mappings.add(it)
+
+                while (addMappings(mappings));
+
+                usedNodes.addAll(mappings)
+
+                def clonotypeGroup = new ArrayList<Clonotype>()
+
+                mappings.each {
+                    clonotypeGroup.addAll(it.clonotypes)
+                }
+
+                groupedClonotypes.add(clonotypeGroup)
             }
         }
 
-        def groupedMap = new HashMap<NucleotideSequence, List<Clonotype>>()
-
-        cdr3MatchWithoutGermlineNet.values().each {
-            def clonotypeList
-            groupedMap.put(it.parent, clonotypeList = (groupedMap[it.parent] ?: new ArrayList<Clonotype>()))
-            clonotypeList.addAll(cTree.get(it.tag))
-        }
-
-        groupedMap.values()
-    }
-
-    private static class CNode {
-        final HashMap<NucleotideSequence, CNode> net
-        final List<NucleotideSequence> children = new ArrayList<>()
-        final NucleotideSequence tag
-        NucleotideSequence parent
-
-        CNode(HashMap<NucleotideSequence, CNode> net, NucleotideSequence tag) {
-            this.net = net
-            this.tag = tag
-        }
-
-        void assignParent(NucleotideSequence parent) {
-            this.parent = parent
-            children.each {
-                net[it].assignParent(parent)
-            }
-        }
+        groupedClonotypes
     }
 
     static boolean inGermline(int position, Clonotype clonotype) {
