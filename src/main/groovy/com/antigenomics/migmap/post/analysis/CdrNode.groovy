@@ -18,7 +18,9 @@ package com.antigenomics.migmap.post.analysis
 
 import com.antigenomics.migmap.clonotype.Clonotype
 import com.milaboratory.core.sequence.NucleotideSequence
+import groovy.transform.CompileStatic
 
+@CompileStatic
 class CdrNode {
     final Clonotype representative
     final NucleotideSequence cdr3

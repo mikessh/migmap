@@ -24,9 +24,12 @@ import com.milaboratory.core.sequence.NucleotideSequence
 import com.milaboratory.core.tree.SequenceTreeMap
 import com.milaboratory.core.tree.TreeSearchParameters
 import com.milaboratory.util.Factory
+import groovy.transform.CompileStatic
+import groovyx.gpars.GParsPool
 
 import java.util.concurrent.ConcurrentHashMap
 
+@CompileStatic
 class ClonotypeTree {
     static final TreeSearchParameters germOnlyDiffSearchParams = new TreeSearchParameters(5, 0, 0, 5)
 
@@ -51,30 +54,32 @@ class ClonotypeTree {
 
         def cdrNodeMappingsMap = new ConcurrentHashMap<CdrNode, Set<CdrNode>>()
 
-        cTree.values().eachParallel { CdrNode cdrNode ->
-            def niter = cTree.getNeighborhoodIterator(cdrNode.cdr3,
-                    germOnlyDiffSearchParams)
+        GParsPool.withPool(Util.N_THREADS) {
+            cTree.values().eachParallel { CdrNode cdrNode ->
+                def niter = cTree.getNeighborhoodIterator(cdrNode.cdr3,
+                        germOnlyDiffSearchParams)
 
-            def prevCdr3Hash = new HashSet<NucleotideSequence>()
-            prevCdr3Hash.add(cdrNode.cdr3)
-            def mappings = new HashSet<CdrNode>()
+                def prevCdr3Hash = new HashSet<NucleotideSequence>()
+                prevCdr3Hash.add(cdrNode.cdr3)
+                def mappings = new HashSet<CdrNode>()
 
-            def nextCdrNode
-            while ((nextCdrNode = niter.next()) != null) {
-                if (!prevCdr3Hash.contains(nextCdrNode.cdr3)) {
-                    prevCdr3Hash.add(nextCdrNode.cdr3)
+                def nextCdrNode
+                while ((nextCdrNode = niter.next()) != null) {
+                    if (!prevCdr3Hash.contains(nextCdrNode.cdr3)) {
+                        prevCdr3Hash.add(nextCdrNode.cdr3)
 
-                    def alignment = niter.currentAlignment
+                        def alignment = niter.currentAlignment
 
-                    if (cdr3MatchWithoutGermlineMutations(cdrNode.representative,
-                            nextCdrNode.representative,
-                            nextCdrNode.cdr3,
-                            alignment)) {
-                        mappings.add(nextCdrNode)
+                        if (cdr3MatchWithoutGermlineMutations(cdrNode.representative,
+                                nextCdrNode.representative,
+                                nextCdrNode.cdr3,
+                                alignment)) {
+                            mappings.add(nextCdrNode)
+                        }
                     }
                 }
+                cdrNodeMappingsMap.put(cdrNode, mappings)
             }
-            cdrNodeMappingsMap.put(cdrNode, mappings)
         }
 
         Util.report("- Aggregating")
