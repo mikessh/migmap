@@ -24,12 +24,10 @@ import com.milaboratory.core.sequence.NucleotideSequence
 import com.milaboratory.core.tree.SequenceTreeMap
 import com.milaboratory.core.tree.TreeSearchParameters
 import com.milaboratory.util.Factory
-import groovy.transform.CompileStatic
 import groovyx.gpars.GParsPool
 
 import java.util.concurrent.ConcurrentHashMap
 
-@CompileStatic
 class ClonotypeTree {
     static final TreeSearchParameters germOnlyDiffSearchParams = new TreeSearchParameters(5, 0, 0, 5)
 
