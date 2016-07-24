@@ -149,6 +149,8 @@ Note that error correction only works for clonotype tables, not by-read output. 
 
 #### Post-analysis
 
+> **IMPORTANT** It is highly recommended that you merge contigs and perform error correction prior to proceeding to post-analysis.
+
 To summarize somatic hypermutations and generate clonotype trees run
 
 ```bash
