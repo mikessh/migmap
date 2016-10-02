@@ -31,9 +31,6 @@ cli.R(args: 1, argName: "chain1,...",
                 "Allowed values: $ALLOWED_CHAINS. [required]")
 cli.S(args: 1, argName: "name",
         "Species. Allowed values: $ALLOWED_SPECIES. [required]")
-cli._(longOpt: "all-alleles",
-        "Will use all alleles during alignment (this is going to be slower). " +
-                "[default = use only major (*01) alleles]")
 
 def opt = cli.parse(args)
 
@@ -42,8 +39,7 @@ if (opt.h || opt == null || opt.arguments().size() != 2) {
     System.exit(3)
 }
 
-def species = (String) opt.S, genes = ((String) opt.R).split(",") as List<String>,
-    allAlleles = (boolean) opt.'all-alleles'
+def species = (String) opt.S, genes = ((String) opt.R).split(",") as List<String>
 
 if (!ALLOWED_SPECIES.contains(species)) {
     Util.error("Unknown species $species.", 3)
@@ -68,7 +64,7 @@ if (tr && ig) {
 
 //
 
-def segmentDatabase = new SegmentDatabase(".", species, genes, allAlleles)
+def segmentDatabase = new SegmentDatabase(".", species, genes)
 
 def inputFile = opt.arguments()[0], outputPrefix = opt.arguments()[1]
 
