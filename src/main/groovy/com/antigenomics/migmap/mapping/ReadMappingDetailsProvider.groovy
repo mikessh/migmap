@@ -24,9 +24,13 @@ import static java.lang.Math.max
 
 class ReadMappingDetailsProvider {
     public static
-    final List<String> ALLOWED_FIELDS = Collections.unmodifiableList(["fr1nt", "cdr1nt", "fr2nt", "cdr2nt", "fr3nt",
+    final List<String> ALLOWED_FIELDS = Collections.unmodifiableList(["fr1nt", "cdr1nt",
+                                                                      "fr2nt", "cdr2nt",
+                                                                      "fr3nt", "fr4nt",
                                                                       "contignt",
-                                                                      "fr1aa", "cdr1aa", "fr2aa", "cdr2aa", "fr3aa",
+                                                                      "fr1aa", "cdr1aa",
+                                                                      "fr2aa", "cdr2aa",
+                                                                      "fr3aa", "fr4aa",
                                                                       "contigaa"])
 
     public static ReadMappingDetailsProvider DUMMY = new ReadMappingDetailsProvider([])
@@ -72,7 +76,7 @@ class ReadMappingDetailsProvider {
     static class ReadMappingDetails {
         final String seq
         final RegionMarkup readMarkup, referenceMarkup
-        final int vStartInRef, vStartInQuery, cdr3Start
+        final int vStartInRef, vStartInQuery, cdr3Start, cdr3End
 
         static final ReadMappingDetails DUMMY = new ReadMappingDetails()
 
@@ -90,6 +94,7 @@ class ReadMappingDetailsProvider {
 
             this.readMarkup = mapping.regionMarkup
             this.cdr3Start = max(readMarkup.cdr2End, readMarkup.cdr3Start)
+            this.cdr3End = readMarkup.cdr3End
         }
 
         ReadMappingDetails() {
@@ -97,6 +102,7 @@ class ReadMappingDetailsProvider {
             this.vStartInRef = 480011
             this.vStartInQuery = vStartInRef
             this.cdr3Start = -1
+            this.cdr3End = -1
             this.referenceMarkup = RegionMarkup.DUMMY
             this.readMarkup = RegionMarkup.DUMMY
         }
@@ -139,6 +145,10 @@ class ReadMappingDetailsProvider {
                     'N' * (referenceMarkup.cdr3Start - referenceMarkup.cdr2End)
         }
 
+        String getFr4nt() {
+            cdr3End >= 0 ? seq.substring(cdr3End) : ""
+        }
+
         String getContignt() {
             fr1nt + cdr1nt + fr2nt + cdr2nt + fr3nt + downstream
         }
@@ -161,6 +171,10 @@ class ReadMappingDetailsProvider {
 
         String getFr3aa() {
             translateLinear(fr3nt)
+        }
+
+        String getFr4aa() {
+            translateLinear(fr4nt)
         }
 
         String getContigaa() {

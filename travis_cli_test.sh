@@ -1,4 +1,4 @@
-MIGMAP="java -Xmx4G -jar `ls build/libs/migmap-*.jar` --blast-dir . --data-dir data/ -S human -R IGH"
+MIGMAP="java -Xmx4G -jar `ls build/libs/migmap-*.jar` --blast-dir . --data-dir data/ -S human -R IGH --details all"
 $MIGMAP post/raji_R12.fastq.gz raji.txt
 $MIGMAP --by-read post/raji_R12.fastq.gz - > raji_reads.txt
 
