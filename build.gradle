@@ -8,12 +8,14 @@ repositories {
     mavenCentral()
 }
 
+mainClassName = "com.antigenomics.migmap.Main"
+
 jar {
     baseName = "migmap"
     version = "1.0.2-SNAPSHOT"
 
     manifest {
-        attributes "Main-Class": "com.antigenomics.migmap.Main"
+        attributes "Main-Class": mainClassName
     }
 
     from {
