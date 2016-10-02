@@ -10,7 +10,7 @@ repositories {
 
 jar {
     baseName = "migmap"
-    version = "1.0.1"
+    version = "1.0.2-SNAPSHOT"
 
     manifest {
         attributes "Main-Class": "com.antigenomics.migmap.Main"
