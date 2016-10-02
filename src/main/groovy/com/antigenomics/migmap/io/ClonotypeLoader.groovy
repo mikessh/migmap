@@ -210,6 +210,10 @@ class ClonotypeLoader {
             return segmentType == SegmentType.D ? Segment.DUMMY_D : Segment.DUMMY_J
         }
 
+        if (!segmentDatabase.segments.containsKey(name)) {
+            throw new RuntimeException("Segment '$name' not found in the database")
+        }
+
         segmentDatabase.segments[name]
     }
 }
