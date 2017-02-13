@@ -36,10 +36,12 @@ class MutationConverter {
             endInRef = (int) ((mutation.end - 1) / 3)
 
         mutation.aaPos = (int) (mutation.pos / 3)
-        mutation.aaFrom = mutation.type == MutationType.Insertion || endInRef >= ref.length() || startInRef < 0 ? "" :
-                ref[startInRef..endInRef]
-        mutation.aaTo = mutation.type == MutationType.Deletion || endInQuery >= ref.length() || startInQuery < 0 ? "" :
-                query[startInQuery..endInQuery]
+        mutation.aaFrom = mutation.type == MutationType.Insertion ? "" :
+                (endInRef >= ref.length() || startInRef < 0 ? "X" :
+                ref[startInRef..endInRef])
+        mutation.aaTo = mutation.type == MutationType.Deletion ? "" :
+                (endInQuery >= ref.length() || startInQuery < 0 ? "X" :
+                query[startInQuery..endInQuery])
     }
 
     static String mutateBack(String readSeq, List<Mutation> mutations) {
