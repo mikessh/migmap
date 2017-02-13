@@ -25,7 +25,7 @@ import com.antigenomics.migmap.pipeline.ExecutionUtil
 import com.antigenomics.migmap.pipeline.Pipeline
 import com.antigenomics.migmap.pipeline.Util
 
-def ALLOWED_SPECIES = [SegmentDatabase.SPECIES_ALIAS.keySet(), SegmentDatabase.SPECIES_ALIAS.values()].flatten(),
+def ALLOWED_SPECIES = SegmentDatabase.SPECIES_ALIAS.keySet(),
     ALLOWED_CHAINS = ["TRA", "TRB", "TRG", "TRD", "IGH", "IGL", "IGK"],
     HOME = new File(this.class.protectionDomain.codeSource.location.path).parent.replaceAll("%20", " "),
     DEFAULT_Q = "25", ERROR_LOG = "_migmap_error.log"

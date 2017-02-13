@@ -45,7 +45,7 @@ class SegmentDatabase implements Serializable {
                     boolean allAlleles = true,
                     String segmentsFilePath = null,
                     String databaseTempPath = null) {
-        this.genes.addAll(genes)
+        this.genes.addAll(genes.collect { it.toUpperCase() })
 
         String speciesAlias = (SPECIES_ALIAS.containsKey(species) ? SPECIES_ALIAS[species] : species).toLowerCase()
 
@@ -53,11 +53,12 @@ class SegmentDatabase implements Serializable {
 
         int vSegments = 0, dSegments = 0, jSegments = 0
 
-        segmentsFilePath ? new File(segmentsFilePath) : Util.getStream("segments.txt", true)
+        (segmentsFilePath ? new FileInputStream(segmentsFilePath) : Util.getStream("segments.txt", true))
                 .splitEachLine("[\t ]+") { List<String> splitLine ->
             if (!splitLine[0].startsWith("#") &&
-                    splitLine[0].toLowerCase().startsWith(speciesAlias) &&
-                    this.genes.contains(splitLine[1])) {
+                    (splitLine[0].toLowerCase().startsWith(speciesAlias) ||
+                            splitLine[0].toLowerCase().startsWith(species))&&
+                    this.genes.contains(splitLine[1].toUpperCase())) {
 
                 def gene = splitLine[1], segmentName = splitLine[3]
 
