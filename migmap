@@ -116,7 +116,7 @@ jar=""
 
 if [[ -z "$otherJar" ]];
 then
-    for j in "$dir/../jar/migmap.jar" "$dir/migmap.jar" $(ls -d -1 $dir/target/* 2> /dev/null | grep distribution.jar)
+    for j in "$dir/../jar/migmap-1.0.2.jar" "$dir/migmap-1.0.2.jar" $(ls -d -1 $dir/target/* 2> /dev/null | grep distribution.jar)
     do
         if [[ -e "$j" ]];
         then
