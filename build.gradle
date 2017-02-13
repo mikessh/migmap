@@ -12,7 +12,7 @@ mainClassName = "com.antigenomics.migmap.Main"
 
 jar {
     baseName = "migmap"
-    version = "1.0.2-SNAPSHOT"
+    version = "1.0.2"
 
     manifest {
         attributes "Main-Class": mainClassName

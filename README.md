@@ -11,7 +11,7 @@ The software is distributed as an executable JAR file and a data bundle.
 
 ## Motivation
 
-IgBlast is an excellent  of V-(D)-J mapping tool able to correctly map even severely hypermutated antibody variants. While being a gold standard, the following limitations apply to IgBlast:
+IgBlast is an excellent  of V-(D)-J mapping tool able to correctly map even severely hypermutated antibody variants. While being a gold standard, the following limitations of IgBlast v1.4.0 have driven MIGMAP development:
 
 - It doesn't extract sequence of CDR3 region directly, neither provide coordinates for CDR3 region in reads. It reports reference Cys residue of Variable segment and Variable segment end in CDR3, but not Phe/Trp residue of J segment that marks the end of CDR3
 
@@ -45,6 +45,8 @@ Present wrapper adds the following capabilities to IgBlast:
 
 [Java v1.8](http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html) is required to run MIGMAP. Users should then install [IgBlast v1.4.0](http://www.ncbi.nlm.nih.gov/igblast/faq.html#standalone) binaries that are appropriate for their system and make sure that ``igblastn`` and ``makeblastdb`` are added to ``$PATH`` or the directory that contains binaries is specified using ``--blast-dir /path/to/bin/`` argument during MiGMAP execution. IgBlast v1.4.0 binaries can also be downloaded from [here](https://github.com/mikessh/igblast-bin).
 
+> Note that MIGMAP also works with IgBlast v1.6.1, although this was not tested extensively
+
 A data folder named ``data/`` containing binary databases required for IgBlast to work is provided in the release bundle. It can also explicitly specify its path with ``--blast-dir /path/to/bin/`` for troubleshooting purposes.
 
 
@@ -56,6 +58,8 @@ See [latest release](https://github.com/mikessh/migmap/releases/latest) section 
 brew tap mikessh/repseq
 brew install migmap-macos # or migmap-linux
 ```
+
+Another option is to intall MIGMAP using BIOCONDA, see corresponding [recipe](http://bioconda.github.io/recipes/migmap/README.html).
 
 MiGMAP can be compiled from sources using [Gradle](https://gradle.org/) with ``gradle build``. Note that in order for tests to pass IgBlast binaries should be in ``$PATH`` variable, you may need to modify following part of ``build.gradle`` 
 
