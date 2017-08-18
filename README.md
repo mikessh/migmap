@@ -52,7 +52,7 @@ A data folder named ``data/`` containing binary databases required for IgBlast t
 
 ## Installation
 
-See [latest release](https://github.com/mikessh/migmap/releases/latest) section for MiGMAP package. For Windows you need to both install IgBlast and download the latest release. For MacOS and Linux, MIGMAP can be easily installed using [Homebrew/Linuxbrew](http://brew.sh) (no need to download anything/manually install IgBlast):
+See [latest release](https://github.com/mikessh/migmap/releases/latest) section for MiGMAP package. For Windows you need to both install IgBlast and download the latest release. For MacOS and Linux, MIGMAP can be easily installed using [Homebrew/Linuxbrew](http://brew.sh) or [bioconda](https://bioconda.github.io/) (no need to download anything/manually install IgBlast):
 
 ```bash
 brew tap mikessh/repseq
