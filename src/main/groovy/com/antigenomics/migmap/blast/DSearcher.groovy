@@ -64,7 +64,7 @@ class DSearcher {
                     return new AuxiliaryDMapping(from,
                             from + i,
                             // binomial P-value, uniform base distribution
-                            1.0 - Math.pow(1.0 - Math.pow(0.25, i), regionSize - i + 1),
+                            1.0d - Math.pow(1.0d - Math.pow(0.25d, i), regionSize - i + 1),
                             hitSegments
                     )
                 }

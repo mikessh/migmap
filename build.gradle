@@ -12,7 +12,7 @@ mainClassName = "com.antigenomics.migmap.Main"
 
 jar {
     baseName = "migmap"
-    version = "1.0.2"
+    version = "1.0.3"
 
     manifest {
         attributes "Main-Class": mainClassName
@@ -32,8 +32,8 @@ sourceSets {
 }
 
 dependencies {
-    compile 'org.codehaus.groovy:groovy-all:2.4.4'
-    compile 'org.codehaus.gpars:gpars:1.0.0'
+    compile 'org.codehaus.groovy:groovy-all:2.4.13'
+    compile 'org.codehaus.gpars:gpars:1.2.1'
     compile 'junit:junit:4.12'
     compile 'commons-cli:commons-cli:1.2'
     compile 'com.milaboratory:milib:1.2'
