@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/mikessh/migec.svg?branch=master)]((https://travis-ci.org/mikessh/migmap))
+[![Build Status](https://travis-ci.org/mikessh/migec.svg?branch=master)](https://travis-ci.org/mikessh/migmap)
 
 #  MiGMAP: mapper for full-length T- and B-cell repertoire sequencing
 
