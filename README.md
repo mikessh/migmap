@@ -158,7 +158,7 @@ Note that error correction only works for clonotype tables, not by-read output. 
 To summarize somatic hypermutations and generate clonotype trees run
 
 ```bash
-java -jar migmap.jar com.antigenomics.migmap.Analyze -S species -R gene out.txt out
+java -cp migmap.jar com.antigenomics.migmap.Analyze -S species -R gene out.txt out
 ```
 
 Species and receptor parameters are required and should be the same as the ones used in initial MIGMAP analysis. This module will generate several text files with ``out`` prefix:
