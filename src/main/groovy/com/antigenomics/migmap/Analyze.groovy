@@ -48,7 +48,7 @@ if (!ALLOWED_SPECIES.contains(species)) {
 boolean tr = false, ig = false
 genes.each { gene ->
     if (!ALLOWED_CHAINS.contains(gene)) {
-        Util.error("Unknown gene $gene.", 3)
+        Util.error("Unknown gene $gene parameter.", 3)
     }
     if (gene.toUpperCase().startsWith("TR")) {
         tr = true
